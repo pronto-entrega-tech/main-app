@@ -1,14 +1,21 @@
 {
   "expo": {
-    "name": "poupapreco",
+    "name": "Poupa Preço",
     "slug": "poupapreco",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "primaryColor": "#2196F3",
+    "backgroundColor": "#FEFEFE",
+    "scheme": "poupapreco",
+    "icon": "./src/assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./src/assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2196F3"
+    },
+    "androidNavigationBar": {
+      "backgroundColor": "#FFF",
+      "barStyle": "light-content"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -16,17 +23,44 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
+      "package": "com.poupapreco.poupapreco",
+      "versionCode": 1,
+      "icon": "./src/assets/round-icon.png",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      }
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#2196F3"
+      },
+      "intentFilters": [{
+        "action": "VIEW",
+        "data": [
+          {
+            "scheme": "https",
+            "host": "www.poupapreco.com.br",
+            "pathPrefix": "/produto"
+          },
+          {
+            "scheme": "https",
+            "host": "www.poupapreco.com.br",
+            "pathPrefix": "/mercado"
+          }
+        ],
+        "category":[
+          "BROWSABLE",
+          "DEFAULT"
+        ]
+      }]
+    },
+    "ios": {
+      "bundleIdentifier": "com.poupapreco.poupapreco",
+      "buildNumber": "1.0.0",
+      "supportsTablet": false,
+      "icon": "./src/assets/icon.png"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/assets/favicon.png",
+      "themeColor": "#2196F3",
+      "shortName": "PoupaPreço"
     }
   }
 }
