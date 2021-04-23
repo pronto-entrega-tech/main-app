@@ -9,7 +9,7 @@ import Payment from './Payment';
 import PaymentInApp from './PaymentInApp';
 import PaymentOnDelivery from './PaymentOnDelivery';
 import Product, { ProductHeader } from './Product';
-import routes from './routes';
+import routes from '../../constants/routes';
 import Schedule from './Schedule';
 import Splash from './Splash';
 import Search from './Search';

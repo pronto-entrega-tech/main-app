@@ -1,35 +1,33 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { View, Image } from 'react-native';
 import { InitialState, NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
-import { myColors, device, myTitle } from '../../constants'
-import Header from '../../components/Header';
-import Header2 from '../../components/Header2';
-import Splash from './Splash';
-import NewUser from './NewUser';
-import Others from '.';
-import Home from '../Home';
-import Perfil from '../Perfil';
-import { enableScreens } from 'react-native-screens';
+import { myColors, device, myTitle, images } from './src/constants'
+import Header from './src/components/Header';
+import Header2 from './src/components/Header2';
+import Splash from './src/pages/Others/Splash';
+import NewUser from './src/pages/Others/NewUser';
+import Others from './src/pages/Others';
+import Home from './src/pages/Home';
+import Perfil from './src/pages/Perfil';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Loading from '../../components/Loading';
+import Loading from './src/components/Loading';
 import * as Font from 'expo-font';
 import * as Linking from 'expo-linking';
-import myFonts from '../../assets/fonts'
-import BottomTabs from './BottomTabs';
-import linking from './routes';
-import { MyProvider } from '../../functions/MyContext';
-import { View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import myFonts from './src/assets/fonts'
+import BottomTabs from './src/pages/Others/BottomTabs';
+import linking from './src/constants/routes';
+import { MyProvider } from './src/functions/MyContext';
+import MyToast from './src/components/MyToast';
 
 const prefix = Linking.createURL('');
-enableScreens();
 const Stack = createStackNavigator();
 
 const NAVIGATION_PERSISTENCE_KEY = '@poupapreco/NAVIGATION_STATE';
 
 function App() {
   const navigationRef = useRef(null);
-  const [isReady, setIsReady] = useState(!device.web);
+  const [isReady, setIsReady] = useState(false);
   const [initialState, setInitialState] = useState<InitialState | undefined>();
   
   useEffect(() => {
@@ -37,22 +35,29 @@ function App() {
       try {
         const initialUrl = (await Linking.getInitialURL())?.replace(prefix, '');
         
-        if (device.web) {
-          const savedState = await AsyncStorage?.getItem(NAVIGATION_PERSISTENCE_KEY);
-          const state = savedState ? JSON.parse(savedState) : undefined;
+        const savedState = await AsyncStorage?.getItem(NAVIGATION_PERSISTENCE_KEY);
+        const state = savedState ? JSON.parse(savedState) : undefined;
 
-          if (!(initialUrl?.startsWith('/produto') || initialUrl?.startsWith('/mercado')))
-          setInitialState(state);
+        if (!(initialUrl?.startsWith('/produto') || initialUrl?.startsWith('/mercado')))
+        setInitialState(state);
 
-          await Font.loadAsync(myFonts);
-        }
+        await Font.loadAsync(myFonts);
       } finally {
         setIsReady(true);
       }
     })();
   }, []);
 
-  if (!isReady) return <Loading />
+  if (!isReady) {
+    if (device.web) return <Loading />
+    return (
+      <View style={{
+        justifyContent: 'center', alignItems: 'center', flex: 1, backgroundColor: myColors.primaryColor}}>
+        <Image fadeDuration={0} source={images.splash} style={{
+          width: Math.round((device.height * 1284) / 2778), height: device.height}} />
+      </View>
+    )
+  }
   
   return (
     <MyProvider>
@@ -64,7 +69,7 @@ function App() {
         }}
         linking={linking}
         fallback={device.web ? <Loading /> : <View/>}
-        theme={{colors: { primary: myColors.primaryColor, background: myColors.background}}}>
+        theme={{colors: {primary: myColors.primaryColor, background: myColors.background}}}>
         <Stack.Navigator
           screenOptions={TransitionPresets.SlideFromRightIOS}
           headerMode='screen'>
@@ -151,6 +156,7 @@ function App() {
             component={Others.UploadQuestion}
             options={{header: props => <Header {...props} title={'Envie sua dúvida'}/>, title: myTitle}}/>
         </Stack.Navigator>
+        <MyToast />
       </NavigationContainer>
     </MyProvider>
   );

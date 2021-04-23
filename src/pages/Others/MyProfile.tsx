@@ -1,11 +1,23 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
-import { BackHandler, ScrollView } from 'react-native';
+import { BackHandler, ImageURISource, ScrollView } from 'react-native';
 import { Button, Image, Input } from 'react-native-elements';
 import Header from '../../components/Header';
 import IconButton from '../../components/IconButton';
 import ProfileModal from '../../components/ProfileModal';
+import * as ImagePicker from 'expo-image-picker';
 import { myColors, device, images } from '../../constants';
+import { getProfile, saveProfile } from '../../functions/dataStorage';
+import useMyContext from '../../functions/MyContext';
+import Loading from '../../components/Loading';
+
+export interface profileModel {
+  photoUri?: ImageURISource,
+  name?: string,
+  email: string,
+  CPF: string,
+  phone: string,
+}
 
 const emailCorrectRega = /[a-zA-Z0-9.!#$%&'*+/=?`{|}~^-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
 const emailCompleteReg = /^(.+)@(.+)\.(.{2,})$/;
@@ -68,12 +80,36 @@ function phoneMask(value: string) {
 }
 
 function Perfil({navigation}: {navigation: StackNavigationProp<any, any>}) {
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [ready, setReady] = React.useState<boolean>(true)
+  const [buttonLoading, setButtonLoading] = React.useState<boolean>(false)
+  const [profile, setProfile] = React.useState<profileModel>()
   const [modalVisible, setModalVisible] = useState(false);
+  const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [emailError, setEmailError] = useState<string>('');
   const [CPF, setCPF] = useState<string>('');
   const [isCpfValid, setCpfValid] = useState<boolean>(false);
   const [phone, setPhone] = useState<string>('');
+  const { toast } = useMyContext();
+
+  React.useEffect(() => {
+    ImagePicker.getPendingResultAsync().then(result => {
+      if (result.length == 0) return;
+      const image = result[result.length-1]
+      if (!image.cancelled)
+      getProfile()
+        .then(profile => {
+          profile.photoUri = result[result.length-1].uri;
+          saveProfile(profile)
+        })
+        .catch(() => alert('Erro ao salvar foto de perfil'))
+    })
+    getProfile().then(profile => {
+      setProfile(profile)
+      setIsLoading(false)
+    })
+  }, []);
 
   React.useEffect(() => {
     if (!modalVisible) return;
@@ -85,31 +121,43 @@ function Perfil({navigation}: {navigation: StackNavigationProp<any, any>}) {
     return () => backHandler.remove();
   }, [modalVisible]);
 
+  if (isLoading) 
+  return (
+    <Loading />
+  )
+
   return (
     <>
     <Header navigation={navigation} title={'Meu Perfil'}/>
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{backgroundColor: myColors.background, alignItems: 'center', paddingHorizontal: 4, paddingTop: 12, paddingBottom: 40}}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{backgroundColor: myColors.background, alignItems: 'center', paddingHorizontal: 4, paddingTop: 12, paddingBottom: 40}}>
       <Image
         placeholderStyle={{backgroundColor: '#FFF'}}
-        style={{height: 120, width: 120}}
-        source={images.account} />
+        style={{height: 120, width: 120, borderRadius: 120}}
+        source={profile?.photoUri? profile.photoUri : images.account} />
       <IconButton onPress={() => setModalVisible(true)} icon='camera-outline' size={32} color={myColors.grey2} type='profile'/>
       <Input
         label='Nome Completo' 
-        placeholder='Seu nome' 
-        labelStyle={{ color: myColors.primaryColor }}  
+        placeholder='Seu nome'
+        defaultValue={profile?.name}
+        labelStyle={{color: myColors.primaryColor}}  
         selectionColor={myColors.colorAccent}
-        autoCompleteType='name' />
+        autoCompleteType='name'
+        textContentType='name'
+        onChangeText={v => setName(v)} />
       <Input
         label='Email'
         errorMessage={emailError}
+        defaultValue={profile?.email}
         placeholder='nome@email.com' 
         keyboardType='email-address' 
         autoCapitalize='none' 
         autoCorrect={false}
-        labelStyle={{ color: myColors.primaryColor }}  
+        labelStyle={{color: myColors.primaryColor}}  
         selectionColor={myColors.colorAccent}
         autoCompleteType='email'
+        textContentType='emailAddress'
         onChangeText={v => {
           setEmail(v)
           if (!emailCorrectRega.test(v.toLowerCase())) return setEmailError('Email inválido')
@@ -118,6 +166,7 @@ function Perfil({navigation}: {navigation: StackNavigationProp<any, any>}) {
       <Input 
         label='CPF'
         errorMessage={CPF.length == 14 && !isCpfValid ? 'CPF inválido' : '' }
+        defaultValue={profile?.CPF}
         placeholder='000.000.000-00' 
         keyboardType='numeric' 
         selectionColor={myColors.colorAccent}
@@ -131,10 +180,12 @@ function Perfil({navigation}: {navigation: StackNavigationProp<any, any>}) {
           }}} />
       <Input 
         label='Número de celular' 
+        defaultValue={profile?.phone}
         placeholder='(00) 0 0000-0000' 
         keyboardType='phone-pad' 
         selectionColor={myColors.colorAccent}
         autoCompleteType='tel'
+        textContentType='telephoneNumber'
         maxLength={16}
         value={phone}
         onChangeText={v => {v != phone? setPhone(phoneMask(v)):null}} />
@@ -145,8 +196,24 @@ function Perfil({navigation}: {navigation: StackNavigationProp<any, any>}) {
       theme={{ colors: { primary: myColors.primaryColor}}}
       buttonStyle={{borderWidth: 2, width: 210, height: 46, backgroundColor: '#fff'}}
       containerStyle={{position: 'absolute', alignSelf: 'center', bottom: device.iPhoneNotch ? 38 : 12}}
-      onPress={()=> null} />
-    <ProfileModal isVisible={modalVisible} setVisible={setModalVisible} />
+      disabled={!ready}
+      loading={buttonLoading}
+      onPress={()=> {
+        if (buttonLoading) return;
+        setButtonLoading(true);
+        saveProfile({
+          photoUri: profile?.photoUri,
+          name: (name != ''? name : undefined),
+          email: email,
+          CPF: CPF,
+          phone: phone,
+        })
+        .then(() => {
+          toast('Perfil atualizado')
+          navigation.navigate('Profile', 'redirect')
+        })
+        }} />
+    <ProfileModal isVisible={modalVisible} setVisible={() => setModalVisible(false)} setProfile={setProfile} />
     </>
   )
 }

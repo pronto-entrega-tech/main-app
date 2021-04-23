@@ -1,3 +1,4 @@
+import { StackNavigationProp } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { View, Text, Image, ImageURISource, ScrollView } from 'react-native';
@@ -27,7 +28,8 @@ const payments: iconText[] = [
   {icon: images.elo, text: 'Elo', payment: {title: 'Débito Elo', sub: 'máquininha'}},
 ]
 
-function PaymentOnDelivery({navigation, route}) {
+function PaymentOnDelivery({navigation, route}: 
+{navigation: StackNavigationProp<any, any>, route: any}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [troco, setTroco] = useState('');
 
@@ -52,7 +54,7 @@ function PaymentOnDelivery({navigation, route}) {
           <Image style={{width: 38, height: 38 }} source={item.icon}  />
           <Text style={{fontSize: 15, fontFamily: 'Medium', color: myColors.text2, marginLeft: 12}} >{item.text}</Text>
         </MyButton>
-        <Divider style={{marginHorizontal: 16, backgroundColor: myColors.divider, height: 1}} />
+        <Divider style={{marginHorizontal: 16, backgroundColor: myColors.divider2, height: 1}} />
       </View>
     )
   }}

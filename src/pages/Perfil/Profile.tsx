@@ -1,12 +1,23 @@
+import { useFocusEffect } from '@react-navigation/core';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { ScrollView, Text, View, StyleSheet } from 'react-native';
 import { Divider, Image, Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { myColors, images, device, globalStyles } from '../../constants';
+import { myColors, images, globalStyles } from '../../constants';
+import { getProfile } from '../../functions/dataStorage';
+import { profileModel } from '../Others/MyProfile';
 
-function Perfil({ navigation }:
-  {navigation: StackNavigationProp<any, any>}) {
+function Perfil({ navigation, route }:
+{navigation: StackNavigationProp<any, any>, route: any}) {
+  const [profile, setProfile] = React.useState<profileModel>()
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      getProfile().then(profile => {setProfile(profile)})
+    }, [])
+  );
+
   const data1: {icon: string, title: string, navegate: string}[] = [
     {icon: 'account', title: 'Meu Perfil', navegate: 'MyProfile'},
     {icon: 'map-marker', title: 'Endereços salvos', navegate: 'Address'},
@@ -20,15 +31,19 @@ function Perfil({ navigation }:
     {icon: 'logout-variant', title: 'Sair da conta', navegate: ''},
   ]
   const data: {icon: string, title: string, navegate: string}[][] = [data1, data2]
+
   return (
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={[{paddingBottom: 50}, globalStyles.notch]}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={globalStyles.notch}
+      contentContainerStyle={{paddingBottom: 68}} >
       <>
         <View style={{flexDirection: 'row', alignItems: 'center', marginLeft: 30, marginBottom: 22, marginTop: 18}} >
           <Image
             placeholderStyle={{backgroundColor: '#FFF'}}
-            style={{height: 100, width: 100, }}
-            source={images.account} />
-          <Text style={{fontSize: 22, color: myColors.grey4, fontWeight: 'bold', marginLeft: 16}} >Convidado</Text>
+            style={{height: 100, width: 100, borderRadius: 100}}
+            source={profile?.photoUri? profile.photoUri : images.account} />
+          <Text style={styles.name} >{profile?.name? profile.name : 'Convidado'}</Text>
         </View>
         {
           data.map((data, index) => (
@@ -74,6 +89,12 @@ const styles = StyleSheet.create({
     backgroundColor: myColors.divider3,
     height: 1,
     marginHorizontal: 16,
+  },
+  name: {
+    fontSize: 22,
+    color: myColors.grey4,
+    fontWeight: 'bold',
+    marginLeft: 16
   },
   card: {
     backgroundColor: '#fff',

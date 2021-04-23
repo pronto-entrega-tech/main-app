@@ -3,6 +3,7 @@ import { mercModel } from "../components/MercItem"
 import { prodModel } from "../components/ProdItem"
 import { orderModel } from "../pages/Compras/Order"
 import { addressModel } from "../pages/Others/Address"
+import { profileModel } from "../pages/Others/MyProfile"
 import requests from "../services/requests"
 
 const suffix = '@poupapreco{g&?Op#b}/'
@@ -133,5 +134,17 @@ export const saveOrdersList = async (value: orderModel[]) => {
 export const getOrdersList = async () => {
   const stringValue =  await AsyncStorage.getItem(suffix+'ordersList')
   const ordersList: orderModel[] = stringValue? JSON.parse(stringValue) : []
+  return ordersList
+}
+
+//profile
+export const saveProfile = async (value: profileModel) => {
+  const stringValue = JSON.stringify(value);
+  await AsyncStorage.setItem(suffix+'ordersList', stringValue)
+}
+
+export const getProfile = async () => {
+  const stringValue =  await AsyncStorage.getItem(suffix+'ordersList')
+  const ordersList: profileModel = stringValue? JSON.parse(stringValue) : undefined
   return ordersList
 }

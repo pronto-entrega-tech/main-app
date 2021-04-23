@@ -7,11 +7,10 @@ import { myColors, device, globalStyles } from '../../constants';
 import { LocationGeocodedLocation } from 'expo-location';
 import { addressModel } from './Address';
 import { saveActiveAddress, saveReturning } from '../../functions/dataStorage';
-import { StatusBar } from 'expo-status-bar';
 
 async function getLocation(setLoading: (b: boolean) => void) {
   setLoading(true)
-  let { status } = await Location.requestPermissionsAsync();
+  let { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== 'granted') return false;
 
   Location.enableNetworkProviderAsync()
@@ -20,14 +19,19 @@ async function getLocation(setLoading: (b: boolean) => void) {
     return false;
   });
 
-  let { coords } = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest });
+  let loc = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest })
+  .catch(() => {return null});
 
+  if (!loc) {
+    Alert.alert('Erro ao obter localização!');
+    return false
+  }
   if (!device.web) {
-    const loc: LocationGeocodedLocation = {
-      latitude: coords.latitude, 
-      longitude: coords.longitude
+    const location: LocationGeocodedLocation = {
+      latitude: loc.coords.latitude, 
+      longitude: loc.coords.longitude
     }
-    let address = (await Location.reverseGeocodeAsync(loc))[0];
+    let address = (await Location.reverseGeocodeAsync(location))[0];
     const adress: addressModel = {
       apelido: '',
       rua: (device.iOS ? address.name : address.street)?.replace('Avenida', 'Av.')+'',
@@ -35,8 +39,8 @@ async function getLocation(setLoading: (b: boolean) => void) {
       bairro: address.district != null ? address.district : '',
       cidade: (device.iOS ? address.city : address.subregion)+'',
       estado: address.region+'',
-      latitude: coords.latitude,
-      longitude: coords.longitude
+      latitude: loc.coords.latitude,
+      longitude: loc.coords.longitude
     };
     
     saveActiveAddress(adress)
@@ -49,8 +53,8 @@ async function getLocation(setLoading: (b: boolean) => void) {
       bairro: 'Samuel Grahan',
       cidade: 'Jataí',
       estado: 'GO',
-      latitude: coords.latitude,
-      longitude: coords.longitude
+      latitude: loc.coords.latitude,
+      longitude: loc.coords.longitude
     };
   
     saveActiveAddress(adress)
@@ -64,8 +68,7 @@ function NewUser({ navigation }:
   
   return (
     <View style={[styles.conteiner, globalStyles.notch]}>
-      <StatusBar backgroundColor={myColors.background} translucent={false} />
-      <Text style={{fontSize: 18, color: myColors.text2}} >Bem-Vindo</Text>
+      <Text style={{fontSize: 18, color: myColors.text2, marginTop: 16}} >Bem-Vindo</Text>
       <View style={{alignItems: 'center'}} >
         <Text style={{fontSize: 20, color: myColors.text5}} >Permitir Localização</Text>
         <Text style={{fontSize: 15, color: myColors.text}} >Para achar as oferts mais próximas de você</Text>
@@ -89,6 +92,7 @@ function NewUser({ navigation }:
           titleStyle={styles.buttonText} containerStyle={styles.buttonConteiner}
           buttonStyle={styles.button}
           onPress={() => {
+            if (loading) return null;
             getLocation(setLoading).then(got => {
               saveReturning()
               if (got) {
@@ -108,7 +112,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flex: 1,
-    paddingTop: device.iPhoneNotch ? 42 : 8
   },
   bottom: {
     marginBottom: device.iPhoneNotch ? 40 : 8,

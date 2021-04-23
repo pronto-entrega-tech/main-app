@@ -46,7 +46,7 @@ function Header2({navigation, fallback}:
           onPress={() => navigation.navigate('Address')} />
       </View>
       <View style={{ marginHorizontal: 16 }} >
-        <Divider style={{backgroundColor: myColors.divider3, height: 1, marginBottom: 8, marginTop: -1 }}/>
+        <Divider style={{backgroundColor: myColors.divider2, height: 1, marginBottom: 8, marginTop: -1 }}/>
         <MySearchbar/>
       </View>
     </View>

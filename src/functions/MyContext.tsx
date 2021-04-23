@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert } from 'react-native';
+import { Alert, Animated } from 'react-native';
 import { prodModel } from '../components/ProdItem';
 import { getActiveMarketKey, getFavorites, getShoppingList, saveActiveMarketKey, saveFavorites, saveShoppingList } from './dataStorage';
 import validate from './validate';
@@ -21,6 +21,12 @@ interface contextModel {
   onPressAdd: (item: prodModel) => void,
   onPressRemove: (item: prodModel) => void,
   setActiveMarketKey: React.Dispatch<React.SetStateAction<number>>,
+  modalState: {
+    message: string;
+    long?: boolean;
+  },
+  toast: (message: string, long?: boolean) => void,
+  modalRefresh: boolean,
 } 
 
 const MyContext = React.createContext<contextModel | undefined>(undefined);
@@ -40,7 +46,22 @@ function MyProvider(props: any) {
   const [shoppingList, setShoppingList] = React.useState<Map<number, {quantity: number, item: prodModel}>>(new Map);
   const [favorites, setFavorites] = React.useState<Map<number, prodModel>>(new Map);
   const doRefresh = () => setRefresh(c => !c);
+  
+  const [modalRefresh, setModalRefresh] = React.useState<boolean>(false);
+  const doModalRefresh = () => setModalRefresh(c => !c);
+  const [modalState, setModalState] = React.useState({
+    message: '',
+    long: false
+  })  
 
+  const toast = (message: string, long = false) => {
+    setModalState({
+      message: message, 
+      long: long,
+    })
+    doModalRefresh()
+  }
+  
   const onPressFav = (item: prodModel) => {
     if (!validate([favorites])) return;
     let isFavorite = favorites.has(item.prodKey);
@@ -139,7 +160,10 @@ function MyProvider(props: any) {
     onPressFav: onPressFav,
     onPressAdd: onPressAdd,
     onPressRemove: onPressRemove,
-    setActiveMarketKey: setActiveMarketKey
+    setActiveMarketKey: setActiveMarketKey,
+    modalState: modalState,
+    toast: toast,
+    modalRefresh: modalRefresh
   }} {...props} />
 }
 

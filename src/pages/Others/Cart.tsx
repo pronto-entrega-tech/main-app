@@ -1,4 +1,3 @@
-import { useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
@@ -18,6 +17,7 @@ import validate from '../../functions/validate';
 import { prodOrderModel } from '../Compras/Order';
 import MyText from '../../components/MyText';
 import requests from '../../services/requests';
+import { PaymentsStripe as Payment } from 'expo-payments-stripe'
 
 export interface scheduleModel {
   dia: string,
@@ -31,7 +31,7 @@ function CartHeader({ navigation, entregar, setEntregar }:
   {navigation: StackNavigationProp<any, any>, entregar: boolean, setEntregar: React.Dispatch<React.SetStateAction<boolean>>}) {
   const {setShoppingList, setSubtotal, setActiveMarketKey} = useMyContext();
   return(
-    <View style={{backgroundColor: myColors.background, marginTop: device.iPhoneNotch ? 34 : 0}} >
+    <View style={[{backgroundColor: myColors.background}, globalStyles.notch]} >
       <View style={styles.headerConteiner} >
         <IconButton
           icon='arrow-left'
@@ -320,7 +320,7 @@ function Cart({ navigation, route }:
               schedules.list.map((item, index) => {
                 const active = item == activeSchedule;
                 return (
-                  <View key={index} >
+                  <View key={index} style={{borderRadius: 10}} >
                   <MyButton
                     onPress={() => {
                       setActiveSchedule(item)
@@ -393,42 +393,72 @@ function Cart({ navigation, route }:
         containerStyle={[styles.buttonConteiner]}
         buttonStyle={{backgroundColor: myColors.primaryColor, height: 58}}
         onPress={() => {
-          setIsLoading(true)
-          const scheduled = activeSchedule?.scheduled;
-          const d = new Date();
-          const orderDate = `${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')} - ${d.getDay().toString().padStart(2, '0')}/${d.getMonth().toString().padStart(2, '0')}/${d.getFullYear()}`;
-          var previsao: string;
-          if (!scheduled) {
-            const date1 = new Date(d.getTime() + (parseInt(activeMarket.minPrazo)*60000));
-            const date2 = new Date(d.getTime() + (parseInt(activeMarket.maxPrazo)*60000));
-            previsao = `${date1.getHours()}:${date1.getMinutes().toString().padStart(2, '0')} - ${date2.getHours()}:${date2.getMinutes().toString().padStart(2, '0')}`;
-          } else {
-            previsao = activeSchedule.horarios;
-          }
-          getOrdersList().then(list => {
-            saveOrdersList([{
-              nome: activeMarket.nome,
-              mercPosition: activeMarket.position,
-              pedido: list.length+1,
-              prodList: prodOrder,
-              scheduled: scheduled,
-              previsao: previsao,
-              date: orderDate,
-              subtotal: subtotal,
-              off: off,
-              ship: parseInt(activeMarket.taxa),
-              total: subtotal+parseInt(activeMarket.taxa),
-              endereco: longAddress.rua+' - '+longAddress.bairro,
-              pagamento: payment.title,
-            }, ...list])
-          saveShoppingList(new Map)
-          setShoppingList(new Map)
-          setSubtotal(0)
-          setActiveMarketKey(0)
-          saveActiveMarketKey(0)
-          navigation.pop(1)
-          navigation.navigate('ComprasTab',['Hi', {screen: 'Compras'}])
-          })
+          (async () => {
+            try {
+              setIsLoading(true)
+              //only on bare
+              if (['ApplePay', 'GooglePay'].includes(payment.title)) {
+                const token = await Payment.paymentRequestWithNativePayAsync(device.android? 
+                {
+                  total_price: converter.toPrice(subtotal+Number.parseFloat(activeMarket.taxa)),
+                  currency_code: 'BRL',
+                  line_items: [{
+                    currency_code: 'BRL',
+                    description: 'Poupa Preço',
+                    total_price: '50',
+                    unit_price: '10',
+                    quantity: '5'
+                  }]
+                }: 
+                {
+                  shippingMethods: [],
+                  currencyCode: 'BRL',
+                  countryCode: 'BR'
+                }, [{label: 'Poupa Preço', amount: converter.toPrice(subtotal+Number.parseFloat(activeMarket.taxa))}])
+
+                Payment.completeNativePayRequestAsync()
+              }
+
+              const scheduled = activeSchedule?.scheduled;
+              const d = new Date();
+              const orderDate = `${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')} - ${d.getDay().toString().padStart(2, '0')}/${d.getMonth().toString().padStart(2, '0')}/${d.getFullYear()}`;
+              var previsao: string;
+              if (!scheduled) {
+                const date1 = new Date(d.getTime() + (parseInt(activeMarket.minPrazo)*60000));
+                const date2 = new Date(d.getTime() + (parseInt(activeMarket.maxPrazo)*60000));
+                previsao = `${date1.getHours()}:${date1.getMinutes().toString().padStart(2, '0')} - ${date2.getHours()}:${date2.getMinutes().toString().padStart(2, '0')}`;
+              } else {
+                previsao = activeSchedule.horarios;
+              }
+              getOrdersList().then(list => {
+                saveOrdersList([{
+                  nome: activeMarket.nome,
+                  mercPosition: activeMarket.position,
+                  pedido: list.length+1,
+                  prodList: prodOrder,
+                  scheduled: scheduled,
+                  previsao: previsao,
+                  date: orderDate,
+                  subtotal: subtotal,
+                  off: off,
+                  ship: parseInt(activeMarket.taxa),
+                  total: subtotal+parseInt(activeMarket.taxa),
+                  endereco: longAddress.rua+' - '+longAddress.bairro,
+                  pagamento: payment.title,
+                }, ...list])
+              saveShoppingList(new Map)
+              setShoppingList(new Map)
+              setSubtotal(0)
+              setActiveMarketKey(0)
+              saveActiveMarketKey(0)
+              navigation.pop(1)
+              navigation.navigate('ComprasTab',['Hi', {screen: 'Compras'}])
+              })
+            } catch (error) {
+              Payment.cancelNativePayRequestAsync()
+              setIsLoading(false)
+            }
+          })()
         }} />
     </View>
   )}

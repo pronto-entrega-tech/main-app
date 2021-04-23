@@ -1,5 +1,5 @@
-import { StyleSheet, StatusBar} from 'react-native';
-import { myColors } from '.';
+import { StyleSheet, StatusBar } from 'react-native';
+import myColors from './colors';
 import device from './device';
 
 const web = device.web ? 2 : 0
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2.22+web,
   },
   elevation4: {
-    elevation: 3,
+    elevation: 4,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84+web,
   },
   darkBoader: {
-    borderWidth: 1,
+    borderWidth: device.web? 1:0,
     borderColor: myColors.divider,
   },
 })

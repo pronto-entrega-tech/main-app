@@ -1,15 +1,16 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { View, StyleSheet, TouchableNativeFeedback, TouchableHighlight } from 'react-native';
+import { View, StyleSheet, TouchableNativeFeedback, TouchableHighlight, Pressable } from 'react-native';
 import { myColors, device, globalStyles } from '../constants';
 import colors from '../constants/colors';
 
-function IconButton ({onPress,  icon, size, color, type } : 
-{onPress: (item: any) => void,  icon: string, size: number, color: string, 
-  type: 'clear'|'add'|'addHorizontal'|'fill'|'back'|'profile'|'address'|'prodIcons'|'profile2' }) {
-  var style = {}
-  var conteinerStyle = {}
-  var rippleRadius = 30
+function IconButton ({onPress, icon, size=24, color=myColors.primaryColor, type } : 
+{onPress: (item: any) => void, icon: string, size?: number, color?: string, 
+  type?: 'clear'|'add'|'addHorizontal'|'fill'|'back'|'profile'|'address'|'prodIcons'|'profile2'|'cancel' }) {
+  let style = {};
+  let conteinerStyle = {};
+  let rippleRadius = 30;
+  let hitSlop = 0;
   switch(type){
     case 'clear':
       style = styles.buttonClear;
@@ -17,12 +18,17 @@ function IconButton ({onPress,  icon, size, color, type } :
       break;
     case 'add':
       conteinerStyle = [styles.buttonAdd, globalStyles.elevation4, globalStyles.darkBoader];
+      hitSlop = 16;
       break;
     case 'addHorizontal':
       conteinerStyle = [styles.buttonAddHorizontal, globalStyles.elevation4, globalStyles.darkBoader];
       break;
     case 'back':
       style = styles.buttonBack;
+      rippleRadius = 24;
+      break;
+    case 'cancel':
+      style = styles.cancel;
       rippleRadius = 24;
       break;
     case 'prodIcons':
@@ -42,31 +48,28 @@ function IconButton ({onPress,  icon, size, color, type } :
     default:
       conteinerStyle = [styles.button, globalStyles.elevation4, globalStyles.darkBoader];
   }
-  if (device.android) {
-    return (
-      <View style={conteinerStyle}>
-        <TouchableNativeFeedback 
-          style={{borderRadius: 60}}
-          background={TouchableNativeFeedback.Ripple('#aaa', true, rippleRadius)}
-          onPress={onPress} >
-          <View style={style} >
-            <Icon name={icon} size={size} color={color} />
-          </View>  
-        </TouchableNativeFeedback>
-      </View>
-    )
-  } else {
-    return (
-      <View>
-        <TouchableHighlight 
-          style={[style, conteinerStyle]} 
-          underlayColor={myColors.buttonUnderlayColor}
-          onPress={onPress} >
+  if (device.android)
+  return (
+    <View style={conteinerStyle}>
+      <TouchableNativeFeedback 
+        style={{borderRadius: 60}}
+        background={TouchableNativeFeedback.Ripple('#aaa', true, rippleRadius)}
+        onPress={onPress} >
+        <View style={style} >
           <Icon name={icon} size={size} color={color} />
-        </TouchableHighlight>
-      </View>
-    )
-  }
+        </View>  
+      </TouchableNativeFeedback>
+    </View>
+  )
+  
+  return (
+    <TouchableHighlight
+      style={[style, conteinerStyle]} 
+      underlayColor={myColors.buttonUnderlayColor}
+      onPress={onPress} >
+      <Icon name={icon} size={size} color={color} />
+    </TouchableHighlight>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -148,6 +151,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 60,
     marginTop: -2,
+  },
+  cancel: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 48,
   }
 })
 

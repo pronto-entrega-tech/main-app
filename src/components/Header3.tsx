@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   },
   headerDivider: {
     marginTop: 47,
-    backgroundColor: myColors.divider3,
+    backgroundColor: myColors.divider2,
     height: 1,
     marginHorizontal: 16,
   },

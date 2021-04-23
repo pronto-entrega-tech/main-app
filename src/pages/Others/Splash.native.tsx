@@ -10,7 +10,7 @@ import { useFonts } from 'expo-font';
 import myFonts from '../../assets/fonts'
 
 async function getLocation() {
-  let { status } = await Location.getPermissionsAsync();
+  let { status } = await Location.getForegroundPermissionsAsync();
   if (status !== 'granted') return false;
 
   let enabled = await Location.hasServicesEnabledAsync();
@@ -44,10 +44,8 @@ async function getLocation() {
 
 function Splash({ navigation }:
 {navigation: StackNavigationProp<any, any>, route: any}) {
-  let [fontsLoaded] = useFonts(myFonts);
-
+  
   useEffect(() => {
-    if (!fontsLoaded) return
     isReturning().then(returning => {
       if (!returning) return navigation.replace('NewUser')
       getActiveAddressIndex().then(index => {
@@ -59,7 +57,7 @@ function Splash({ navigation }:
         })
       })
     })
-  },[fontsLoaded])
+  },[])
 
   return (
     <View style={{

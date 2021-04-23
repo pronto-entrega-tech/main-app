@@ -11,7 +11,7 @@ import { converter } from '../../functions';
 import requests from '../../services/requests';
 import { getActiveAddress } from '../../functions/dataStorage';
 import Loading from '../../components/Loading';
-import { useProdContext2 } from '../Others/ProdContext';
+import { useProdContext2 } from '../../functions/ProdContext';
 
 function Mercado({navigation, route}:
 {navigation: StackNavigationProp<any, any>, route: any}) {

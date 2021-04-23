@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageSourcePropType, ViewStyle, StyleProp } from 'react-native';
+import { View, Text, StyleSheet, ImageSourcePropType, ViewStyle, StyleProp, Pressable } from 'react-native';
 import { Image } from 'react-native-elements';
 import { Divider } from 'react-native-paper';
 import { myColors, device, images, globalStyles } from '../constants';
@@ -28,7 +28,7 @@ function ProdItem({navigation, item, isFavorite, quantity = 0, onPressFav, onPre
 
   return (
     <View style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader, style]} >
-      <MyButton style={{borderRadius: 8}} onPress={() => navigation.push('Product', device.web? {prod: item.prodKey} : {item: item})} >
+      <MyButton onPress={() => navigation.push('Product', device.web? {prod: item.prodKey} : {item: item})} >
         <View>
           <View style={ styles.top } >
             { item.precoAntes != null ? <View style={styles.offTextBox}><Text style={styles.offText} >-{off}%</Text></View> : null }
@@ -66,7 +66,7 @@ function ProdItem({navigation, item, isFavorite, quantity = 0, onPressFav, onPre
             </Text>
           </View>
           <Divider style={{backgroundColor: myColors.divider2, height: 1, marginBottom: 0 }}/>
-          <View style={ styles.containerAdd } >
+          <Pressable style={ styles.containerAdd } >
             <IconButton 
               icon='minus' 
               size={24} 
@@ -80,7 +80,7 @@ function ProdItem({navigation, item, isFavorite, quantity = 0, onPressFav, onPre
               color={myColors.primaryColor} 
               type='add' 
               onPress={onPressAdd} />
-          </View>
+          </Pressable>
         </View>
       </MyButton>
     </View>
@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderRadius: 8,
     backgroundColor: '#fff',
+    overflow: 'hidden'
   },
   top: {
     alignItems: 'center',

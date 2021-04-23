@@ -2,13 +2,14 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { Button, Divider, Input } from 'react-native-elements';
+import { Picker } from '@react-native-picker/picker';
 import IconButton from '../../components/IconButton';
 import { myColors, device, globalStyles } from '../../constants';
 import { saveAddressList } from '../../functions/dataStorage';
 import { addressModel } from './Address';
 
 function NewAddress({navigation, route}:
-  {navigation: StackNavigationProp<any, any>}) {
+  {navigation: StackNavigationProp<any, any>, route: any}) {
   const params = route.params;
   const position = params.position;
   var addressList: addressModel[] = params.addressList
@@ -48,49 +49,59 @@ function NewAddress({navigation, route}:
         placeholder={'Endereço '+position}
         onChangeText={(text) => newAddressItem.apelido = text}
         defaultValue={addressItem.apelido}
-        labelStyle={{ color: myColors.primaryColor }}  
-        selectionColor={myColors.primaryColor} />
+        selectionColor={myColors.primaryColor}
+        autoCompleteType='off' />
       <Input
-        label='Rua*' 
+        label='Rua' 
         onChangeText={(text) => newAddressItem.rua = text}
         defaultValue={addressItem.rua}
         labelStyle={{color: myColors.primaryColor}}  
         selectionColor={myColors.primaryColor}
-        autoCompleteType='street-address' />
+        autoCompleteType='street-address'
+        textContentType='streetAddressLine1' />
       <Input 
-        label='Número*' 
+        label='Número' 
         onChangeText={(text) => newAddressItem.numero = text}
         defaultValue={addressItem.numero}
         keyboardType='numeric' 
         labelStyle={{color: myColors.primaryColor}}  
-        selectionColor={myColors.primaryColor} />
+        selectionColor={myColors.primaryColor}
+        textContentType='streetAddressLine2' />
       <Input 
-        label='Bairro*'
+        label='Bairro'
         onChangeText={(text) => newAddressItem.bairro = text}
         defaultValue={addressItem.bairro}
         labelStyle={{color: myColors.primaryColor}}  
-        selectionColor={myColors.primaryColor} />
+        selectionColor={myColors.primaryColor}
+        textContentType='sublocality' />
+      <Picker mode='dropdown' >
+        <Picker.Item label='Jataí' value="Jataí" />
+        <Picker.Item label='Goiania' value="Goiania" />
+      </Picker>
       <View style={{flexDirection: 'row'}} >
-        <Input 
+        <Input
           containerStyle={{flex: 2}}
-          label='Cidade*'
+          label='Cidade'
           onChangeText={(text) => newAddressItem.cidade = text}
           defaultValue={addressItem.cidade}
           labelStyle={{color: myColors.primaryColor}}  
-          selectionColor={myColors.primaryColor} />
+          selectionColor={myColors.primaryColor}
+          textContentType='addressCity' />
         <Input 
           containerStyle={{flex: 1}}
-          label='Estado*' 
+          label='Estado' 
           onChangeText={(text) => newAddressItem.estado = text}
           defaultValue={addressItem.estado}
           labelStyle={{color: myColors.primaryColor}}  
-          selectionColor={myColors.primaryColor} />
+          selectionColor={myColors.primaryColor}
+          textContentType='addressState' />
       </View>
       <Input 
         label='Complemento'
         onChangeText={(text) => newAddressItem.complement = text}
         defaultValue={addressItem.complement}
-        selectionColor={myColors.primaryColor} />
+        selectionColor={myColors.primaryColor}
+        textContentType='location' />
     </ScrollView>
     <Button
       title='Salvar endereço'

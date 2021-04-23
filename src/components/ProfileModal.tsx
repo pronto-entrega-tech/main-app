@@ -2,9 +2,13 @@ import React from "react";
 import { StyleSheet, Pressable, Animated } from "react-native";
 import { myColors, device } from "../constants";
 import IconButtonText from "./IconButtonText";
+import * as ImagePicker from 'expo-image-picker';
+import { getProfile, saveProfile } from "../functions/dataStorage";
+import { profileModel } from "../pages/Others/MyProfile";
 
-function ProfileModal({isVisible, setVisible}: {isVisible: boolean, setVisible: any}) {
-  const [state, _setState] = React.useState({
+function ProfileModal({isVisible, setVisible, setProfile}:
+{isVisible: boolean, setVisible: () => void, setProfile: (profile: profileModel) => void}) {
+  const [state] = React.useState({
     opacity: new Animated.Value(0),
     conteiner: new Animated.Value(device.height),
     modal: new Animated.Value(device.height),
@@ -34,6 +38,53 @@ function ProfileModal({isVisible, setVisible}: {isVisible: boolean, setVisible: 
     }
   }, [isVisible])
 
+  const openCamera = () => {
+    setVisible();
+    (async () => {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') return;
+      
+      const image = await ImagePicker.launchCameraAsync({aspect: [1,1], quality: 0.5});
+      if (image.cancelled) return;
+      getProfile()
+        .then(profile => {
+          profile.photoUri = {uri: image.uri}
+          saveProfile(profile)
+          setProfile(profile)
+        })
+        .catch(() => alert('Erro ao salvar foto de perfil'))
+    })();
+  }
+  
+  const openPhotos = () => {
+    setVisible();
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') return;
+      
+      const image = await ImagePicker.launchImageLibraryAsync({allowsEditing: true, aspect: [1,1], quality: 0.5});
+      if (image.cancelled) return;
+      getProfile()
+        .then(profile => {
+          profile.photoUri = {uri: image.uri}
+          saveProfile(profile)
+          setProfile(profile)
+        })
+        .catch(() => alert('Erro ao salvar foto de perfil'))
+    })();
+  }
+  
+  const removePhoto = () => {
+    setVisible()
+    getProfile()
+      .then(profile => {
+        profile.photoUri = undefined
+        saveProfile(profile)
+        setProfile(profile)
+      })
+      .catch(() => alert('Erro ao remover foto de perfil'))
+  }
+
   return (
     <Animated.View style={[styles.conteiner, {
       transform: [
@@ -41,16 +92,16 @@ function ProfileModal({isVisible, setVisible}: {isVisible: boolean, setVisible: 
       ]
     }]} >
       <Animated.View style={{opacity: state.opacity}} >
-        <Pressable style={[styles.background]} onPress={()=> setVisible(false)} />
+        <Pressable style={[styles.background]} onPress={setVisible} />
       </Animated.View>
       <Animated.View style={[styles.modal, {
         transform: [
           { translateY: state.modal }
         ]
       }]} >
-        <IconButtonText icon='camera' text={`Abrir\ncâmera`} onPress={()=> setVisible(false)} type='profile2' />
-        <IconButtonText icon='image' text={`Adicionar\nfoto`} onPress={()=> setVisible(false)} type='profile2' />
-        <IconButtonText icon='delete' text={`Remover\nfoto`} onPress={()=> setVisible(false)} type='profile2' />
+        <IconButtonText icon='camera' text={`Abrir\ncâmera`} onPress={openCamera} type='profile2' />
+        <IconButtonText icon='image' text={`Adicionar\nfoto`} onPress={openPhotos} type='profile2' />
+        <IconButtonText icon='delete' text={`Remover\nfoto`} onPress={removePhoto} type='profile2' />
       </Animated.View>
     </Animated.View>
   )

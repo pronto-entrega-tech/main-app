@@ -53,14 +53,23 @@
     },
     "ios": {
       "bundleIdentifier": "com.poupapreco.poupapreco",
-      "buildNumber": "1.0.0",
       "supportsTablet": false,
-      "icon": "./src/assets/icon.png"
+      "icon": "./src/assets/icon.png",
+      "usesIcloudStorage": true
     },
     "web": {
       "favicon": "./src/assets/favicon.png",
       "themeColor": "#2196F3",
       "shortName": "PoupaPreço"
-    }
+    },
+    "plugins": [
+      [
+        "expo-payments-stripe",
+        {
+          "scheme": "BottomTabs/ComprasTab/compras",
+          "merchantId": "merchant.<com.poupapreco.poupapreco>"
+        }
+      ]
+    ]
   }
 }

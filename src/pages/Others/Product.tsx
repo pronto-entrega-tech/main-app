@@ -5,21 +5,24 @@ import { View, Share } from 'react-native';
 import { Divider } from 'react-native-elements';
 import { CartBar } from './BottomTabs';
 import IconButton from '../../components/IconButton';
-import { myColors, device } from '../../constants'; 
+import { myColors, device, globalStyles } from '../../constants'; 
 import Mercado from '../Home/Mercado';
 import ProductDetails from './ProductDetails';
 import { prodModel } from '../../components/ProdItem';
 import useMyContext from '../../functions/MyContext';
 import requests from '../../services/requests';
 import Loading from '../../components/Loading';
-import { ProdContext } from './ProdContext';
+import { ProdContext } from '../../functions/ProdContext';
 
 export function ProductHeader({ navigation, item }:
 {navigation: StackNavigationProp<any, any>, item: prodModel}) {
   const {favorites, onPressFav} = useMyContext();
   return(
-    <View style={{backgroundColor: myColors.background, 
-      marginTop: device.iPhoneNotch ? 34 : 0, flexDirection: 'row', justifyContent: 'flex-end', height: 46}} >
+    <View
+    style={[{
+      backgroundColor: myColors.background, flexDirection: 'row', justifyContent: 'flex-end', height: 46},
+      globalStyles.notch
+     ]} >
       <View style ={{position: 'absolute', left: 0}}>
         <IconButton
           icon='arrow-left'
@@ -72,19 +75,21 @@ function Product({ navigation, route }:
   if (!item) return <Loading />
 
   return (
-    <View style={device.web ? {height: device.height-56} : {flex: 1}} >
+    <>
       <ProductHeader
         navigation={navigation}
         item={item} />
-      <ProdContext.Provider value={{item: item, merc: item.mercKey}}>
-        <Tab.Navigator tabBarOptions={{activeTintColor: myColors.text3, indicatorStyle: {backgroundColor: myColors.primaryColor}}} >
-          <Tab.Screen name='Produto' component={ProductDetails} />
-          <Tab.Screen name='Mercado' component={Mercado} />
-        </Tab.Navigator>
-      </ProdContext.Provider>
-      <Divider style={{width: '100%', height: 1, marginTop: device.iPhoneNotch? 128 : 94, backgroundColor: myColors.divider, position: 'absolute'}} />
-      <CartBar navigation={navigation} />
-    </View>
+      <View style={device.web ? {height: device.height-56} : {flex: 1}} >
+        <ProdContext.Provider value={{item: item, merc: item.mercKey}}>
+          <Tab.Navigator tabBarOptions={{activeTintColor: myColors.text3, indicatorStyle: {backgroundColor: myColors.primaryColor}}} >
+            <Tab.Screen name='Produto' component={ProductDetails} />
+            <Tab.Screen name='Mercado' component={Mercado} />
+          </Tab.Navigator>
+        </ProdContext.Provider>
+        <Divider style={{width: '100%', height: 1, marginTop: 48, backgroundColor: myColors.divider2, position: 'absolute'}} />
+        <CartBar navigation={navigation} />
+      </View>
+    </>
   )
 }
 

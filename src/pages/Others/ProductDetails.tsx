@@ -9,7 +9,7 @@ import { myColors, device, images } from '../../constants';
 import { converter } from '../../functions';
 import validate from '../../functions/validate';
 import requests from '../../services/requests';
-import { useProdContext } from './ProdContext';
+import { useProdContext } from '../../functions/ProdContext';
 
 function ProductDetails({ navigation }:
   {navigation: StackNavigationProp<any, any>}) {

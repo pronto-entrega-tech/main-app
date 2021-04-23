@@ -1,5 +1,5 @@
 import React from 'react';
-import { prodModel } from '../../components/ProdItem';
+import { prodModel } from '../components/ProdItem';
 
 interface contextModel {
   item: prodModel,

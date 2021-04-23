@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Image } from 'react-native-elements';
 import { myColors, device, images, globalStyles } from '../constants';
 import { converter } from '../functions';
@@ -18,7 +18,7 @@ function ProdItemHorizontal({navigation, item, isFavorite, quantity = 0, onPress
     <View style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader]} >
       <MyButton style={{borderRadius: 8}} onPress={() => navigation.push('Product', item)} >
         <View style={ styles.container }> 
-          <View style={ styles.containerAdd } >
+          <Pressable style={ styles.containerAdd } >
             <IconButton 
               icon='plus' 
               size={24} 
@@ -32,7 +32,7 @@ function ProdItemHorizontal({navigation, item, isFavorite, quantity = 0, onPress
               color={myColors.primaryColor} 
               type='addHorizontal' 
               onPress={onPressRemove} />
-          </View>
+          </Pressable>
           <View style={ styles.containerImage } >
             <Image 
               placeholderStyle={{backgroundColor: '#FFF'}}

@@ -29,7 +29,7 @@ async function getLocation(setCurrentAddress: React.Dispatch<React.SetStateActio
   setStatusText: React.Dispatch<React.SetStateAction<string>>,
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>) {
   setStatusText('Carregando...')
-  let { status } = await Location.requestPermissionsAsync();
+  let { status } = await Location.requestForegroundPermissionsAsync();
 
   if (status !== 'granted') {
     myAlert('Permissão de acesso à localização foi negada');
@@ -92,20 +92,26 @@ async function getLocation(setCurrentAddress: React.Dispatch<React.SetStateActio
 };
 
 async function tryGetLocation(setCurrentAddress: React.Dispatch<React.SetStateAction<addressModel | null>>, isFocus: boolean) {
-  let { status } = await Location.getPermissionsAsync();
+  let { status } = await Location.getForegroundPermissionsAsync();
 
   if (status !== 'granted') {
     if (isFocus) setCurrentAddress(null)
     return;
   }
 
-  let coords = (await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest })).coords;
-  const loc: LocationGeocodedLocation = {
-    latitude: coords.latitude, 
-    longitude: coords.longitude
+  let loc = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest })
+  .catch(() => {return null});
+
+  if (!loc) {
+    Alert.alert('Erro ao obter localização!');
+    return false
+  }
+  const location: LocationGeocodedLocation = {
+    latitude: loc.coords.latitude, 
+    longitude: loc.coords.longitude
   }
   if (!device.web) {
-    let address = (await Location.reverseGeocodeAsync(loc))[0];
+    let address = (await Location.reverseGeocodeAsync(location))[0];
     const adress: addressModel = {
       apelido: '',
       rua: (device.iOS ? address.name : address.street)?.replace('Avenida', 'Av.')+'',
@@ -113,8 +119,8 @@ async function tryGetLocation(setCurrentAddress: React.Dispatch<React.SetStateAc
       bairro: address.district != null ? address.district : '',
       cidade: (device.iOS ? address.city : address.subregion)+'',
       estado: address.region+'',
-      latitude: coords.latitude,
-      longitude: coords.longitude
+      latitude: loc.coords.latitude,
+      longitude: loc.coords.longitude
     };
     if (isFocus) setCurrentAddress(adress)
   } else {
@@ -125,8 +131,8 @@ async function tryGetLocation(setCurrentAddress: React.Dispatch<React.SetStateAc
       bairro: '',
       cidade: 'Jataí',
       estado: 'Goiás',
-      latitude: coords.latitude,
-      longitude: coords.longitude
+      latitude: loc.coords.latitude,
+      longitude: loc.coords.longitude
     };
     if (isFocus) setCurrentAddress(adress)
   }
