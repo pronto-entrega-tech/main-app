@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Switch } from 'react-native';
-import { Button, Divider } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { Divider, Switch } from 'react-native-elements';
 import { myColors, device } from '../../constants';
 
 interface configModel {
