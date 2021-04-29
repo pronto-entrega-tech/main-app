@@ -1,36 +1,22 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { Divider, Image } from 'react-native-elements';
-import MyButton from '../../components/MyButton';
-import MySearchbar from '../../components/MySearchBar';
+import Loading from '../../components/Loading';
+import MyText from '../../components/MyText';
+import MyTouchable from '../../components/MyTouchable';
 import { myColors, globalStyles } from '../../constants';
 import { getOrdersList } from '../../functions/dataStorage';
 import validate from '../../functions/validate';
 import requests from '../../services/requests';
 import { orderModel } from './Order';
 
-export function ComprasHeader() {
-  return (
-    <>
-      <View style={styles.header}>
-        <Text style={styles.textHeader}>Compras</Text>
-        <Divider style={styles.headerDivider}/>
-      </View>
-      <View style={{marginTop: 12, marginBottom: 8, paddingHorizontal: 16}} >
-        <MySearchbar/>
-      </View>
-    </>
-  )
-}
-
 function Compras({ navigation, route }:
-  {navigation: StackNavigationProp<any, any>}) {
+  {navigation: StackNavigationProp<any, any>, route: any}) {
   const [isLoading, setIsLoading] = useState(true);
   const [ordersList, setOrdersList] = useState<orderModel[]>();
 
   useEffect(() => {
-    console.log(route.params)
     getOrdersList()
       .then(list => setOrdersList(list))
   }, [route]);
@@ -45,47 +31,43 @@ function Compras({ navigation, route }:
 
   const render_item = ({item}: {item: orderModel}) => {
     return (
-    <MyButton
-      onPress={()=> navigation.navigate('Order', ordersList.indexOf(item))}
+    <MyTouchable
+      onPress={()=> navigation.navigate('Order', ordersList?.indexOf(item))}
       style={[styles.card, globalStyles.elevation3, globalStyles.darkBoader]} >
       <View style={{flexDirection: 'row'}} >
         <Image
-          source={{uri: requests+'images/mercado.png'}}
+          source={{uri: requests+'images/'+'mercado'/*item.key*/+'.png'}}
           placeholderStyle={{backgroundColor: '#FFF'}}
-          style={{height: 50, width: 50}} />
+          containerStyle={{height: 50, width: 50}} />
         <View style={{marginLeft: 16}} >
-          <Text style={styles.mercName} >{item.nome}</Text>
-          <Text style={styles.orderText} >Pedido em Andamento • {item.pedido.toString().padStart(3, '0')}</Text>
+          <MyText style={styles.mercName} >{item.nome}</MyText>
+          <MyText style={styles.orderText} >Pedido em Andamento • {item.pedido.toString().padStart(3, '0')}</MyText>
         </View>
       </View>
       <Divider style={{marginHorizontal: -4, marginTop: 10, marginBottom: 6}} />
       <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}} >
-        <Text style={styles.previsionText} >{item.scheduled? 'Agendado para':'Previsão de entrega'}</Text>
-        <Text style={styles.previsionTime} >{item.previsao}</Text>
+        <MyText style={styles.previsionText} >{item.scheduled? 'Agendado para':'Previsão de entrega'}</MyText>
+        <MyText style={styles.previsionTime} >{item.previsao}</MyText>
       </View>
-    </MyButton>
+    </MyTouchable>
   )}
 
   if (isLoading) {
-    return (
-      <View style={{backgroundColor: myColors.background, flex: 1, justifyContent: 'center', alignItems: 'center'}} >
-       <ActivityIndicator color={myColors.loading} size='large' />
-      </View>
-    )
+    return <Loading/>
   } else {
     if (ordersList?.length == 0) {
       return (
         <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
-          <Text style={{fontSize: 15, color: myColors.text2}} >Nenhum pedido realizado ainda</Text>
+          <MyText style={{fontSize: 15, color: myColors.text2}} >Nenhum pedido realizado ainda</MyText>
         </View>
       )
     } else {
       return (
         <FlatList
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{paddingBottom: 50}}
           data={ordersList}
-          keyExtractor={({pedido}) =>  pedido.toString()}
+          contentContainerStyle={{paddingBottom: 50}}
+          keyExtractor={({pedido}) => pedido.toString()}
           renderItem={render_item} />
       )
     }
@@ -94,6 +76,7 @@ function Compras({ navigation, route }:
 
 const styles = StyleSheet.create({
   header: {
+    backgroundColor: '#aaa',
     justifyContent: 'center',
     height: 48,
   },

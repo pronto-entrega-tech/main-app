@@ -1,5 +1,6 @@
+import { Picker } from '@react-native-picker/picker';
 import React from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text } from 'react-native';
 import { myColors } from '../../constants';
 
 function Cupons() {

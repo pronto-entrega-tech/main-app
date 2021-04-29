@@ -1,102 +1,100 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageSourcePropType, ViewStyle, StyleProp, Pressable } from 'react-native';
+import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { Image } from 'react-native-elements';
 import { Divider } from 'react-native-paper';
 import { myColors, device, images, globalStyles } from '../constants';
-import { converter } from '../functions';
 import IconButton from './IconButton';
-import MyButton from './MyButton';
+import MyButton from './MyTouchable';
 import { StackNavigationProp } from '@react-navigation/stack';
 import requests from '../services/requests';
+import { Money } from '../functions/converter';
+import MyText from './MyText';
 
 export interface prodModel {
-  prodKey: number,
-  image: ImageSourcePropType,
+  prodKey: string,
+  image: string,
   nome: string,
-  mercKey: number,
+  mercKey: string,
   marca: string,
   quantidade: string,
-  preco: number,
-  precoAntes: number,
+  preco: Money,
+  precoAntes?: Money,
 }
 
-function ProdItem({navigation, item, isFavorite, quantity = 0, onPressFav, onPressAdd, onPressRemove, style={}}:
+function ProdItem({navigation, item, isFavorite, quantity = 0, onPressFav, onPressAdd, onPressRemove, style={}, merc}:
 {navigation: StackNavigationProp<any, any>, item: prodModel, isFavorite: boolean, quantity?: number, 
-  onPressFav: (item: any) => void , onPressAdd: (item: any) => void , onPressRemove: (item: any) => void, style?: StyleProp<ViewStyle> }) {
-  const off = ((1-(item.preco / item.precoAntes))*100).toFixed(0)
+  onPressFav: (item: any) => void , onPressAdd: (item: any) => void , onPressRemove: (item: any) => void,
+   style?: StyleProp<ViewStyle>, merc: boolean }) {
+  const off = item.precoAntes? ((1-(item.preco.value / item.precoAntes.value))*100).toFixed(0) : undefined;
   const uriImage = item.image != null ? {uri: requests+'images/'+item.image} : images.loadProdImage;
 
   return (
-    <View style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader, style]} >
-      <MyButton onPress={() => navigation.push('Product', device.web? {prod: item.prodKey} : {item: item})} >
-        <View>
-          <View style={ styles.top } >
-            { item.precoAntes != null ? <View style={styles.offTextBox}><Text style={styles.offText} >-{off}%</Text></View> : null }
-            <Image 
-              placeholderStyle={{backgroundColor: '#FFF'}}
-              source={uriImage}
-              style={styles.image} />
-            <View style={styles.fav} >
-              <IconButton
-                icon={isFavorite ? 'heart' : 'heart-outline'}
-                size={24}
-                color={isFavorite ? myColors.primaryColor : myColors.grey2}
-                type='clear'
-                onPress={onPressFav} />
-            </View>
-          </View>
-          <View style={styles.mercLine} >
-            <Image 
-              placeholderStyle={{backgroundColor: '#FFF'}}
-              source={{uri: requests+'images/mercado.png'}}
-              style={styles.mercImage} />
-          </View>
-          <View style={ styles.container } >
-            {item.precoAntes != null ? <Text style={ styles.oldPriceText } >R${converter.toPrice(item.precoAntes)}</Text> : null }
-            <Text style={ styles.priceText } >R${converter.toPrice(item.preco)}</Text>
-            <View style={ styles.brandWeightRow } >
-              <Text style={ styles.brandText } >{item.marca}</Text>
-              <Text style={ styles.weightText } >{item.quantidade}</Text>
-            </View>
-            <Text
-              ellipsizeMode="tail"
-              numberOfLines={3}
-              style={ styles.prodText }>
-              {item.nome}
-            </Text>
-          </View>
-          <Divider style={{backgroundColor: myColors.divider2, height: 1, marginBottom: 0 }}/>
-          <Pressable style={ styles.containerAdd } >
-            <IconButton 
-              icon='minus' 
-              size={24} 
-              color={myColors.primaryColor} 
-              type='add' 
-              onPress={onPressRemove} />
-            <Text style={ styles.centerNumText } >{quantity}</Text>
-            <IconButton 
-              icon='plus' 
-              size={24} 
-              color={myColors.primaryColor} 
-              type='add' 
-              onPress={onPressAdd} />
-          </Pressable>
+    <MyButton
+      style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader, style]}
+      onPress={() => navigation.push('Product', device.web? {prod: item.prodKey} : {item: item})} >
+      <View style={ styles.top } >
+        {off? <View style={styles.offTextBox}><MyText style={styles.offText} >-{off}%</MyText></View> : null}
+        <Image 
+          placeholderStyle={{backgroundColor: '#FFF'}}
+          source={uriImage}
+          containerStyle={styles.image} />
+        <View style={styles.fav} >
+          <IconButton
+            icon={isFavorite ? 'heart' : 'heart-outline'}
+            size={24}
+            color={isFavorite ? myColors.primaryColor : myColors.grey2}
+            type='clear'
+            onPress={onPressFav} />
         </View>
-      </MyButton>
-    </View>
+      </View>
+      {!merc?
+      <Image 
+        placeholderStyle={{backgroundColor: '#FFF'}}
+        source={{uri: requests+'images/'+'mercado'/*item.key*/+'.png'}}
+        containerStyle={styles.mercImage} /> : null}
+      <View style={ styles.container } >
+        {item.precoAntes != null ? <MyText style={ styles.oldPriceText } >R${item.precoAntes.toString()}</MyText> : null }
+        <MyText style={ styles.priceText } >R${item.preco.toString()}</MyText>
+        <View style={ styles.brandWeightRow } >
+          <MyText style={ styles.brandText } >{item.marca}</MyText>
+          <MyText style={ styles.weightText } >{item.quantidade}</MyText>
+        </View>
+        <MyText
+          ellipsizeMode="tail"
+          numberOfLines={2}
+          style={ styles.prodText }>
+          {item.nome}
+        </MyText>
+      </View>
+      <Divider style={{backgroundColor: myColors.divider2, height: 1, marginBottom: 0 }}/>
+      <View style={ styles.containerAdd } >
+        <IconButton 
+          icon='minus' 
+          size={24} 
+          color={myColors.primaryColor} 
+          type='add' 
+          onPress={onPressRemove} />
+        <MyText style={ styles.centerNumText } >{quantity.toString()}</MyText>
+        <IconButton 
+          icon='plus' 
+          size={24} 
+          color={myColors.primaryColor} 
+          type='add' 
+          onPress={onPressAdd} />
+      </View>
+    </MyButton>
   );
 }
 
-const textLinePad = device.android ? -2 : 1
 const tileWidth = device.width/2-12
 const styles = StyleSheet.create({
   card: {
+    height: 220,
     width: tileWidth,
     marginLeft: 8,
     marginBottom: 8,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    overflow: 'hidden'
+    borderRadius: 10,
+    backgroundColor: '#fff'
   },
   top: {
     alignItems: 'center',
@@ -109,12 +107,10 @@ const styles = StyleSheet.create({
     alignSelf:'flex-end',
     right: 0
   },
-  mercLine: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: -10
-  },
   mercImage: {
+    position: 'absolute',
+    right: 0,
+    top: 90,
     marginRight: 10,
     height: 34,
     width: 34,
@@ -139,37 +135,37 @@ const styles = StyleSheet.create({
     width: 80,
   },
   container: {
+    marginTop: 24,
     marginHorizontal: 8,
   },
   oldPriceText: {
+    height: 20,
     position: 'absolute',
     textDecorationLine: 'line-through',
     color: myColors.grey2,
     marginTop: -38,
     fontSize: 13,
-    fontFamily: 'Regular'
   },
   priceText: {
+    height: 27,
     color: myColors.text3,
-    marginTop: -22+textLinePad,
+    marginTop: -22,
     fontSize: 20,
     fontFamily: 'Medium'
   },
   brandWeightRow: {
+    height: 19,
     flexDirection: 'row',
-    marginTop: textLinePad
   },
   brandText: {
     color: myColors.grey2,
-    fontFamily: 'Regular'
   },
   weightText: {
     marginLeft: 4,
     color: myColors.grey2,
-    fontFamily: 'Regular'
   },
   prodText: { 
-    height: 17.5*2,
+    height: 35,
     color: myColors.grey3,
     marginBottom: 8,
     fontFamily: 'Condensed'

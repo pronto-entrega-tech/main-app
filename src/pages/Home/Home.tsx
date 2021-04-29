@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
 import { Divider } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AdsSlider from '../../components/Slides';
 import IconButtonText from '../../components/IconButtonText';
 import { myColors, device, globalStyles } from '../../constants'
 import { StackNavigationProp } from '@react-navigation/stack';
-import ProdList from '../../components/ProdList';
+import ProdList, { ListHeader } from '../../components/ProdList';
 import MySearchbar from '../../components/MySearchBar';
 import { getShortAddress } from '../../functions/dataStorage';
 import { useFocusEffect } from '@react-navigation/native';
+import MyButton from '../../components/MyButton';
 
 export function HomeHeader({ navigation }:
   {navigation: StackNavigationProp<any, any>}) {
@@ -30,12 +30,12 @@ export function HomeHeader({ navigation }:
           name='map-marker'
           size={30} 
           color={myColors.primaryColor} />
-        <Button
+        <MyButton
           type='clear'
           title={shortAdress}
           titleStyle={{color: myColors.text5, fontFamily: 'Condensed', fontSize: 17}}
+          iconRight
           icon={<Icon name='chevron-right' size={24} color={myColors.text5} />}
-          iconRight={true}
           onPress={() => {
             navigation.navigate('Address')
             }} />
@@ -70,6 +70,7 @@ function Home({ navigation }:
               text='Favoritos' 
               onPress={() => navigation.navigate('Favoritos')} />
           </View>
+          <ListHeader navigation={navigation} />
         </View>
       )} />
     </View>

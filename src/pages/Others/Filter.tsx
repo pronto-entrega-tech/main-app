@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Slider from '@react-native-community/slider';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MyTouchable from '../../components/MyTouchable';
 import MyButton from '../../components/MyButton';
 import { myColors, device, globalStyles } from '../../constants';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Chip } from 'react-native-paper';
 import { categorias } from '../Categorias';
-import { Button } from 'react-native-elements';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { Chip } from 'react-native-paper';
 
 function FilterButton({icon, text, onPress, selected}:
    {icon: string, text: string, onPress: (i: number) => void, selected: boolean}) {
   return (
-    <MyButton onPress={onPress} style={styles.filterButton} >
+    <MyTouchable onPress={onPress} style={styles.filterButton} >
       <View style={[styles.iconConteiner, {backgroundColor: selected? myColors.primaryColor : '#FFF'}, selected? globalStyles.elevation5 : globalStyles.elevation3]} >
         <Icon name={icon} size={24} color={selected? '#FFF' : myColors.grey2} />
       </View>
       <Text style={[styles.buttonText, {color: selected? myColors.primaryColor : myColors.text2}]} >{text}</Text>
-    </MyButton>
+    </MyTouchable>
   )
 }
 
@@ -30,6 +30,7 @@ function Filter({ navigation }:
     <>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        style={{height: device.height-(device.web? 56 : 0)}}
         contentContainerStyle={styles.conteiner} >
         <Text style={styles.title} >Ordernar por</Text>
         <FilterButton icon='sort-variant' text='Padrão' onPress={() => setFilter(0)} selected={filter===0} />
@@ -56,26 +57,26 @@ function Filter({ navigation }:
             categorias.map((item) => {
               const isSelected = categoriasList.includes(item);
               return (
-              <Chip key={item} onPress={() => {
-                  if (isSelected) {
-                    setCategoriasList(c => c.filter(i => i != item))
-                  } else {
-                    setCategoriasList(c => [...c, item])
-                  }
-                }} icon={{}}
+              <Chip
+                key={item}
+                onPress={() => {
+                    if (isSelected) {
+                      setCategoriasList(c => c.filter(i => i != item))
+                    } else {
+                      setCategoriasList(c => [...c, item])
+                    }
+                  }}
+                icon={{}}
                 selectedColor={isSelected? '#FFF' : '#191919'}
-                selected={isSelected}
                 style={{margin: 4, backgroundColor: isSelected? myColors.colorAccent : '#ECECEC'}} >{item}</Chip>
             )})
           }
         </View>
       </ScrollView>
-      <Button
+      <MyButton
         title='Ver resultados'
         type='outline'
-        theme={{ colors: { primary: myColors.primaryColor}}}
-        buttonStyle={{borderWidth: 2, width: 210, height: 46, backgroundColor: '#fff'}}
-        containerStyle={{position: 'absolute', alignSelf: 'center', bottom: device.iPhoneNotch ? 38 : 12}}
+        buttonStyle={styles.button}
         onPress={()=> {
           navigation.pop(1)
           navigation.navigate('Search')
@@ -88,7 +89,6 @@ const styles = StyleSheet.create({
   conteiner: {
     backgroundColor: myColors.background,
     paddingBottom: 56,
-    height: device.height-(device.web ? 56 : 0),
   },
   title: {
     color: myColors.text3,
@@ -130,7 +130,16 @@ const styles = StyleSheet.create({
   slider: {
     marginTop: 8,
     marginHorizontal: 16,
-  }
+  },
+  button: {
+    position: 'absolute',
+    alignSelf: 'center',
+    bottom: device.iPhoneNotch ? 38 : 12,
+    borderWidth: 2,
+    width: 210,
+    height: 46,
+    backgroundColor: '#fff',
+  },
 })
 
 export default Filter

@@ -23,7 +23,7 @@ async function saveCity(city: {city: string, estate: string}) {
 function Splash() {
   const linkTo = useLinkTo();
   const cites: {city: string, estate: string}[] = [
-    {city: 'Jataí', estate: 'Goiás'},
+    {city: 'Jataí', estate: 'GO'},
   ]
   
   return (
@@ -31,9 +31,9 @@ function Splash() {
       <View style={{backgroundColor: '#f8f8f8'}}>
         <Button
           type='clear'
-          buttonStyle={styles.loginButton}
+          containerStyle={styles.loginButton}
           title='Entrar'
-          onPress={() => alert('Ainda não')} />
+          onPress={() => linkTo('/entrar')} />
         <Image source={images.pineapple} style={styles.pineapple} />
         <Image source={images.tomato} style={styles.tomato} />
         <Image source={images.broccoli} style={styles.broccoli} />
@@ -65,42 +65,44 @@ function Splash() {
 
 const styles = StyleSheet.create({
   loginButton: {
+    position: 'absolute',
     alignSelf: 'flex-end',
     marginRight: 4,
     marginTop: 4,
   },
   pineapple: {
     position: 'absolute',
-    marginLeft: 10,
-    top: -40,
-    width: 170,
-    height: 125,
+    alignSelf: 'flex-start',
+    marginLeft: 25,
+    top: -50,
+    width: 200,
+    height: 160,
   },
   tomato: {
     alignSelf: 'flex-end',
     position: 'absolute',
     marginTop: 50,
-    width: 50,
-    height: 100,
+    width: 60,
+    height: 120,
   },
   broccoli: {
     position: 'absolute',
     left: -65,
     marginTop: 180,
-    width: 110,
-    height: 110,
+    width: 130,
+    height: 130,
   },
   logo: {
     alignSelf: 'center',
-    marginTop: 38,
-    width: 200,
-    height: 120,
+    marginTop: 120,
+    width: 170,
+    height: 92,
   },
   title: {
     marginTop: 28,
     alignSelf: 'center',
     textAlign: 'center',
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: '500',
     color: myColors.text4_5,
     marginHorizontal: 36,
@@ -119,7 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: myColors.primaryColor,
     marginTop: 30,
     marginHorizontal: 18,
-    paddingVertical: 14,
+    height: 52,
     marginBottom: 18,
   },
   text: {

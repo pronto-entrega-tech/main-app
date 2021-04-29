@@ -1,23 +1,26 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, Animated } from 'react-native';
 import { Button, Divider } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import useMyContext from '../../functions/MyContext';
 import IconButton from '../../components/IconButton';
 import { mercModel } from '../../components/MercItem';
+import MyTouchable from '../../components/MyTouchable';
 import MyButton from '../../components/MyButton';
 import { prodModel } from '../../components/ProdItem';
 import ProdList from '../../components/ProdList';
 import ProdListHorizontal from '../../components/ProdListHorizontal';
-import { myColors, device, globalStyles } from '../../constants'; 
-import { converter } from '../../functions';
-import { getLongAddress, saveShoppingList, getActiveMarket, saveActiveMarketKey, saveOrdersList, getOrdersList, getActiveMarketKey } from '../../functions/dataStorage';
+import { myColors, device, globalStyles } from '../../constants';
+import { getLongAddress, saveShoppingList, getActiveMarket, saveActiveMarketKey, saveOrdersList, getOrdersList, getActiveMarketKey, getLastPayment, saveLastPayment } from '../../functions/dataStorage';
 import validate from '../../functions/validate';
 import { prodOrderModel } from '../Compras/Order';
 import MyText from '../../components/MyText';
 import requests from '../../services/requests';
 import { PaymentsStripe as Payment } from 'expo-payments-stripe'
+import Header from '../../components/Header';
+import { money, Money, createMercItem, createProdList, moneyToString } from '../../functions/converter';
+import Loading from '../../components/Loading';
 
 export interface scheduleModel {
   dia: string,
@@ -27,9 +30,23 @@ export interface scheduleModel {
 }
 
 const extraWidth = device.android?  0 : 10
-function CartHeader({ navigation, entregar, setEntregar }:
-  {navigation: StackNavigationProp<any, any>, entregar: boolean, setEntregar: React.Dispatch<React.SetStateAction<boolean>>}) {
+function CartHeader({navigation, entregar, setEntregar, setIsLoading}:
+{navigation: StackNavigationProp<any, any>, entregar: boolean,
+  setEntregar: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>}) {
   const {setShoppingList, setSubtotal, setActiveMarketKey} = useMyContext();
+  const [state] = React.useState({
+    indicator: new Animated.Value(0),
+  })
+
+  useEffect(() => {
+    if (entregar) {
+      Animated.timing(state.indicator, { toValue: 0, duration: 175, useNativeDriver: true }).start();
+    } else {
+      Animated.timing(state.indicator, { toValue: 80+extraWidth, duration: 175, useNativeDriver: true }).start();
+    }
+  }, [entregar])
+
   return(
     <View style={[{backgroundColor: myColors.background}, globalStyles.notch]} >
       <View style={styles.headerConteiner} >
@@ -40,38 +57,45 @@ function CartHeader({ navigation, entregar, setEntregar }:
           type='back'
           onPress={() => navigation.goBack()} />
         <View style={styles.headerButtonsConteiner} >
-          <Button
+          <MyButton
             onPress={()=> setEntregar(true)} title='Entregar' type='clear'
-            titleStyle={{color: entregar ? myColors.primaryColor : myColors.grey,}}
+            titleStyle={{color: entregar ? myColors.primaryColor : myColors.grey}}
             buttonStyle={styles.headerButtons1} />
-          <Button
+          <MyButton
             onPress={()=> setEntregar(false)} title='Retirar' type='clear'
             titleStyle={{color: !entregar ? myColors.primaryColor : myColors.grey}}
             buttonStyle={styles.headerButtons2} />
         </View>
-        <Button onPress={()=> {
-            navigation.goBack()
-            setShoppingList(new Map)
-            saveShoppingList(new Map)
-            setSubtotal(0)
-            setActiveMarketKey(0)
-            saveActiveMarketKey(0)
+        <MyButton onPress={()=> {
+            setIsLoading(true)
+            setTimeout(() => {
+              setShoppingList(new Map)
+              saveShoppingList(new Map)
+              setActiveMarketKey('')
+              saveActiveMarketKey('')
+              setSubtotal(money('0'))
+            }, 50)
+            setTimeout(() => {
+              navigation.goBack()
+            }, 300)
           }}
           titleStyle={{color: myColors.primaryColor}} title='Limpar carrinho' type='clear' />
       </View>
       <Divider style={{height: 1, marginTop: -1, backgroundColor: myColors.divider2}} />
-      <Divider style={[styles.indicator, {marginLeft: entregar ? 52 : 132+extraWidth, width: entregar ? 80+extraWidth : 70+extraWidth}]} />
+      <Animated.View style={[styles.indicator, {transform: [{translateX: state.indicator}], width: entregar ? 80+extraWidth : 70+extraWidth}]} />
     </View>
   )
 }
 
-function updateCart(shoppingList: Map<number, {quantity: number, item: prodModel}>,
-  setSubtotal: (final: number)=>void, 
-  setOff: (subtotal: number)=>void,
+function updateCart(shoppingList: Map<string, {quantity: number, item: prodModel}>,
+  setSubtotal: (subtotal: Money) => void, 
+  setOff: (off: Money) => void,
+  setTotal: (total: Money) => void,
   setProdOrder: React.Dispatch<React.SetStateAction<prodOrderModel[]>>,
-  setProdList: React.Dispatch<React.SetStateAction<prodModel[]>>) {
-  var subtotal: number = 0
-  var totalOff: number = 0
+  setProdList: React.Dispatch<React.SetStateAction<prodModel[] | undefined>>,
+  setReadySubtotal: React.Dispatch<React.SetStateAction<boolean>>) {
+  var subtotal = money('0')
+  var totalOff = money('0')
   var prodList: prodModel[] = []
   var prodOrder: prodOrderModel[] = []
   const keys = Array.from(shoppingList.keys());
@@ -79,10 +103,10 @@ function updateCart(shoppingList: Map<number, {quantity: number, item: prodModel
     const key = keys[i]
     const quantity = shoppingList.get(key)?.quantity;
     const item = shoppingList.get(key)?.item;
-    if (typeof item == 'undefined' || typeof quantity == 'undefined') return;
-    subtotal = subtotal + (item.preco * quantity)
-    if (item.precoAntes != null)
-      totalOff = totalOff + ((item.precoAntes - item.preco) * quantity)
+    if (!item || !quantity) return;
+    subtotal.add(item.preco.value * quantity)
+    if (item.precoAntes)
+      totalOff.add((item.precoAntes.value - item.preco.value) * quantity)
     prodList = [...prodList, item]
     prodOrder = [...prodOrder, {
       quantity: quantity.toString(),
@@ -94,8 +118,11 @@ function updateCart(shoppingList: Map<number, {quantity: number, item: prodModel
   }
   setSubtotal(subtotal)
   setOff(totalOff)
+  setTotal(money((subtotal.value + totalOff.value).toString()))
   setProdOrder(prodOrder)
   setProdList(prodList)
+
+  setReadySubtotal(true)
 }
 
 function updateSchedule(activeMarket: mercModel,
@@ -120,17 +147,17 @@ function updateSchedule(activeMarket: mercModel,
     close = activeMarket.close;
   }
 
-  let open2 = Number.parseInt(open);
-  let close2 = Number.parseInt(close);
+  let open2 = open;
+  let close2 = close;
 
   const dayText: string = hours < close2 ? 'Hoje' : 'Amanhã';
   const dayText2: number = hours < close2 ? day : day+1;
 
-  const deliveryHour = hours+((min+Number.parseInt(activeMarket.minPrazo))/60)
+  const deliveryHour = hours+(min+activeMarket.minPrazo)/60
 
   const isOpen = hours >= open2 && hours < close2;
   if (isOpen) {
-    let schedule: scheduleModel = {
+    const schedule: scheduleModel = {
       dia: dayText,
       diaDoMes: dayText2,
       horarios: `${activeMarket.minPrazo} - ${activeMarket.maxPrazo} min`,
@@ -144,8 +171,8 @@ function updateSchedule(activeMarket: mercModel,
 
   for (let i = open2; i < close2 ; i=i+2) {
     if (deliveryHour < i || hours >= close2) {
-      let i2 = i+2 < close2 ? i+2 : close2;
-      let schedule: scheduleModel = {
+      const i2 = i+2 < close2 ? i+2 : close2;
+      const schedule: scheduleModel = {
         dia: dayText,
         diaDoMes: dayText2,
         horarios: `${i}:00 - ${i2}:00`,
@@ -158,10 +185,9 @@ function updateSchedule(activeMarket: mercModel,
 }
 
 function Cart({ navigation, route }:
-  {navigation: StackNavigationProp<any, any>, route: any}) {
+{navigation: StackNavigationProp<any, any>, route: any}) {
   const [readySubtotal, setReadySubtotal] = useState(false);
-  const [readyActiveSchedule, setReadyActiveSchedule] = useState(false);
-  const [readyAddress, setReadyAddress] = useState(false);
+  const [readyActiveMarket, setReadyActiveMarket] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [entregar, setEntregar] = useState<boolean>(true);
   const [longAddress, setLongAddress] = useState<{rua: string, bairro: string} | null>(null);
@@ -169,39 +195,53 @@ function Cart({ navigation, route }:
   const [activeMarket, setActiveMarket] = useState<mercModel>();
   const [activeSchedule, setActiveSchedule] = useState<scheduleModel | null>(route.params?.activeSchedule);
   const [schedules, setSchedules] = useState<{isOpen: Boolean, list: scheduleModel[]}>({isOpen: false, list: []});
-  const [off, setOff] = useState<number>(0);
-  const [prodList, setProdList] = useState<prodModel[]>([]);
+  const [cartSubtotal, setCartSubtotal] = useState<Money>(money('0'));
+  const [off, setOff] = useState<Money>();
+  const [total, setTotal] = useState<Money>();
+  const [prodList, setProdList] = useState<prodModel[]>();
+  const [buyTooList, setBuyTooList] = useState<prodModel[]>();
   const [ready, setReady] = useState<boolean>(false);
   const [buttonText, setButtonText] = useState<string>('');
   const [prodOrder, setProdOrder] = useState<prodOrderModel[]>([]);
-  const {refresh, subtotal, setSubtotal, shoppingList, setShoppingList, setActiveMarketKey} = useMyContext();
+  const {isGuest, refresh, shoppingList, setShoppingList, setActiveMarketKey, setSubtotal} = useMyContext();
 
   useEffect(() => {
-    setIsLoading(true)
-    setReadyActiveSchedule(false)
+    setReadyActiveMarket(false)
+
+    getLastPayment()
+    .then(lastPayment => {if (lastPayment) setPayment(lastPayment)})
+
+    fetch(requests+'prodList.php')
+      .then((response) => response.json())
+      .then((json) => setBuyTooList(createProdList(json)))
+      .catch((error) => console.error(error))
+      
     getActiveMarket().then(activeMarket => {
-      if (!activeMarket) {
-        getActiveMarketKey().then(key => {
-          if (key !== 0) {
-            fetch(requests+'mercList.php')
-              .then((response) => response.json())
-              .then((json: mercModel[]) => setActiveMarket(json[0]))
-              .catch((error) => console.error(error));
-          }
-        })
-        setReadyActiveSchedule(true)
-        return
+      if (activeMarket) {
+        setActiveMarket(activeMarket)
+        updateSchedule(activeMarket, setSchedules, setActiveSchedule)
+        setReadyActiveMarket(true)
+        return;
       }
-      setActiveMarket(activeMarket)
-      updateSchedule(activeMarket, setSchedules, setActiveSchedule)
-      setReadyActiveSchedule(true)
+      getActiveMarketKey().then(key => {
+        if (key !== '') {
+          fetch(requests+'mercList.php')
+            .then((response) => response.json())
+            .then((json: mercModel[]) => createMercItem(json[0]))
+            .then((activeMarket) => {
+              setActiveMarket(activeMarket)
+              updateSchedule(activeMarket, setSchedules, setActiveSchedule)
+            })
+            .then(() => setReadyActiveMarket(true))
+            .catch((error) => console.error(error));
+        }
+      })
     })
   }, []);
 
   useEffect(() => {
     setReadySubtotal(false)
-    updateCart(shoppingList, setSubtotal, setOff, setProdOrder, setProdList)
-    setReadySubtotal(true)
+    updateCart(shoppingList, setCartSubtotal, setOff, setTotal, setProdOrder, setProdList, setReadySubtotal)
   }, [refresh]);
 
   useEffect(() => {
@@ -210,7 +250,6 @@ function Cart({ navigation, route }:
     if (callback === 'refresh' || !longAddress) {
       getLongAddress().then(address => {
         setLongAddress(address)
-        setReadyAddress(true)
       })
     }
     if (callback === 'activeSchedule') {
@@ -218,250 +257,290 @@ function Cart({ navigation, route }:
     }
     if (callback === 'payment') {
       setPayment(value)
+      saveLastPayment(value)
     }
   }, [route]);
 
   useEffect(() => {
     if (activeMarket) {
-      if (subtotal < activeMarket.minPedido) {
+      if (cartSubtotal.value < activeMarket.minPedido.value) {
         setReady(false)
-        setButtonText('Subtotal mínimo de R$'+converter.toPrice(activeMarket.minPedido))
+        setButtonText('Subtotal mínimo de R$'+moneyToString(activeMarket.minPedido))
       } else if (longAddress?.rua == '') {
         setReady(false)
         setButtonText('Escolha um endereço')
-      } else if (!validate([payment])) {
+      } else if (!payment && !isGuest) {
         setReady(false)
         setButtonText('Escolha um meio de pagamento')
-      } else if (!validate([activeSchedule])) {
+      } else if (!activeSchedule) {
         setReady(false)
         setButtonText('Escolha um horário')
+      } else if (isGuest) {
+        setReady(false)
+        setButtonText('Entre ou cadastre-se')
       } else {
         setReady(true)
         setButtonText('Fazer pedido')
       }
     }
-  }, [subtotal, longAddress, payment, activeMarket, activeSchedule]);
+  }, [cartSubtotal, longAddress, payment, activeMarket, activeSchedule, isGuest]);
 
   useEffect(() => {
-    if (readySubtotal && readyActiveSchedule && readyAddress) {
+    if (readySubtotal && readyActiveMarket) {
       setIsLoading(false)
     } else {
       setIsLoading(true)
     }
-  }, [readySubtotal, readyActiveSchedule, readyAddress]);
+  }, [readySubtotal, readyActiveMarket]);
 
-  if (prodList.length == 0) {
-    return (
-      <View style={{backgroundColor: myColors.background, flex: 1, justifyContent: 'center', alignItems: 'center',}}>
-        <Text style={{fontSize: 15, color: myColors.text2}} >Carrinho vazio</Text>
-      </View>
-    )
+  const makePayment = async () => {
+    if (!(activeMarket && activeSchedule && off && total && longAddress)) return;
+    try {
+      //only on bare
+      if (['ApplePay', 'GooglePay'].includes(payment.title)) {
+        const token = await Payment.paymentRequestWithNativePayAsync(device.android? 
+        {
+          total_price: total.toString(),
+          currency_code: 'BRL',
+          line_items: [{
+            currency_code: 'BRL',
+            description: 'Poupa Preço',
+            total_price: '50',
+            unit_price: '10',
+            quantity: '5'
+          }]
+        }: 
+        {
+          shippingMethods: [],
+          currencyCode: 'BRL',
+          countryCode: 'BR'
+        }, [{label: 'Poupa Preço', amount: total.toString()}])
+
+        Payment.completeNativePayRequestAsync()
+      }
+      
+      setIsLoading(true)
+      const scheduled = activeSchedule.scheduled;
+      const d = new Date();
+      const orderDate = `${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')} - ${d.getDay().toString().padStart(2, '0')}/${d.getMonth().toString().padStart(2, '0')}/${d.getFullYear()}`;
+      var previsao: string;
+      if (!scheduled) {
+        const date1 = new Date(d.getTime() + activeMarket.minPrazo * 60000);
+        const date2 = new Date(d.getTime() + activeMarket.maxPrazo * 60000);
+        previsao = `${date1.getHours()}:${date1.getMinutes().toString().padStart(2, '0')} - ${date2.getHours()}:${date2.getMinutes().toString().padStart(2, '0')}`;
+      } else {
+        previsao = activeSchedule.horarios;
+      }
+      getOrdersList().then(list => {
+        saveOrdersList([{
+          nome: activeMarket.nome,
+          mercKey: activeMarket.key,
+          pedido: list.length+1,
+          prodList: prodOrder,
+          scheduled: scheduled,
+          previsao: previsao,
+          date: orderDate,
+          subtotal: cartSubtotal.toString(),
+          off: off.toString(),
+          ship: activeMarket.taxa.toString(),
+          total: moneyToString(cartSubtotal.value + activeMarket.taxa.value),
+          endereco: longAddress.rua+' - '+longAddress.bairro,
+          pagamento: payment.title,
+        }, ...list])
+        .then(() => {
+          saveShoppingList(new Map)
+          setShoppingList(new Map)
+          setSubtotal(money('0'))
+          setCartSubtotal(money('0'))
+          setActiveMarketKey('')
+          saveActiveMarketKey('')
+
+          if (payment.title == 'Dinheiro')
+          saveLastPayment({title: 'Dinheiro', sub: 'Sem troco'})
+
+          navigation.pop(1)
+          navigation.navigate('ComprasTab', [{screen: 'Compras'}, `redirect`])
+        })
+      })
+    } catch (error) {
+      Payment.cancelNativePayRequestAsync()
+      setIsLoading(false)
+    }
   }
 
-  if (isLoading) {
-    return (
-      <View style={{backgroundColor: myColors.background, flex: 1, justifyContent: 'center', alignItems: 'center'}} >
-       <ActivityIndicator color={myColors.loading} size='large' />
+  if (prodList?.length == 0)
+  return (
+    <>
+      <Header navigation={navigation} title='' />
+      <View style={{backgroundColor: myColors.background, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <MyText style={{fontSize: 15, color: myColors.text2}} >Carrinho vazio</MyText>
       </View>
-    )
-  } else {
-  return(
-    <View style={[{backgroundColor: myColors.background, flex: 1}, device.web ? {height: device.height-56} : {}]} >
-      <CartHeader navigation={navigation} entregar={entregar} setEntregar={setEntregar} />
-      <ProdListHorizontal
-        data={prodList}
-        style={{paddingBottom: device.iOS ? 98 : 66}}
-        navigation={navigation}
-        header={() => (
-        <View key={'0'}>
-          <MyButton onPress={() => navigation.navigate('Address', {back: 'Cart'})} style={styles.addressConteiner} >
-            <Icon name={entregar? 'home-map-marker':'map-marker-radius'} size={28} color={myColors.primaryColor} style={{marginLeft: -2}} />
-            <View style={{marginLeft: 8}} >
-              <Text style={styles.topText} >{entregar? 'Entregar':'Retirar'} em</Text>
-              <Text style={styles.addressText} >{
-                entregar? 
-                longAddress?.rua != '' ? longAddress?.rua : 'Escolha um endereço' :
-                activeMarket?.endereco
-              }</Text>
-              {entregar && longAddress?.bairro != '' && longAddress?.rua != '' ? <Text style={styles.addressSubtext} >{longAddress?.bairro}</Text> : null}
-            </View>
-            <Icon name='chevron-right' size={36} color={myColors.grey2} style={styles.rightIcon} />
-          </MyButton>
+    </>
+  )
 
-          <Divider style={{height: 1, backgroundColor: myColors.divider3, marginHorizontal: 16}} />
+  if (isLoading)
+  return <Loading/>
 
-          <MyButton onPress={()=>navigation.navigate('Payment',{t: converter.toPrice(subtotal+parseFloat(activeMarket.taxa))})} style={styles.addressConteiner} >
-            <Icon name='credit-card-outline' size={28} color={myColors.primaryColor} />
-            <View style={{marginLeft: 8}} >
-              <Text style={styles.topText} >Meio de pagamento</Text>
-              <Text style={styles.addressText} >{validate([payment?.title])? payment.title : 'Escolha um meio de pagamento'}</Text>
-              {validate([payment?.sub])? <Text style={styles.addressSubtext} >{payment.sub}</Text> : null}
-            </View>
-            <Icon name='chevron-right' size={38} color={myColors.grey2} style={styles.rightIcon} />
-          </MyButton>
-
-          <Divider style={{height: 1, backgroundColor: myColors.divider3, marginHorizontal: 16}} />
-          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}} >
-            <Text style={styles.scheduleText} >{
-              activeSchedule == null ? 'Escolha um horário': activeSchedule.dia+', '+activeSchedule.horarios
-            }</Text>
-            {schedules.list != [] ?
-            <Button
-              title='Ver horários'
-              onPress={()=> navigation.navigate('Schedule', {active: activeSchedule, list: schedules.list})}
-              type='clear'
-              containerStyle={{marginBottom: -4}}
-              titleStyle={{color: myColors.primaryColor}}
-              buttonStyle={{height: 36, paddingHorizontal: 16}} /> : null}
+  const ListHeader = () => {
+    return (
+      <View key={'0'}>
+        {!isGuest? null :
+        <>
+          <View style={{paddingHorizontal: 16, paddingVertical: 12}} >
+            <MyText
+              style={{color: myColors.text2, fontSize: 20, fontFamily: 'Medium'}} >
+              Falta pouco!
+            </MyText>
+            <MyText
+              style={{marginTop: 8, color: myColors.text, fontSize: 16}} >
+              Pra concluir o pedido, precisamos que você se identifique primeiro.
+            </MyText>
+            <MyButton
+              title='Entrar ou cadastrar-se'
+              buttonStyle={{marginTop: 12}}
+              onPress={()=>navigation.navigate('SignIn', 'c')} />
           </View>
+          <Divider style={styles.divider2} />
+        </>
+        }
 
-          <ScrollView contentContainerStyle={styles.scheduleConteiner} showsHorizontalScrollIndicator={false} horizontal >
-            {
-              schedules.list.map((item, index) => {
-                const active = item == activeSchedule;
-                return (
-                  <View key={index} style={{borderRadius: 10}} >
-                  <MyButton
+        <MyTouchable disabled={!entregar} onPress={() => navigation.navigate('Address', {back: 'Cart'})} style={styles.addressConteiner} >
+          <Icon name={entregar? 'home-map-marker':'map-marker-radius'} size={28} color={myColors.primaryColor} style={{marginLeft: -2}} />
+          <View style={{marginLeft: 8}} >
+            <MyText style={styles.topText} >{entregar? 'Entregar':'Retirar'} em</MyText>
+            <MyText style={styles.addressText} >{
+              entregar?
+              !longAddress? 'Carregando...' : 
+              longAddress.rua != '' ? longAddress.rua : 'Escolha um endereço' :
+              activeMarket?.endereco
+            }</MyText>
+            {entregar && longAddress?.bairro != '' && longAddress?.rua != '' ? <MyText style={styles.addressSubtext} >{longAddress?.bairro}</MyText> : null}
+          </View>
+          {entregar? <Icon name='chevron-right' size={36} color={myColors.grey2} style={styles.rightIcon} />:null}
+        </MyTouchable>
+
+        <Divider style={styles.divider} />
+
+        {isGuest? null :
+        <>
+        <MyTouchable onPress={()=>navigation.navigate('Payment',{t: total})} style={styles.addressConteiner} >
+          <Icon name='credit-card-outline' size={28} color={myColors.primaryColor} />
+          <View style={{marginLeft: 8}} >
+            <MyText style={styles.topText} >Meio de pagamento</MyText>
+            <MyText style={styles.addressText} >{validate([payment?.title])? payment.title : 'Escolha um meio de pagamento'}</MyText>
+            {validate([payment?.sub])? <MyText style={styles.addressSubtext} >{payment.sub}</MyText> : null}
+          </View>
+          <Icon name='chevron-right' size={36} color={myColors.grey2} style={styles.rightIcon} />
+        </MyTouchable>
+        <Divider style={styles.divider} />
+        </>
+        }
+
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}} >
+          <MyText style={styles.scheduleText} >{
+            activeSchedule == null ? 'Escolha um horário': activeSchedule.dia+', '+activeSchedule.horarios
+          }</MyText>
+          {schedules.list != [] ?
+          <MyButton
+            title='Ver horários'
+            onPress={()=> navigation.navigate('Schedule', {active: activeSchedule, list: schedules.list})}
+            type='clear'
+            titleStyle={{color: myColors.primaryColor}}
+            buttonStyle={{minHeight: 0, marginBottom: -4, height: 36, paddingHorizontal: 16}} /> : null}
+        </View>
+
+        <ScrollView contentContainerStyle={styles.scheduleConteiner} showsHorizontalScrollIndicator={false} horizontal >
+          {
+            schedules.list.map((item, index) => {
+              const active = item == activeSchedule;
+              return (
+                <View key={index} style={{borderRadius: 10}} >
+                  <MyTouchable
                     onPress={() => {
                       setActiveSchedule(item)
                     }}
                     style={[styles.scheduleCardBase, active ? styles.scheduleCardActive : styles.scheduleCardInactive, active ? globalStyles.elevation4 : globalStyles.elevation1]}>
                     <>
-                      <Text style={{color: active? myColors.primaryColor : myColors.text2, fontWeight: 'bold'}} >{
+                      <MyText style={{color: active? myColors.primaryColor : myColors.text2, fontWeight: 'bold'}} >{
                         schedules.isOpen && index == 0 ? 'Padrão' : 'Agendar'
-                      }</Text>
-                      <Text style={{color: myColors.text4, fontSize: 15}} >{item.dia}</Text>
-                      <Text style={{color: myColors.text4}} >{item.horarios}</Text>
+                      }</MyText>
+                      <MyText style={{color: myColors.text4, fontSize: 15}} >{item.dia}</MyText>
+                      <MyText style={{color: myColors.text4}} >{item.horarios}</MyText>
                     </>
-                  </MyButton>
-                  </View>
-                )
-              })
-            }
-          </ScrollView>
+                  </MyTouchable>
+                </View>
+              )
+            })
+          }
+        </ScrollView>
 
-          <Divider style={{height: 2, backgroundColor: myColors.divider2}} />
-          <View style={{minHeight: 260, backgroundColor: '#FCFCFC'}}>
-            <Text style={styles.orderTooText} >Peça também</Text>
-            <ProdList
-              horizontal
-              style={{paddingRight: 8, paddingTop: 8}}
-              navigation={navigation}
-              title=''
-              header={null} />
-          </View>
-
-          <Divider style={{height: 2, backgroundColor: myColors.divider2, marginBottom: 4}} />
-          <View style={styles.priceConteiner}>
-            <MyText style={styles.priceText} >Subtotal</MyText>
-            <Text style={styles.priceText} >R${converter.toPrice(subtotal)}</Text>
-          </View>
-          <View style={styles.priceConteiner}>
-            <Text style={styles.priceText} >Economizado</Text>
-            <Text style={[styles.priceText, {color: '#E00000'}]} >R${converter.toPrice(off)}</Text>
-          </View>
-          <View style={styles.priceConteiner}>
-            <Text style={styles.priceText} >{entregar? 'Taxa de entrega' : 'Retirada'}</Text>
-            <Text style={[styles.priceText, activeMarket?.taxa == '0.00' || !entregar ? {color: '#109c00'} : null]} >{
-            activeMarket?.taxa == '0.00' || !entregar ? 'Grátis' : 'R$'+converter.toPrice(activeMarket.taxa)
-            }</Text>
-          </View>
-          <Divider style={{backgroundColor: myColors.divider3, marginHorizontal: 16}} />
-          <View style={styles.priceTotalConteiner}>
-            <Text style={styles.priceTotalText} >Total</Text>
-            <Text style={styles.priceTotalText} >R${converter.toPrice(subtotal+Number.parseFloat(activeMarket.taxa))}</Text>
-          </View>
-          <Divider style={{height: 2, backgroundColor: myColors.divider2, marginTop: 4}} />
-            <MyButton onPress={()=>navigation.navigate('CartCupons')} style={styles.cupomConteiner} >
-              <Icon name='ticket-percent' size={48} color={myColors.primaryColor} />
-              <View style={styles.cupomTextConteiner} >
-                <Text style={{color: myColors.text5, fontSize: 16}} >Cupom</Text>
-                <Text style={{color: myColors.text4}} >Insira um código</Text>
-              </View>
-              <Icon name='chevron-right' size={36} color={myColors.grey2} style={styles.rightIcon} />
-            </MyButton>
-          <Divider style={{height: 2, backgroundColor: myColors.divider2}} />
-          <View style={styles.prodListTopbar} >
-            <Text style={{color: myColors.text5, fontSize: 16}} >Lista de compras</Text>
-            <Text style={{color: myColors.text5, fontSize: 16}} >{activeMarket.nome}</Text>
-          </View>
+        <Divider style={styles.divider2} />
+        <View style={{minHeight: 266, backgroundColor: '#FCFCFC'}}>
+          <MyText style={styles.orderTooText} >Peça também</MyText>
+          {!buyTooList? <Loading/> :
+          <ProdList
+            horizontal
+            refreshless
+            style={{paddingRight: 8, paddingTop: 8}}
+            navigation={navigation}
+            header={null}
+            data={buyTooList} />
+          }
         </View>
-      )} />
-      <Button
+
+        <Divider style={[styles.divider2, {marginBottom: 4}]} />
+        <View style={styles.priceConteiner}>
+          <MyText style={styles.priceText} >Subtotal</MyText>
+          <MyText style={styles.priceText} >R${cartSubtotal.toString()}</MyText>
+        </View>
+        <View style={styles.priceConteiner}>
+          <MyText style={styles.priceText} >Economizado</MyText>
+          <MyText style={[styles.priceText, {color: '#E00000'}]} >R${off?.toString()}</MyText>
+        </View>
+        <View style={styles.priceConteiner}>
+          <MyText style={styles.priceText} >{entregar? 'Taxa de entrega' : 'Retirada'}</MyText>
+          <MyText style={[styles.priceText, activeMarket?.taxa.value == 0 || !entregar ? {color: '#109c00'} : null]} >{
+          activeMarket?.taxa.value == 0 || !entregar ? 'Grátis' : 'R$'+moneyToString(activeMarket?.taxa)
+          }</MyText>
+        </View>
+        <Divider style={{backgroundColor: '#DDD', marginHorizontal: 16}} />
+        <View style={styles.priceTotalConteiner}>
+          <MyText style={styles.priceTotalText} >Total</MyText>
+          <MyText style={styles.priceTotalText} >R${total?.toString()}</MyText>
+        </View>
+        <Divider style={[styles.divider2, {marginTop: 4}]} />
+          <MyTouchable onPress={()=>navigation.navigate('CartCupons')} style={styles.cupomConteiner} >
+            <Icon name='ticket-percent' size={48} color={myColors.primaryColor} />
+            <View style={styles.cupomTextConteiner} >
+              <MyText style={{color: myColors.text5, fontSize: 16}} >Cupom</MyText>
+              <MyText style={{color: myColors.text4}} >Insira um código</MyText>
+            </View>
+            <Icon name='chevron-right' size={36} color={myColors.grey2} style={styles.rightIcon} />
+          </MyTouchable>
+        <Divider style={styles.divider2} />
+        <View style={styles.prodListTopbar} >
+          <MyText style={{color: myColors.text5, fontSize: 16}} >Lista de compras</MyText>
+          <MyText style={{color: myColors.text5, fontSize: 16}} >{activeMarket?.nome}</MyText>
+        </View>
+      </View>
+    )
+  }
+
+  return (
+    <View style={[{backgroundColor: myColors.background}, device.web ? {height: device.height} : {flex: 1}]} >
+      <CartHeader navigation={navigation} entregar={entregar} setEntregar={setEntregar} setIsLoading={setIsLoading} />
+      <ProdListHorizontal
+        style={{paddingBottom: device.iOS ? 98 : 66}}
+        navigation={navigation}
+        header={ListHeader}
+        data={prodList} />
+      <MyButton
         title={buttonText}
         disabled={!ready}
-        containerStyle={[styles.buttonConteiner]}
-        buttonStyle={{backgroundColor: myColors.primaryColor, height: 58}}
-        onPress={() => {
-          (async () => {
-            try {
-              setIsLoading(true)
-              //only on bare
-              if (['ApplePay', 'GooglePay'].includes(payment.title)) {
-                const token = await Payment.paymentRequestWithNativePayAsync(device.android? 
-                {
-                  total_price: converter.toPrice(subtotal+Number.parseFloat(activeMarket.taxa)),
-                  currency_code: 'BRL',
-                  line_items: [{
-                    currency_code: 'BRL',
-                    description: 'Poupa Preço',
-                    total_price: '50',
-                    unit_price: '10',
-                    quantity: '5'
-                  }]
-                }: 
-                {
-                  shippingMethods: [],
-                  currencyCode: 'BRL',
-                  countryCode: 'BR'
-                }, [{label: 'Poupa Preço', amount: converter.toPrice(subtotal+Number.parseFloat(activeMarket.taxa))}])
-
-                Payment.completeNativePayRequestAsync()
-              }
-
-              const scheduled = activeSchedule?.scheduled;
-              const d = new Date();
-              const orderDate = `${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')} - ${d.getDay().toString().padStart(2, '0')}/${d.getMonth().toString().padStart(2, '0')}/${d.getFullYear()}`;
-              var previsao: string;
-              if (!scheduled) {
-                const date1 = new Date(d.getTime() + (parseInt(activeMarket.minPrazo)*60000));
-                const date2 = new Date(d.getTime() + (parseInt(activeMarket.maxPrazo)*60000));
-                previsao = `${date1.getHours()}:${date1.getMinutes().toString().padStart(2, '0')} - ${date2.getHours()}:${date2.getMinutes().toString().padStart(2, '0')}`;
-              } else {
-                previsao = activeSchedule.horarios;
-              }
-              getOrdersList().then(list => {
-                saveOrdersList([{
-                  nome: activeMarket.nome,
-                  mercPosition: activeMarket.position,
-                  pedido: list.length+1,
-                  prodList: prodOrder,
-                  scheduled: scheduled,
-                  previsao: previsao,
-                  date: orderDate,
-                  subtotal: subtotal,
-                  off: off,
-                  ship: parseInt(activeMarket.taxa),
-                  total: subtotal+parseInt(activeMarket.taxa),
-                  endereco: longAddress.rua+' - '+longAddress.bairro,
-                  pagamento: payment.title,
-                }, ...list])
-              saveShoppingList(new Map)
-              setShoppingList(new Map)
-              setSubtotal(0)
-              setActiveMarketKey(0)
-              saveActiveMarketKey(0)
-              navigation.pop(1)
-              navigation.navigate('ComprasTab',['Hi', {screen: 'Compras'}])
-              })
-            } catch (error) {
-              Payment.cancelNativePayRequestAsync()
-              setIsLoading(false)
-            }
-          })()
-        }} />
+        buttonStyle={styles.buttonConteiner}
+        onPress={makePayment} />
     </View>
-  )}
+  )
 }
 
 const styles = StyleSheet.create({
@@ -479,7 +558,8 @@ const styles = StyleSheet.create({
   indicator: {
     marginTop: -2,
     height: 2,
-    backgroundColor: myColors.primaryColor
+    backgroundColor: myColors.primaryColor,
+    marginLeft: 52,
   },
   headerButtons1: {
     height: 56,
@@ -490,6 +570,15 @@ const styles = StyleSheet.create({
     height: 56,
     width: 70+extraWidth,
     justifyContent: 'center',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: myColors.divider3,
+    marginHorizontal: 16
+  },
+  divider2: {
+    height: 2,
+    backgroundColor: myColors.divider
   },
   addressConteiner: {
     flexDirection: 'row',
@@ -544,6 +633,7 @@ const styles = StyleSheet.create({
     borderWidth: 1
   },
   orderTooText: {
+    height: 30,
     marginLeft: 16,
     paddingTop: 8,
     color: myColors.text5,
@@ -588,10 +678,10 @@ const styles = StyleSheet.create({
   },
   buttonConteiner: {
     width: '95%',
-    backgroundColor: '#FFF',
     position: 'absolute',
     bottom: device.iOS ? 36 : 6,
     alignSelf: 'center',
+    height: 58,
   }
 })
 

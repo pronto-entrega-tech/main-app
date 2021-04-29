@@ -1,36 +1,61 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { Button, Divider, Input } from 'react-native-elements';
-import { Picker } from '@react-native-picker/picker';
 import IconButton from '../../components/IconButton';
+import Loading from '../../components/Loading';
+import MyButton from '../../components/MyButton';
+import MyPicker from '../../components/MyPicker';
 import { myColors, device, globalStyles } from '../../constants';
-import { saveAddressList } from '../../functions/dataStorage';
+import { getAddressList, saveAddressList } from '../../functions/dataStorage';
+import useMyContext from '../../functions/MyContext';
 import { addressModel } from './Address';
 
 function NewAddress({navigation, route}:
-  {navigation: StackNavigationProp<any, any>, route: any}) {
-  const params = route.params;
-  const position = params.position;
-  var addressList: addressModel[] = params.addressList
-  var addressItem: addressModel;
-  var newAddressItem: addressModel;
-  if (params.addressItem != null) {
-    addressItem = params.addressItem;
-    newAddressItem = params.addressItem;
-  } else {
-    addressItem = {
-      apelido: '',
-      rua: '',
-      numero: '',
-      bairro: '',
-      cidade: 'Jataí',
-      estado: 'Goiás',
-      latitude: 0,
-      longitude: 0
-    };
-    newAddressItem = addressItem;
-  }
+{navigation: StackNavigationProp<any, any>, route: any}) {
+  const [addressList, setAddressList] = React.useState<addressModel[]>();
+  const [addressItem, setAddressItem] = React.useState<addressModel>();
+  const [isNew, setIsNew] = React.useState<boolean>(true);
+  const [streetError, setStreetError] = React.useState<boolean>(false);
+  const [numberError, setNumberError] = React.useState<boolean>(false);
+  const [districtError, setDistrictError] = React.useState<boolean>(false);
+  const [cityError, setCityError] = React.useState<boolean>(false);
+  const [stateError, setStateError] = React.useState<boolean>(false);
+  const {toast} = useMyContext();
+  const address = route.params.address;
+
+  React.useEffect(() => {
+    getAddressList()
+    .then(list => {
+      if (!address || !address.apelido) {
+        setAddressItem({
+          apelido: '',
+          rua: '',
+          numero: '',
+          bairro: '',
+          cidade: 'Jataí',
+          estado: 'GO',
+          latitude: 0,
+          longitude: 0
+        })
+      } else if (typeof address == 'number') {
+        setAddressItem(list[address])
+        setIsNew(list.includes(list[address]))
+      } else {
+        setAddressItem(address)
+      }
+
+      setAddressList(list)
+    })
+  }, [])
+
+  const inputRua = React.useRef<TextInput | null>();
+  const inputNumero = React.useRef<TextInput | null>();
+  const inputBairro = React.useRef<TextInput | null>();
+
+  if (!(addressList && addressItem))
+  return <Loading/>
+
   return (
     <>
     <View style={[styles.header, globalStyles.notch]}>
@@ -40,83 +65,103 @@ function NewAddress({navigation, route}:
       color={myColors.primaryColor}
       type='back'
       onPress={() => navigation.goBack()} />
-      <Text style={styles.textHeader}>{addressList?.includes(addressItem) ? 'Editar endereço' : 'Novo endereço'}</Text>
+      <Text style={styles.textHeader}>{isNew? 'Novo endereço' : 'Editar endereço'}</Text>
       <Divider style={styles.divider} />
     </View>
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{backgroundColor: myColors.background, paddingHorizontal: 4, paddingTop: 12, paddingBottom: 40}}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={device.web? {height: device.height-56}:{}}
+      contentContainerStyle={{backgroundColor: myColors.background, paddingHorizontal: 4, paddingTop: 18, paddingBottom: 66}}>
       <Input
         label='Apelido do endereço'
-        placeholder={'Endereço '+position}
-        onChangeText={(text) => newAddressItem.apelido = text}
+        placeholder={'Endereço '+(addressList.length+1).toString()}
+        onChangeText={(text) => addressItem.apelido = text}
         defaultValue={addressItem.apelido}
         selectionColor={myColors.primaryColor}
-        autoCompleteType='off' />
+        autoCompleteType='off'
+        returnKeyType='next'
+        onSubmitEditing={() => inputRua.current?.focus()} />
       <Input
-        label='Rua' 
-        onChangeText={(text) => newAddressItem.rua = text}
+        label='Rua'
+        labelStyle={{color: myColors.primaryColor}}
+        errorMessage={streetError? 'Insira uma rua' : ''}
+        onChangeText={(text) => {addressItem.rua = text; setStreetError(false)}}
         defaultValue={addressItem.rua}
-        labelStyle={{color: myColors.primaryColor}}  
         selectionColor={myColors.primaryColor}
         autoCompleteType='street-address'
-        textContentType='streetAddressLine1' />
+        textContentType='streetAddressLine1'
+        returnKeyType='next'
+        ref={ref => inputRua.current = ref}
+        onSubmitEditing={() => inputNumero.current?.focus()} />
       <Input 
-        label='Número' 
-        onChangeText={(text) => newAddressItem.numero = text}
+        label='Número'
+        labelStyle={{color: myColors.primaryColor}}  
+        errorMessage={numberError? 'Insira um número' : ''}
+        onChangeText={(text) => {addressItem.numero = text; setNumberError(false)}}
         defaultValue={addressItem.numero}
         keyboardType='numeric' 
-        labelStyle={{color: myColors.primaryColor}}  
         selectionColor={myColors.primaryColor}
-        textContentType='streetAddressLine2' />
+        textContentType='streetAddressLine2'
+        returnKeyType='next'
+        ref={ref => inputNumero.current = ref}
+        onSubmitEditing={() => inputBairro.current?.focus()} />
       <Input 
         label='Bairro'
-        onChangeText={(text) => newAddressItem.bairro = text}
+        labelStyle={{color: myColors.primaryColor}}
+        errorMessage={districtError? 'Insira um bairro' : ''}
+        onChangeText={(text) => {addressItem.bairro = text; setDistrictError(false)}}
         defaultValue={addressItem.bairro}
-        labelStyle={{color: myColors.primaryColor}}  
         selectionColor={myColors.primaryColor}
-        textContentType='sublocality' />
-      <Picker mode='dropdown' >
-        <Picker.Item label='Jataí' value="Jataí" />
-        <Picker.Item label='Goiania' value="Goiania" />
-      </Picker>
+        textContentType='sublocality'
+        ref={ref => inputBairro.current = ref} />
       <View style={{flexDirection: 'row'}} >
-        <Input
-          containerStyle={{flex: 2}}
+        <MyPicker
           label='Cidade'
-          onChangeText={(text) => newAddressItem.cidade = text}
-          defaultValue={addressItem.cidade}
-          labelStyle={{color: myColors.primaryColor}}  
-          selectionColor={myColors.primaryColor}
-          textContentType='addressCity' />
-        <Input 
-          containerStyle={{flex: 1}}
-          label='Estado' 
-          onChangeText={(text) => newAddressItem.estado = text}
-          defaultValue={addressItem.estado}
-          labelStyle={{color: myColors.primaryColor}}  
-          selectionColor={myColors.primaryColor}
-          textContentType='addressState' />
+          style={{flex: 2}}
+          errorMessage={cityError? 'Insira uma cidade' : ''}
+          items={['Jataí']}
+          selectedValue={addressItem.cidade}
+          onValueChange={v => {addressItem.cidade = v; setCityError(false)}} />
+        <MyPicker
+          label='Estado'
+          style={{flex: 1}}
+          errorMessage={stateError? 'Insira um estado' : ''}
+          items={['GO']}
+          selectedValue={addressItem.estado}
+          onValueChange={v => {addressItem.estado = v; setStateError(false)}} />
       </View>
       <Input 
         label='Complemento'
-        onChangeText={(text) => newAddressItem.complement = text}
+        onChangeText={(text) => addressItem.complement = text}
         defaultValue={addressItem.complement}
         selectionColor={myColors.primaryColor}
         textContentType='location' />
     </ScrollView>
-    <Button
+    <MyButton
       title='Salvar endereço'
       onPress={() => {
-        if (addressList.includes(addressItem)) {
-          addressList[addressList.indexOf(addressItem)] = newAddressItem
+        let error = false;
+        const wrong = [undefined, '', '-']
+        if (wrong.includes(addressItem.rua)) {error = true; setStreetError(true)};
+        if (wrong.includes(addressItem.numero)) {error = true; setNumberError(true)};
+        if (wrong.includes(addressItem.bairro)) {error = true; setDistrictError(true)};
+        if (wrong.includes(addressItem.cidade)) {error = true; setCityError(true)};
+        if (wrong.includes(addressItem.estado)) {error = true; setStateError(true)};
+        if (error) return;
+
+        let newAddressList
+        if (isNew) {
+          newAddressList = [...addressList, addressItem]
         } else {
-          addressList = [...addressList, newAddressItem]
+          addressList[addressList.indexOf(addressItem)] = addressItem
+          newAddressList = addressList
         }
-        saveAddressList(addressList).then(() => navigation.goBack())
+        toast('Endereço salvo')
+        saveAddressList(newAddressList)
+        .then(() => navigation.goBack())
       }}
       type='outline'
-      theme={{ colors: { primary: myColors.primaryColor}}}
-      buttonStyle={{borderWidth: 2, width: 210, height: 46, backgroundColor: '#fff'}}
-      containerStyle={{position: 'absolute', alignSelf: 'center', bottom: device.iPhoneNotch ? 38 : 12}} />
+      buttonStyle={styles.button} />
     </>
   )
 }
@@ -137,7 +182,24 @@ const styles = StyleSheet.create({
     height: 1,
     marginTop: -1,
     backgroundColor: myColors.divider2,
-  }
+  },
+  label: {
+    color: myColors.primaryColor,
+    marginBottom: 0,
+    marginLeft: 10,
+    alignSelf: 'flex-start',
+    fontSize: 16,
+    fontFamily: 'Bold',
+  },
+  button: {
+    position: 'absolute',
+    alignSelf: 'center',
+    bottom: device.iPhoneNotch ? 38 : 12,
+    borderWidth: 2,
+    width: 210,
+    height: 46,
+    backgroundColor: '#fff'
+  },
 })
 
 export default NewAddress

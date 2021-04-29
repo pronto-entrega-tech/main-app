@@ -1,9 +1,15 @@
 import React from 'react';
 import { StyleProp, Text, TextStyle } from 'react-native';
 
-function MyText({style={}, children}: {style: StyleProp<TextStyle>, children: string | string[]}) {
+function MyText({children, style={}, ellipsizeMode, numberOfLines}:
+{children?: any | any[], style?: StyleProp<TextStyle>, ellipsizeMode?: 'head'|'middle'|'tail'|'clip', numberOfLines?: number}) {
   return (
-    <Text style={[{fontFamily: 'Regular'}, style]} >{children}</Text>
+    <Text
+      style={[{fontFamily: 'Regular'}, style]}
+      ellipsizeMode={ellipsizeMode}
+      numberOfLines={numberOfLines} >
+      {children}
+    </Text>
   )
 }
 

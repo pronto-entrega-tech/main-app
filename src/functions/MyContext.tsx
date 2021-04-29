@@ -1,26 +1,28 @@
 import React from 'react';
-import { Alert, Animated } from 'react-native';
+import { Alert } from 'react-native';
 import { prodModel } from '../components/ProdItem';
-import { getActiveMarketKey, getFavorites, getShoppingList, saveActiveMarketKey, saveFavorites, saveShoppingList } from './dataStorage';
-import validate from './validate';
+import { money, Money } from './converter';
+import { getActiveMarketKey, getFavorites, getShoppingList, saveActiveMarketKey, saveFavorites, getIsGuest, saveIsGuest, saveShoppingList } from './dataStorage';
 
 interface contextModel {
+  isGuest: boolean,
+  setIsGuest: (isGuest: boolean) => Promise<void>,
   refresh: boolean,
-  subtotal: number,
-  setSubtotal: React.Dispatch<React.SetStateAction<number>>,
-  shoppingList: Map<number, {
+  subtotal: Money,
+  setSubtotal: React.Dispatch<React.SetStateAction<Money>>,
+  shoppingList: Map<string, {
     quantity: number;
     item: prodModel;
   }>,
-  setShoppingList: React.Dispatch<React.SetStateAction<Map<number, {
+  setShoppingList: React.Dispatch<React.SetStateAction<Map<string, {
     quantity: number;
     item: prodModel;
   }>>>,
-  favorites: Map<number, prodModel>,
+  favorites: Map<string, prodModel>,
   onPressFav: (item: prodModel) => void,
   onPressAdd: (item: prodModel) => void,
   onPressRemove: (item: prodModel) => void,
-  setActiveMarketKey: React.Dispatch<React.SetStateAction<number>>,
+  setActiveMarketKey: React.Dispatch<React.SetStateAction<string>>,
   modalState: {
     message: string;
     long?: boolean;
@@ -40,11 +42,16 @@ function useMyContext() {
 }
 
 function MyProvider(props: any) {
+  const [isGuest, setIsGuest] = React.useState<boolean>();
   const [refresh, setRefresh] = React.useState<boolean>(false);
-  const [subtotal, setSubtotal] = React.useState<number>(0);
-  const [activeMarketKey, setActiveMarketKey] = React.useState<number>(0);
-  const [shoppingList, setShoppingList] = React.useState<Map<number, {quantity: number, item: prodModel}>>(new Map);
-  const [favorites, setFavorites] = React.useState<Map<number, prodModel>>(new Map);
+  const [subtotal, setSubtotal] = React.useState<Money>(money('0'));
+  const [activeMarketKey, setActiveMarketKey] = React.useState<string>('');
+  const [shoppingList, setShoppingList] = React.useState<Map<string, {quantity: number, item: prodModel}>>(new Map);
+  const [favorites, setFavorites] = React.useState<Map<string, prodModel>>(new Map);
+  const doSetIsGuest = async (isGuest: boolean) => {
+    setIsGuest(isGuest)
+    await saveIsGuest(isGuest)
+  }
   const doRefresh = () => setRefresh(c => !c);
   
   const [modalRefresh, setModalRefresh] = React.useState<boolean>(false);
@@ -52,7 +59,25 @@ function MyProvider(props: any) {
   const [modalState, setModalState] = React.useState({
     message: '',
     long: false
-  })  
+  })
+
+  React.useEffect(() => {
+    getIsGuest()
+    .then(isGuest => setIsGuest(isGuest))
+
+    getActiveMarketKey()
+    .then(key => setActiveMarketKey(key))
+
+    getFavorites()
+    .then(favorites => setFavorites(favorites));
+
+    getShoppingList()
+    .then(list => {if (list != null) {
+      setShoppingList(list)
+      setSubtotal(updateCart(list))
+      doRefresh()
+    }});
+  }, []);
 
   const toast = (message: string, long = false) => {
     setModalState({
@@ -63,7 +88,6 @@ function MyProvider(props: any) {
   }
   
   const onPressFav = (item: prodModel) => {
-    if (!validate([favorites])) return;
     let isFavorite = favorites.has(item.prodKey);
     if (isFavorite) {
       if (favorites.delete(item.prodKey)) {
@@ -82,8 +106,7 @@ function MyProvider(props: any) {
   }
 
   const onPressAdd = (item: prodModel) => {
-    if (!validate([shoppingList, activeMarketKey])) return;
-    if (activeMarketKey == 0) {
+    if (activeMarketKey == '') {
       saveActiveMarketKey(item.mercKey)
       setActiveMarketKey(item.mercKey)
     } else if (item.mercKey != activeMarketKey) {
@@ -97,8 +120,9 @@ function MyProvider(props: any) {
           setSubtotal(updateCart(newShoppingList))
           saveShoppingList(newShoppingList)
           doRefresh()
-        }}], {cancelable: true})
-        return
+        }}
+      ], {cancelable: true})
+      return;
     }
     let value: number | undefined = shoppingList.has(item.prodKey) ? shoppingList.get(item.prodKey)?.quantity : 0;
     if (typeof value == 'undefined') return Alert.alert('Erro ao adicionar produto', 'Tente novamente');
@@ -111,7 +135,6 @@ function MyProvider(props: any) {
   }
 
   const onPressRemove = (item: prodModel) => {
-    if (!validate([shoppingList, activeMarketKey])) return;
     let value: number | undefined = shoppingList.has(item.prodKey) ? shoppingList.get(item.prodKey)?.quantity : 0;
     if (typeof value == 'undefined') return Alert.alert('Erro ao remover produto', 'Tente novamente');
     if (value > 1) {
@@ -122,8 +145,8 @@ function MyProvider(props: any) {
     } else if (value == 1) {
       if (shoppingList.delete(item.prodKey)) {
         if (shoppingList.size == 0) {
-          saveActiveMarketKey(0)
-          setActiveMarketKey(0)
+          saveActiveMarketKey('')
+          setActiveMarketKey('')
         }
         setShoppingList(shoppingList)
         setSubtotal(updateCart(shoppingList))
@@ -134,23 +157,10 @@ function MyProvider(props: any) {
       }
     }
   }
-
-  React.useEffect(() => {
-    getShoppingList()
-      .then(list => {if (list != null) {
-        setShoppingList(list)
-        setSubtotal(updateCart(list))
-        doRefresh()
-      }});
-
-    getActiveMarketKey()
-    .then(key => setActiveMarketKey(key))
-
-    getFavorites()
-      .then(favorites => setFavorites(favorites));
-  }, []);
   
   return <MyContext.Provider value={{
+    isGuest: isGuest,
+    setIsGuest: doSetIsGuest,
     refresh: refresh,
     subtotal: subtotal,
     setSubtotal: setSubtotal,
@@ -167,15 +177,15 @@ function MyProvider(props: any) {
   }} {...props} />
 }
 
-function updateCart(shoppingList: Map<number, {quantity: number, item: prodModel}>) {
-  if (!validate([shoppingList])) return 0;
-  var final: number = 0
+function updateCart(shoppingList: Map<string, {quantity: number, item: prodModel}>) {
+  var final = money('0')
+  if (shoppingList.size == 0) return final;
   const keys = Array.from(shoppingList.keys());
-  for (var i = 0; i < keys.length ;i++) {
-    const key = keys[i]
-    const item = shoppingList.get(key)
-    if (typeof item === 'undefined') return 0;
-    final = final + (item?.item.preco * item.quantity)
+  for (var i = 0; i < keys.length; i++) {
+    const item = shoppingList.get(keys[i])
+    if (item) (
+      final.add(item.item.preco.value * item.quantity)
+    )
   }
   return final;
 }

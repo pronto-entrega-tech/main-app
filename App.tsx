@@ -5,8 +5,6 @@ import { createStackNavigator, TransitionPresets } from '@react-navigation/stack
 import { myColors, device, myTitle, images } from './src/constants'
 import Header from './src/components/Header';
 import Header2 from './src/components/Header2';
-import Splash from './src/pages/Others/Splash';
-import NewUser from './src/pages/Others/NewUser';
 import Others from './src/pages/Others';
 import Home from './src/pages/Home';
 import Perfil from './src/pages/Perfil';
@@ -33,15 +31,16 @@ function App() {
   useEffect(() => {
     (async () => {
       try {
+        await Font.loadAsync(myFonts);
+        if (!device.web) return;
+
         const initialUrl = (await Linking.getInitialURL())?.replace(prefix, '');
         
         const savedState = await AsyncStorage?.getItem(NAVIGATION_PERSISTENCE_KEY);
         const state = savedState ? JSON.parse(savedState) : undefined;
 
-        if (!(initialUrl?.startsWith('/produto') || initialUrl?.startsWith('/mercado')))
+        if (!(initialUrl == '/' || initialUrl?.startsWith('/produto') || initialUrl?.startsWith('/mercado?')))
         setInitialState(state);
-
-        await Font.loadAsync(myFonts);
       } finally {
         setIsReady(true);
       }
@@ -75,11 +74,15 @@ function App() {
           headerMode='screen'>
           <Stack.Screen
             name='Splash'
-            component={Splash}
+            component={Others.Splash}
             options={{headerShown: false, title: myTitle}}/>
           <Stack.Screen
             name='NewUser'
-            component={NewUser}
+            component={Others.NewUser}
+            options={{headerShown: false, title: myTitle }}/>
+          <Stack.Screen
+            name='SignIn'
+            component={Others.SignIn}
             options={{headerShown: false, title: myTitle }}/>
           <Stack.Screen
             name='BottomTabs'
@@ -126,7 +129,7 @@ function App() {
           <Stack.Screen
             name='Payment'
             component={Others.Payment}
-            options={{header: props => <Header {...props} title={'Pagamento'} divider={false} />, title: myTitle}}/>
+            options={{headerShown: false, title: myTitle}}/>
           <Stack.Screen
             name='PaymentInApp'
             component={Others.PaymentInApp}
@@ -155,6 +158,10 @@ function App() {
             name='UploadQuestion'
             component={Others.UploadQuestion}
             options={{header: props => <Header {...props} title={'Envie sua dúvida'}/>, title: myTitle}}/>
+          <Stack.Screen
+            name='Devices'
+            component={Others.Devices}
+            options={{header: props => <Header {...props} title={'Dispositivos'}/>, title: myTitle}}/>
         </Stack.Navigator>
         <MyToast />
       </NavigationContainer>

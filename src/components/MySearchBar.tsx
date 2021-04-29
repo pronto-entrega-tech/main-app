@@ -1,6 +1,6 @@
 import React from 'react';
 import { Searchbar } from 'react-native-paper';
-import { myColors } from '../constants'
+import { device, myColors } from '../constants'
 
 function MySearchbar ({onSubmit}: {onSubmit: () => void}) {
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -14,7 +14,8 @@ function MySearchbar ({onSubmit}: {onSubmit: () => void}) {
       placeholder="O que você procura?"
       onChangeText={onChangeSearch}
       value={searchQuery}
-      onSubmitEditing={onSubmit}
+      onKeyPress={e => e.nativeEvent.key == 'Enter' && device.web? onSubmit() : null}
+      onSubmitEditing={() => device.web? null : onSubmit}
       focusable={false}
     />
   );

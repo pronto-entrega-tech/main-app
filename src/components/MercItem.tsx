@@ -2,53 +2,49 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { AirbnbRating, Image } from 'react-native-elements';
 import { myColors, device, globalStyles } from '../constants';
-import { converter } from '../functions';
+import { computeDistance, isMarketOpen, Money } from '../functions/converter';
 import requests from '../services/requests';
-import MyButton from './MyButton';
+import MyButton from './MyTouchable';
 
 export interface mercModel {
-  position: number,
+  key: string,
   nome: string,
-  logo: string,
-  logo2: string,
-  color: string,
   endereco: string,
   latitude: number,
   longitude: number,
-  open: string,
-  close: string,
-  openSab: string,
-  closeSab: string,
-  openDom: string,
-  closeDom: string,
-  minPrazo: string,
-  maxPrazo: string,
-  taxa: string,
-  minPedido: number,
+  open: number,
+  close: number,
+  openSab: number,
+  closeSab: number,
+  openDom: number,
+  closeDom: number,
+  minPrazo: number,
+  maxPrazo: number,
+  taxa: Money,
+  minPedido: Money,
   info: string
 }
 
 function MercItem({ item, coords, onPress } :
-  { item: mercModel, coords: {lat: number | undefined, lon: number | undefined}, onPress: (item: any) => void }) {
-  const distance = coords.lat && coords.lon? converter.computeDistance([coords.lat, coords.lon], [item.latitude, item.longitude]) : undefined;
-  const {isOpen, openHour} = converter.open(item);
+{ item: mercModel, coords: {lat: number | undefined, lon: number | undefined}, onPress: (item: any) => void }) {
+  const distance = coords.lat && coords.lon? computeDistance([coords.lat, coords.lon], [item.latitude, item.longitude]) : undefined;
+  const {isOpen, openHour} = isMarketOpen(item);
 
   return (
     <MyButton
       style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader]}
-      underlayColor={myColors.buttonUnderlayColor}
       onPress={onPress} >
       <>
         <Image
-        source={{uri: requests+'images/'+item.logo}}
-        style={styles.image} containerStyle={{margin: -1}} />
+          source={{uri: requests+'images/'+'mercado'/*item.key*/+'.jpeg'}}
+          containerStyle={styles.image} />
         <View style={{marginLeft: 10, marginTop:-5, justifyContent: 'center'}}>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.title}>{item.nome}</Text>
             <AirbnbRating defaultRating={0} isDisabled={true} size={12} showRating={false} starStyle={{margin: 1}} />
           </View>
           <Text style={styles.text1}><Text style={styles.openText}>{isOpen ? 'Aberto' : 'Fechado'}</Text> • {isOpen ? 'Fecha' : 'Abre'} ás {openHour}:00</Text>
-          <Text style={styles.text2}>{distance? `Á ${distance}km • ` : ''}{item.minPrazo}-{item.maxPrazo}min • R${converter.toPrice(item.taxa)}</Text>
+          <Text style={styles.text2}>{distance? `Á ${distance}km • ` : ''}{item.minPrazo}-{item.maxPrazo}min • R${item.taxa.toString()}</Text>
         </View>
       </>
     </MyButton>
@@ -68,6 +64,7 @@ const styles = StyleSheet.create({
     width: 90,
     borderTopLeftRadius:8,
     borderBottomLeftRadius:8,
+    margin: device.web? -1 : 0,
   },
   title: {
     fontSize: 16,

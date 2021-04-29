@@ -1,9 +1,9 @@
 import { device } from "../constants";
 import { Alert } from 'react-native';
 
-function myAlert(mensage: string) {
+function myAlert(title: string, mensage?: string) {
   if (!device.web) {
-    Alert.alert(mensage)
+    Alert.alert(title, mensage)
   } else {
     alert(mensage)
   }

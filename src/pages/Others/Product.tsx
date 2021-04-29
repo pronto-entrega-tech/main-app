@@ -1,7 +1,7 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
-import { View, Share } from 'react-native';
+import { View, Share, StatusBar } from 'react-native';
 import { Divider } from 'react-native-elements';
 import { CartBar } from './BottomTabs';
 import IconButton from '../../components/IconButton';
@@ -13,16 +13,16 @@ import useMyContext from '../../functions/MyContext';
 import requests from '../../services/requests';
 import Loading from '../../components/Loading';
 import { ProdContext } from '../../functions/ProdContext';
+import { createProdList } from '../../functions/converter';
 
 export function ProductHeader({ navigation, item }:
 {navigation: StackNavigationProp<any, any>, item: prodModel}) {
   const {favorites, onPressFav} = useMyContext();
   return(
+    <>
+    <View style={{height: device.android? StatusBar.currentHeight : device.iPhoneNotch ? 34 : 0, backgroundColor: myColors.background}} />
     <View
-    style={[{
-      backgroundColor: myColors.background, flexDirection: 'row', justifyContent: 'flex-end', height: 46},
-      globalStyles.notch
-     ]} >
+    style={{backgroundColor: myColors.background, flexDirection: 'row', justifyContent: 'flex-end', height: 46}} >
       <View style ={{position: 'absolute', left: 0}}>
         <IconButton
           icon='arrow-left'
@@ -55,6 +55,7 @@ export function ProductHeader({ navigation, item }:
           Share.share({message: requests+'produto/'+item.prodKey})
         }} />
     </View>
+    </>
   )
 }
 
@@ -68,7 +69,9 @@ function Product({ navigation, route }:
     if (item) return;
     fetch(requests+'prodList.php')
       .then((response) => response.json())
-      .then((json) => setItem(json[route.params?.prod-1]))
+      .then((json) => createProdList(json))
+      .then((list: prodModel[]) => list.filter(item => item.prodKey == route.params?.prod)[0])
+      .then((item: prodModel) => setItem(item))
       .catch((error) => console.error(error))
   }, []);
 
@@ -79,10 +82,10 @@ function Product({ navigation, route }:
       <ProductHeader
         navigation={navigation}
         item={item} />
-      <View style={device.web ? {height: device.height-56} : {flex: 1}} >
+      <View style={device.web ? {height: device.height} : {flex: 1}} >
         <ProdContext.Provider value={{item: item, merc: item.mercKey}}>
           <Tab.Navigator tabBarOptions={{activeTintColor: myColors.text3, indicatorStyle: {backgroundColor: myColors.primaryColor}}} >
-            <Tab.Screen name='Produto' component={ProductDetails} />
+            <Tab.Screen name='ProductDetails' component={ProductDetails} options={{tabBarLabel: 'Produto'}} />
             <Tab.Screen name='Mercado' component={Mercado} />
           </Tab.Navigator>
         </ProdContext.Provider>

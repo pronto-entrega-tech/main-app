@@ -1,74 +1,57 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { View, StyleSheet, TouchableNativeFeedback, TouchableHighlight, Pressable } from 'react-native';
+import { View, StyleSheet, TouchableNativeFeedback } from 'react-native';
 import { myColors, device, globalStyles } from '../constants';
 import colors from '../constants/colors';
+import { TouchableRipple } from 'react-native-paper';
+import MyTouchable from './MyTouchable';
 
 function IconButton ({onPress, icon, size=24, color=myColors.primaryColor, type } : 
 {onPress: (item: any) => void, icon: string, size?: number, color?: string, 
   type?: 'clear'|'add'|'addHorizontal'|'fill'|'back'|'profile'|'address'|'prodIcons'|'profile2'|'cancel' }) {
+  let hitSlop;
   let style = {};
-  let conteinerStyle = {};
-  let rippleRadius = 30;
-  let hitSlop = 0;
   switch(type){
     case 'clear':
       style = styles.buttonClear;
-      rippleRadius = 22;
       break;
     case 'add':
-      conteinerStyle = [styles.buttonAdd, globalStyles.elevation4, globalStyles.darkBoader];
-      hitSlop = 16;
+      style = [styles.buttonAdd, globalStyles.elevation4, globalStyles.darkBoader];
+      hitSlop = {top: 9, bottom: 9, left: 12, right: 12};
       break;
     case 'addHorizontal':
-      conteinerStyle = [styles.buttonAddHorizontal, globalStyles.elevation4, globalStyles.darkBoader];
+      style = [styles.buttonAddHorizontal, globalStyles.elevation4, globalStyles.darkBoader];
+      hitSlop = {top: 10, bottom: 10, left: 10, right: 12};
       break;
     case 'back':
       style = styles.buttonBack;
-      rippleRadius = 24;
       break;
     case 'cancel':
       style = styles.cancel;
-      rippleRadius = 24;
       break;
     case 'prodIcons':
       style = styles.buttonProdIcons;
-      rippleRadius = 24;
       break;
     case 'profile':
-      conteinerStyle = [styles.buttonProfile, globalStyles.elevation4, globalStyles.darkBoader];
+      style = [styles.buttonProfile, globalStyles.elevation4, globalStyles.darkBoader];
       break;
     case 'profile2':
-      conteinerStyle = [styles.buttonProfile2, globalStyles.elevation4];
+      style = [styles.buttonProfile2, globalStyles.elevation4];
       break;
     case 'address':
-      conteinerStyle = styles.buttonAddress;
-      rippleRadius = 24;
+      style = styles.buttonAddress;
       break;
     default:
-      conteinerStyle = [styles.button, globalStyles.elevation4, globalStyles.darkBoader];
+      style = [styles.button, globalStyles.elevation4, globalStyles.darkBoader];
   }
-  if (device.android)
-  return (
-    <View style={conteinerStyle}>
-      <TouchableNativeFeedback 
-        style={{borderRadius: 60}}
-        background={TouchableNativeFeedback.Ripple('#aaa', true, rippleRadius)}
-        onPress={onPress} >
-        <View style={style} >
-          <Icon name={icon} size={size} color={color} />
-        </View>  
-      </TouchableNativeFeedback>
-    </View>
-  )
   
   return (
-    <TouchableHighlight
-      style={[style, conteinerStyle]} 
-      underlayColor={myColors.buttonUnderlayColor}
-      onPress={onPress} >
+    <MyTouchable
+      hitSlop={hitSlop}
+      onPress={onPress}
+      style={style} >
       <Icon name={icon} size={size} color={color} />
-    </TouchableHighlight>
+    </MyTouchable>
   )
 }
 

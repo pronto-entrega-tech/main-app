@@ -5,10 +5,10 @@ import { Divider } from 'react-native-elements';
 import { myColors, globalStyles } from '../constants';
 import IconButton from './IconButton';
 
-function Header({navigation, title, divider = true, goBack = true}:
-  {navigation: StackNavigationProp<any, any>, title: string, divider?: boolean, goBack?: boolean}) {
+function Header({navigation, title, divider = true, goBack = true, notchless = false}:
+  {navigation: StackNavigationProp<any, any>, title: string, divider?: boolean, goBack?: boolean, notchless?: boolean}) {
   return(
-    <View style={[styles.header, globalStyles.notch]}>
+    <View style={[styles.header, notchless? {} : globalStyles.notch]}>
       {goBack? <IconButton
       icon='arrow-left'
       size={24}

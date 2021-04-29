@@ -7,6 +7,7 @@ const linking: LinkingOptions = {
   config: {
     screens: {
       Splash: '',
+      SignIn: 'entrar',
       SelectAddress: 'selecione-endereco',
       BottomTabs: {
         initialRouteName: 'HomeTab',
@@ -19,6 +20,12 @@ const linking: LinkingOptions = {
               ListMercados: 'mercados',
               Mercado: {
                 path: 'mercado',
+              },
+              MercInfo: {
+                path: 'mercado-detalhes/:key',
+              },
+              MercRating: {
+                path: 'mercado-avaliacao/:key',
               },
             },
           },
@@ -44,15 +51,25 @@ const linking: LinkingOptions = {
       Product: {
         path: 'produto/:prod',
         screens: {
-          Produto: '',
+          ProductDetails: '',
           Mercado: 'mercado',
         }
       },
-      MyProfile: 'meu-perfil',
+      Payment: {
+        screens: {
+          PaymentInApp: 'pagamento',
+          PaymentOnDelivery: 'pagamento-entrega',
+        }
+      },
+      Cart: 'carrinho',
+      Schedule: 'agendamento',
       Address: 'enderecos',
-      Search: 'pesquisa',
-      UploadQuestion: 'mandar-pergunta',
+      NewAddress: 'editar-endereco',
       Filter: 'filtro',
+      Search: 'pesquisa',
+      MyProfile: 'meu-perfil',
+      UploadQuestion: 'mandar-pergunta',
+      Devices: 'dispositivos',
       NotFound: '*',
     },
   },

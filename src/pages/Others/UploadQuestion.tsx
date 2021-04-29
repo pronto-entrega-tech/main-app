@@ -1,6 +1,6 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
-import { Text, ScrollView, StyleSheet, View, Pressable } from 'react-native';
+import { Text, ScrollView, StyleSheet, View, Pressable, TextInput } from 'react-native';
 import { Button, Divider, Input } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as DocumentPicker from 'expo-document-picker';
@@ -9,6 +9,8 @@ import { device, myColors } from '../../constants';
 import { getProfile } from '../../functions/dataStorage';
 import useMyContext from '../../functions/MyContext';
 import IconButton from '../../components/IconButton';
+import MyButton from '../../components/MyButton';
+import myAlert from '../../functions/myAlert';
 
 const emailCorrectRega = /[a-zA-Z0-9.!#$%&'*+/=?`{|}~^-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
 const emailCompleteReg = /^(.+)@(.+)\.(.{2,})$/;
@@ -23,7 +25,7 @@ function UploadQuestion({navigation}:
   const [message, setMessage] = React.useState<string>('');
   const [messageError, setMessageError] = React.useState<boolean>(false);
   const [documents, setDocuments] = React.useState<DocumentPicker.DocumentResult[]>([]);
-  const { toast } = useMyContext();
+  const {toast} = useMyContext();
 
   React.useEffect(() => {
     getProfile().then(profile => {
@@ -31,6 +33,9 @@ function UploadQuestion({navigation}:
       setIsLoading(false)
     })
   }, []);
+
+  const inputTitle = React.useRef<TextInput | null>();
+  const inputMessage = React.useRef<TextInput | null>();
 
   if (isLoading) 
   return (
@@ -58,7 +63,9 @@ function UploadQuestion({navigation}:
         onChangeText={v => {
           setEmailError(false)
           setEmail(v)
-          }} />
+          }}
+        returnKeyType='next'
+        onSubmitEditing={() => inputTitle.current?.focus()} />
       <Input
         label='Assunto'
         labelStyle={styles.label}
@@ -66,7 +73,10 @@ function UploadQuestion({navigation}:
         selectionColor={myColors.colorAccent}
         inputStyle={styles.border}
         inputContainerStyle={{borderColor: 'transparent'}}
-        onChangeText={v => {setTitleError(false); setTitle(v)}} />
+        onChangeText={v => {setTitleError(false); setTitle(v)}}
+        returnKeyType='next'
+        onSubmitEditing={() => inputMessage.current?.focus()}
+        ref={ref => inputTitle.current = ref} />
       <Input
         label='Descrição'
         labelStyle={styles.label}
@@ -77,21 +87,20 @@ function UploadQuestion({navigation}:
         style={{textAlignVertical: 'top'}}
         multiline={true}
         numberOfLines={5}
-        onChangeText={v => {setMessageError(false); setMessage(v)}} />
+        onChangeText={v => {setMessageError(false); setMessage(v)}} 
+        ref={ref => inputMessage.current = ref}/>
         
-      <Text style={[styles.label, {alignSelf: 'flex-start', fontFamily: 'Medium', marginLeft: 19}]} >Anexos</Text>
+      <Text style={[styles.label, {alignSelf: 'flex-start', fontFamily: 'Bold', marginLeft: 19, fontSize: 16}]} >Anexos</Text>
       <View style={styles.attachment} >
-        <Button
+        <MyButton
           title='Adicionar arquivo'
           type='clear'
-          theme={{colors: {primary: myColors.primaryColor}}}
-          buttonStyle={{width: device.width-20}}
-          containerStyle={{borderRadius: 12}}
+          buttonStyle={{borderRadius: 12, width: device.width-20}}
           onPress={()=> {
             (async () => {
               const document = await DocumentPicker.getDocumentAsync({copyToCacheDirectory: false});
               if (document.type == 'cancel') return;
-              if (documents.length > 4) return alert('Máximo de 5 anexos');
+              if (documents.length > 4) return myAlert('Máximo de 5 anexos');
               setDocuments([...documents, document])
             })();
             }} />
@@ -122,12 +131,10 @@ function UploadQuestion({navigation}:
         }
       </View>
     </ScrollView>
-    <Button
+    <MyButton
       title='Enviar'
       type='outline'
-      theme={{colors: {primary: myColors.primaryColor}}}
-      buttonStyle={{borderWidth: 2, width: 120, height: 46, backgroundColor: '#fff'}}
-      containerStyle={{position: 'absolute', alignSelf: 'center', bottom: device.iPhoneNotch ? 38 : 12}}
+      buttonStyle={styles.button}
       onPress={()=> {
         let error = false;
         if (!emailCorrectRega.test(email)) {error = true; setEmailError(true)};
@@ -146,12 +153,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: myColors.background,
     paddingTop: 24,
-    paddingBottom: 8+46+(device.iPhoneNotch ? 38 : 12)
+    paddingBottom: 8+46+(device.iPhoneNotch ? 38 : 12),
   },
   label: {
     color: myColors.primaryColor,
     marginBottom: 6,
-    marginLeft: 8
+    marginLeft: 8,
   },
   border: {
     borderWidth: 2,
@@ -164,7 +171,16 @@ const styles = StyleSheet.create({
     borderColor: myColors.primaryColor,
     borderRadius: 12,
     width: device.width-20,
-    borderStyle: 'dashed'
+    borderStyle: 'dashed',
+  },
+  button: {
+    position: 'absolute',
+    alignSelf: 'center',
+    bottom: device.iPhoneNotch ? 38 : 12,
+    borderWidth: 2,
+    width: 120,
+    height: 46,
+    backgroundColor: '#fff',
   },
 })
 

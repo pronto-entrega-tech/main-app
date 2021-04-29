@@ -4,13 +4,16 @@ import React from 'react';
 import { ScrollView, Text, View, StyleSheet } from 'react-native';
 import { Divider, Image, Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MyButton from '../../components/MyButton';
 import { myColors, images, globalStyles } from '../../constants';
 import { getProfile } from '../../functions/dataStorage';
+import useMyContext from '../../functions/MyContext';
 import { profileModel } from '../Others/MyProfile';
 
 function Perfil({ navigation, route }:
 {navigation: StackNavigationProp<any, any>, route: any}) {
   const [profile, setProfile] = React.useState<profileModel>()
+  const {isGuest} = useMyContext()
   
   useFocusEffect(
     React.useCallback(() => {
@@ -18,19 +21,22 @@ function Perfil({ navigation, route }:
     }, [])
   );
 
-  const data1: {icon: string, title: string, navegate: string}[] = [
-    {icon: 'account', title: 'Meu Perfil', navegate: 'MyProfile'},
-    {icon: 'map-marker', title: 'Endereços salvos', navegate: 'Address'},
-    {icon: 'bell', title: 'Notificações', navegate: 'Notifications'},
-    {icon: 'credit-card-outline', title: 'Formas de pagamento', navegate: 'PaymentInApp'},
+  const data1: {icon: string, title: string, navigate: string}[] = [
+    {icon: 'account', title: isGuest? 'Entrar ou cadastrar-se' : 'Meu Perfil', navigate: isGuest? 'SignIn' : 'MyProfile'},
+    {icon: 'map-marker', title: 'Endereços salvos', navigate: 'Address'},
+    {icon: 'bell', title: 'Notificações', navigate: 'Notifications'},
+    {icon: 'credit-card-outline', title: 'Formas de pagamento', navigate: 'PaymentInApp'},
   ]
-  const data2: {icon: string, title: string, navegate: string}[] = [
-    {icon: 'help-circle', title: 'Central de ajuda', navegate: 'Help'},
-    {icon: 'cog', title: 'Configurações', navegate: 'Config'},
-    {icon: 'store', title: 'Sugerir estabelecimento', navegate: 'Sugestao'},
-    {icon: 'logout-variant', title: 'Sair da conta', navegate: ''},
+  const data2: {icon: string, title: string, navigate: string}[] = [
+    {icon: 'help-circle', title: 'Central de ajuda', navigate: 'Help'},
+    {icon: 'cog', title: 'Configurações', navigate: 'Config'},
+    {icon: 'store', title: 'Sugerir estabelecimento', navigate: 'Sugestao'},
+    {icon: 'monitor-cellphone', title: 'Dispositivos conectados', navigate: 'Devices'},
   ]
-  const data: {icon: string, title: string, navegate: string}[][] = [data1, data2]
+  const data: {icon: string, title: string, navigate: string}[][] = isGuest? [
+    data1.filter(item => item.navigate != 'PaymentInApp'),
+    data2.filter(item => item.navigate != 'Devices'),
+  ] : [data1, data2]
 
   return (
     <ScrollView
@@ -41,7 +47,7 @@ function Perfil({ navigation, route }:
         <View style={{flexDirection: 'row', alignItems: 'center', marginLeft: 30, marginBottom: 22, marginTop: 18}} >
           <Image
             placeholderStyle={{backgroundColor: '#FFF'}}
-            style={{height: 100, width: 100, borderRadius: 100}}
+            containerStyle={{height: 100, width: 100, borderRadius: 100}}
             source={profile?.photoUri? profile.photoUri : images.account} />
           <Text style={styles.name} >{profile?.name? profile.name : 'Convidado'}</Text>
         </View>
@@ -58,12 +64,11 @@ function Perfil({ navigation, route }:
                   name='chevron-right'
                   size={32}
                   color={myColors.grey2} />
-                  <Button
-                  onPress={() => navigation.navigate(item.navegate)}
+                  <MyButton
+                  onPress={() => navigation.navigate(item.navigate)}
                   title={item.title}
                   icon={<Icon name={item.icon} size={28} color={myColors.primaryColor}/>}
-                  containerStyle={index == 0? styles.top : index == data.length-1? styles.bottom : null}
-                  buttonStyle={styles.button}
+                  buttonStyle={[styles.button, index == 0? styles.top : index == data.length-1? styles.bottom : {borderRadius: 0}]}
                   titleStyle={{color: myColors.text2, fontSize: 17, marginLeft: 6}}
                   type='clear'
                   />
@@ -103,10 +108,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   top: {
+    borderRadius: 0,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
   bottom: {
+    borderRadius: 0,
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
   },

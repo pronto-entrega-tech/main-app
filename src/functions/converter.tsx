@@ -1,19 +1,118 @@
 import { mercModel } from "../components/MercItem";
+import { prodModel } from "../components/ProdItem";
 
-export function toMoneyInt(value: string) {
-  return Number.parseInt(value.replace('.', ''))
+function money(money?: string) {
+  return new Money(money)
 }
 
-export function toMoneyString(value: number) {
-  const v = value.toString()
+class Money {
+  value: number = 0;
+
+  constructor(money?: string) {
+    if (!money) return;
+    this.value = parseInt(money.replace(/\D/g, ''));
+  }
+
+  add(money: number | Money) {
+    this.value = this.value + (typeof money == 'number'? money : money.value);
+    return this;
+  }
+
+  sub(money: number | Money) {
+    this.value = this.value - (typeof money == 'number'? money : money.value);
+    return this;
+  }
+
+  multiply(money: number | Money) {
+    this.value = this.value * (typeof money == 'number'? money : money.value);
+    return this;
+  }
+
+  divide(money: number | Money) {
+    this.value = this.value / (typeof money == 'number'? money : money.value);
+    return this;
+  }
+
+  toString() {
+    const v = this.value.toString().padStart(3, '0');
+    return v.substring(0, v.length-2)+','+v.substring(v.length-2, v.length)
+  }
+}
+
+function moneyToString(money?: Money | {value: number} | number) {
+  if (!money) return '';
+  let v;
+  if (typeof money == 'number') {
+    v = money.toString();
+  } else {
+    v = money.value.toString().padStart(3, '0');
+  }
   return v.substring(0, v.length-2)+','+v.substring(v.length-2, v.length)
 }
 
-function toPrice(value: number | string) {
-  if (typeof value == 'string') return value.replace('.',',')
-  if (typeof value == 'undefined') return value
-  const price = value.toFixed(2).toString().replace('.',',');
-  return (price)
+function createProdList(json: any[]) {
+  let prodList: prodModel[] = []
+  for (let i = 0; i < json.length; i++) {
+    const item = json[i]
+    prodList = [...prodList, {
+      prodKey: item.prodKey,
+      image: item.image,
+      nome: item.nome,
+      mercKey: item.mercKey,
+      marca: item.marca,
+      quantidade: item.quantidade,
+      preco: money(item.preco),
+      precoAntes: item.precoAntes != null? money(item.precoAntes) : undefined,
+    }]
+  }
+  return prodList
+}
+
+function createMercList(json: any[]) {
+  let mercList: mercModel[] = []
+  for (let i = 0; i < json.length; i++) {
+    const item = json[i]
+    mercList = [...mercList, {
+      key: item.key,
+      nome: item.nome,
+      endereco: item.endereco,
+      latitude: parseFloat(item.latitude),
+      longitude: parseFloat(item.longitude),
+      open: parseInt(item.open),
+      close: parseInt(item.close),
+      openSab: parseInt(item.openSab),
+      closeSab: parseInt(item.closeSab),
+      openDom: parseInt(item.openDom),
+      closeDom: parseInt(item.closeDom),
+      minPrazo: parseInt(item.minPrazo),
+      maxPrazo: parseInt(item.maxPrazo),
+      taxa: money(item.taxa),
+      minPedido: money(item.minPedido),
+      info: item.info
+    }]
+  }
+  return mercList
+}
+
+function createMercItem(item: any): mercModel {
+  return {
+    key: item.key,
+    nome: item.nome,
+    endereco: item.endereco,
+    latitude: parseFloat(item.latitude),
+    longitude: parseFloat(item.longitude),
+    open: parseInt(item.open),
+    close: parseInt(item.close),
+    openSab: parseInt(item.openSab),
+    closeSab: parseInt(item.closeSab),
+    openDom: parseInt(item.openDom),
+    closeDom: parseInt(item.closeDom),
+    minPrazo: parseInt(item.minPrazo),
+    maxPrazo: parseInt(item.maxPrazo),
+    taxa: money(item.taxa),
+    minPedido: money(item.minPedido),
+    info: item.info
+  }
 }
 
 function computeDistance([prevLat, prevLong]: [prevLat: number, prevLong: number], [lat, long]: [lat: number, long: number]) {
@@ -54,8 +153,13 @@ function isMarketOpen(item: mercModel) {
   return {isOpen, openHour}
 }
 
-export default {
-  toPrice,
+export {
+  money,
+  Money,
+  moneyToString,
+  createProdList,
+  createMercList,
+  createMercItem,
   computeDistance,
-  open: isMarketOpen,
-};
+  isMarketOpen,
+}

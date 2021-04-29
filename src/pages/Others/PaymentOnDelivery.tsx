@@ -1,12 +1,13 @@
 import { StackNavigationProp } from '@react-navigation/stack';
-import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { View, Text, Image, ImageURISource, ScrollView } from 'react-native';
-import { Divider, Button, Input } from 'react-native-elements';
-import { Modal, Portal } from 'react-native-paper';
+import { View, Text, Image, ImageURISource, ScrollView, StyleSheet, Keyboard } from 'react-native';
+import { Button, Input } from 'react-native-elements';
+import { Portal } from 'react-native-paper';
+import BottomModal from '../../components/BottomModal';
 import MyButton from '../../components/MyButton';
+import MyTouchable from '../../components/MyTouchable';
 import { myColors, device, images } from '../../constants';
-import validate from '../../functions/validate';
+import { money, Money, moneyToString } from '../../functions/converter';
 
 interface iconText {
   icon?: ImageURISource,
@@ -31,57 +32,132 @@ const payments: iconText[] = [
 function PaymentOnDelivery({navigation, route}: 
 {navigation: StackNavigationProp<any, any>, route: any}) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [troco, setTroco] = useState('');
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [troco, setTroco] = useState('0,00');
+  const total: Money = route.params.t
+
+  const trocoMask = (v: string) => {
+    v = v.replace(/\D/g, '')
+
+    if (v.length > 3)
+    v = parseInt(v).toString();
+
+    v = v.padStart(3, '0')
+    v = v.substring(0,v.length-2)+','+v.substring(v.length-2)
+    setTroco(v)
+  }
 
   const renderItem = (item: iconText, index: number) => {
     if (item.icon == null) {
       return (
-        <View key={index} >
-          <Text style={{marginLeft: 24, marginBottom: 14, marginTop: 18, fontSize: 17, fontFamily: 'Medium', color: myColors.text4}} >{item.text}</Text>
-          <Divider style={{marginHorizontal: 14, backgroundColor: myColors.divider2, height: 1}} />
-        </View>
+        <Text key={index} style={styles.title} >{item.text}</Text>
       )
     } else {
       return (
       <View key={index} >
-        <MyButton onPress={()=> {
-            if (index == 0) {
-              setModalVisible(true)
-            } else {
-              navigation.navigate('Cart', {callback: 'payment', value: item.payment})
-            }
-          }} style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 16}} >
+        <MyTouchable
+          onPress={()=> {
+              if (index == 0) {
+                setModalVisible(true)
+              } else {
+                navigation.navigate('Cart', {callback: 'payment', value: item.payment})
+              }
+            }}
+          style={[styles.card]} >
           <Image style={{width: 38, height: 38 }} source={item.icon}  />
-          <Text style={{fontSize: 15, fontFamily: 'Medium', color: myColors.text2, marginLeft: 12}} >{item.text}</Text>
-        </MyButton>
-        <Divider style={{marginHorizontal: 16, backgroundColor: myColors.divider2, height: 1}} />
+          <Text style={{fontSize: 15, fontFamily: 'Medium', color: myColors.text2, marginLeft: 16}} >{item.text}</Text>
+        </MyTouchable>
       </View>
     )
   }}
 
+  const _keyboardDidShow = () => setKeyboardVisible(true);
+  const _keyboardDidHide = () => setKeyboardVisible(false);
+
+  React.useEffect(() => {
+    if (!device.iPhoneNotch) return
+    Keyboard.addListener('keyboardWillShow', _keyboardDidShow)
+    Keyboard.addListener('keyboardWillHide', _keyboardDidHide)
+
+    return () => {
+      Keyboard.removeListener('keyboardWillShow', _keyboardDidShow);
+      Keyboard.removeListener('keyboardWillHide', _keyboardDidHide);
+    }
+  }, [])
+
   return (
     <>
-      <ScrollView contentContainerStyle={{backgroundColor: myColors.background, height: device.height-112}} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={device.web? {height: device.height-56} : {}}
+        contentContainerStyle={[{backgroundColor: myColors.background, paddingTop: 8, paddingBottom: 16},
+        ]}>
         {
           payments.map(renderItem)
         }
       </ScrollView>
-      <Modal visible={modalVisible} onDismiss={()=>setModalVisible(false)} style={{justifyContent: 'flex-end'}} >
-        <View style={{backgroundColor: myColors.background, width: '100%', height: 210, borderTopLeftRadius: 16, borderTopRightRadius: 16, padding: 24, alignItems: 'center'}} >
-          <Text style={{fontSize: 20, color: myColors.text4, fontFamily: 'Medium'}} >Troco para quanto?</Text>
-          <Text style={{fontSize: 16, color: myColors.text4, fontFamily: 'Regular'}} >Valor total da compra R${route.params.t}</Text>
+      <Portal>
+        <BottomModal
+          isVisible={modalVisible}
+          onDismiss={() => setModalVisible(false)}
+          style={{padding: 24, alignItems: 'center', paddingBottom: keyboardVisible? 0 : 24}} >
+          <Text style={{fontSize: 20, color: myColors.text4_5, fontFamily: 'Medium'}} >Troco para quanto?</Text>
+          <Text style={{fontSize: 16, color: myColors.text4, fontFamily: 'Regular'}} >Valor total da compra R${moneyToString(total)}</Text>
           <View style={{flexDirection: 'row', marginTop: 4}} >
             <Text style={{fontSize: 20, color: myColors.text4, marginTop: 7, fontFamily: 'Regular'}} >R$</Text>
-            <Input selectionColor={myColors.primaryColor} inputStyle={{fontSize: 20, color: myColors.text4, fontFamily: 'Regular'}} keyboardType='numeric' value={troco} placeholder={'0,00'} onChangeText={v => setTroco(v)} containerStyle={{width: 70}} style={{width: 70}} />
+            <Input
+              autoFocus
+              selectionColor={myColors.primaryColor}
+              inputStyle={{fontSize: 20, color: myColors.text4, fontFamily: 'Regular'}}
+              keyboardType='numeric'
+              maxLength={7}
+              value={troco.toString()}
+              onChangeText={v => trocoMask(v)}
+              textAlign='right'
+              containerStyle={{width: 82}}
+              style={{width: 70}} />
           </View>
           <View style={{flexDirection: 'row'}} >
-            <Button type='outline' onPress={()=> {navigation.navigate('Cart', {payment: {title: 'Dinheiro', sub: 'Sem troco'}}); setModalVisible(false)}} title='Sem troco' />
-            <Button disabled={troco == ''} containerStyle={{marginLeft: 16}} onPress={()=> {navigation.navigate('Cart', {payment: {title: 'Dinheiro', sub: 'Troco para R$'+troco}}); setModalVisible(false)}} title='Confirmar' />
+            <MyButton
+              type='outline'
+              buttonStyle={{borderWidth: 2, padding: 6, width: 106}}
+              onPress={()=> {navigation.navigate('Cart', {callback: 'payment', value: {title: 'Dinheiro', sub: 'Sem troco'}})
+              setModalVisible(false)}}
+              title='Sem troco' />
+            <MyButton
+              disabled={money(troco).value < total.value}
+              buttonStyle={{marginLeft: 16, width: 106}}
+              onPress={()=> {navigation.navigate('Cart', {callback: 'payment', value: {title: 'Dinheiro', sub: 'Troco para R$'+troco}})
+              setModalVisible(false)}}
+              title='Confirmar' />
           </View>
-        </View>
-      </Modal>
+        </BottomModal>
+      </Portal>
     </>
   )
 }
+
+const styles = StyleSheet.create({
+  title: {
+    marginLeft: 24,
+    marginTop: 16,
+    fontSize: 17,
+    fontFamily: 'Medium',
+    color: myColors.text4
+  },
+  card: {
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: 'white',
+    marginHorizontal: 16,
+    marginTop: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: myColors.divider
+  }
+})
 
 export default PaymentOnDelivery

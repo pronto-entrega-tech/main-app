@@ -3,7 +3,7 @@ import { prodModel } from '../components/ProdItem';
 
 interface contextModel {
   item: prodModel,
-  merc: number,
+  merc: string,
 }
 
 const ProdContext = React.createContext<contextModel | undefined>(undefined);

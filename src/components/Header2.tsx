@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Button } from 'react-native-elements';
 import { Divider } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { myColors, globalStyles } from '../constants'
@@ -9,6 +8,7 @@ import IconButton from './IconButton';
 import MySearchbar from './MySearchBar';
 import { getShortAddress } from '../functions/dataStorage';
 import { useFocusEffect } from '@react-navigation/native';
+import MyButton from './MyButton';
 
 function Header2({navigation, fallback}: 
   {navigation: StackNavigationProp<any, any>, fallback: string}) {
@@ -37,12 +37,12 @@ function Header2({navigation, fallback}:
           size={30} 
           color={myColors.primaryColor} 
           style={{ marginTop: 5, marginRight: -4 }} />
-        <Button
+        <MyButton
           type='clear'
           title={shortAdress}
           titleStyle={{ color: myColors.text5, fontFamily: 'Condensed', fontSize: 17}}
+          iconRight
           icon={<Icon name='chevron-right' size={24} color={myColors.text5} />}
-          iconRight={true}
           onPress={() => navigation.navigate('Address')} />
       </View>
       <View style={{ marginHorizontal: 16 }} >

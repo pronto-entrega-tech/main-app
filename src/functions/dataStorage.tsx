@@ -5,20 +5,37 @@ import { orderModel } from "../pages/Compras/Order"
 import { addressModel } from "../pages/Others/Address"
 import { profileModel } from "../pages/Others/MyProfile"
 import requests from "../services/requests"
+import { createMercItem } from "./converter"
 
 const suffix = '@poupapreco{g&?Op#b}/'
 
-//returningUser
-export const saveReturning = async () => {
-  await AsyncStorage.setItem(suffix+'returningUser', 'returningUser')
+//userStatus
+export async function saveUserStatus(status: 'returning'|'returning&logged') {
+  await AsyncStorage.setItem(suffix+'userStatus', status)
 }
-export const isReturning = async () => {
-  return AsyncStorage.getItem(suffix+'returningUser')
-  .then(item => item === 'returningUser')
+
+export async function getUserStatus(): Promise<'returning'|'returning&logged'|undefined> {
+  const value = await AsyncStorage.getItem(suffix+'userStatus')
+  if (value == 'returning' || value == 'returning&logged') return value;
+  return
+}
+
+//guest
+export async function saveIsGuest(isGuest: boolean) {
+  if (isGuest) {
+    await AsyncStorage.removeItem(suffix+'guest')
+  } else {
+    await AsyncStorage.setItem(suffix+'guest', 'notGuest')
+  }
+}
+
+export async function getIsGuest() {
+  return AsyncStorage.getItem(suffix+'guest')
+  .then(item => item !== 'notGuest')
 }
 
 //shortAddress
-export const getShortAddress = async () => {
+export async function getShortAddress() {
   return getActiveAddress()
   .then((address: addressModel | '') => {
     if (address === '') return 'Escolha um endereço';
@@ -27,7 +44,7 @@ export const getShortAddress = async () => {
 }
 
 //longAddress
-export const getLongAddress = async () => {
+export async function getLongAddress() {
   return getActiveAddress()
   .then((address: addressModel | '') => {
     if (address === '') return {rua: '', bairro: ''};
@@ -36,115 +53,126 @@ export const getLongAddress = async () => {
 }
 
 //activeAddressIndex
-export const saveActiveAddressIndex = async (value: number) => {
+export async function saveActiveAddressIndex(value: number) {
   const stringValue = JSON.stringify(value);
   await AsyncStorage.setItem(suffix+'activeAddressIndex', stringValue)
 }
 
-export const getActiveAddressIndex = async () => {
+export async function getActiveAddressIndex() {
   const stringValue =  await AsyncStorage.getItem(suffix+'activeAddressIndex')
   const activeIndex: number = stringValue? JSON.parse(stringValue) : -1
   return activeIndex
 }
 
 //activeAddress
-export const saveActiveAddress = async (value: addressModel) => {
+export async function saveActiveAddress(value: addressModel) {
   const stringValue = JSON.stringify(value);
   await AsyncStorage.setItem(suffix+'activeAddress', stringValue)
 }
 
-export const getActiveAddress = async () => {
+export async function getActiveAddress() {
   const stringValue =  await AsyncStorage.getItem(suffix+'activeAddress')
   const address: addressModel = stringValue? JSON.parse(stringValue) : ''
   return address
 }
 
 //addressList
-export const saveAddressList = async (value: addressModel[]) => {
+export async function saveAddressList(value: addressModel[]) {
   const stringValue = JSON.stringify(value);
   await AsyncStorage.setItem(suffix+'addressList', stringValue)
 }
 
-export const getAddressList = async () => {
+export async function getAddressList(): Promise<addressModel[]> {
   const stringValue =  await AsyncStorage.getItem(suffix+'addressList');
   return stringValue? JSON.parse(stringValue) : []
 }
 
 //favorites
-export const saveFavorites = async (value: Map<number, prodModel>) => {
+export async function saveFavorites(value: Map<string, prodModel>) {
   const stringValue = JSON.stringify(Array.from(value.entries()))
   await AsyncStorage.setItem(suffix+'favorites', stringValue)
 }
 
-export const getFavorites = async () => {
+export async function getFavorites() {
   const stringValue = await AsyncStorage.getItem(suffix+'favorites');
-  return new Map<number, prodModel>(stringValue? JSON.parse(stringValue) : null)
+  return new Map<string, prodModel>(stringValue? JSON.parse(stringValue) : null)
 }
 
 //shoppingList
-export const saveShoppingList = async (value: Map<number, {quantity: number, item: prodModel}>) => {
+export async function saveShoppingList(value: Map<string, {quantity: number, item: prodModel}>) {
   const stringValue = JSON.stringify(Array.from(value.entries()))
   await AsyncStorage.setItem(suffix+'shoppingList', stringValue)
 }
 
-export const getShoppingList = async () => {
+export async function getShoppingList() {
   const stringValue = await AsyncStorage.getItem(suffix+'shoppingList')
-  return new Map<number, {quantity: number, item: prodModel}>
-    (stringValue? JSON.parse(stringValue) : null)
+  return new Map<string, {quantity: number, item: prodModel}>(stringValue? JSON.parse(stringValue) : null)
 }
 
 //activeMarketKey
-export const saveActiveMarketKey = async (value: number) => {
+export async function saveActiveMarketKey(value: string) {
   const stringValue = JSON.stringify(value);
   await AsyncStorage.setItem(suffix+'activeMarketKey', stringValue)
-  if (value == 0) {
+  if (value == '') {
     await AsyncStorage.removeItem(suffix+'activeMarket')
     return;
   }
   fetch(requests+'mercList.php')
-      .then((response) => response.json())
-      .then((json: mercModel[]) => saveActiveMarket(json[0]))
-      .catch((error) => console.error(error));
+  .then((response) => response.json())
+  .then((json: mercModel[]) => saveActiveMarket(createMercItem(json[0])))
+  .catch((error) => console.error(error));
 }
 
-export const getActiveMarketKey = async () => {
+export async function getActiveMarketKey() {
   const stringValue =  await AsyncStorage.getItem(suffix+'activeMarketKey')
-  const activeIndex: number = stringValue? JSON.parse(stringValue) : 0;
-  return activeIndex
+  const activeKey: string = stringValue? JSON.parse(stringValue) : 0;
+  return activeKey
 }
 
 //activeMarket
-const saveActiveMarket = async (value: mercModel) => {
+async function saveActiveMarket(value: mercModel) {
   const stringValue = JSON.stringify(value);
   await AsyncStorage.setItem(suffix+'activeMarket', stringValue)
 }
 
-export const getActiveMarket = async () => {
+export async function getActiveMarket() {
   const stringValue =  await AsyncStorage.getItem(suffix+'activeMarket')
   const activeMarket: mercModel = stringValue? JSON.parse(stringValue) : undefined
   return activeMarket
 }
 
 //ordersList
-export const saveOrdersList = async (value: orderModel[]) => {
+export async function saveOrdersList(value: orderModel[]) {
   const stringValue = JSON.stringify(value);
   await AsyncStorage.setItem(suffix+'ordersList', stringValue)
 }
 
-export const getOrdersList = async () => {
+export async function getOrdersList() {
   const stringValue =  await AsyncStorage.getItem(suffix+'ordersList')
   const ordersList: orderModel[] = stringValue? JSON.parse(stringValue) : []
   return ordersList
 }
 
 //profile
-export const saveProfile = async (value: profileModel) => {
+export async function saveProfile(value: profileModel) {
   const stringValue = JSON.stringify(value);
   await AsyncStorage.setItem(suffix+'ordersList', stringValue)
 }
 
-export const getProfile = async () => {
+export async function getProfile() {
   const stringValue =  await AsyncStorage.getItem(suffix+'ordersList')
   const ordersList: profileModel = stringValue? JSON.parse(stringValue) : undefined
   return ordersList
+}
+
+//lastPayment
+export async function saveLastPayment(value: {title: string, sub: string}) {
+  const stringValue = JSON.stringify(value);
+  await AsyncStorage.setItem(suffix+'lastPayment', stringValue)
+}
+
+export async function getLastPayment() {
+  const stringValue =  await AsyncStorage.getItem(suffix+'lastPayment')
+  const lastPayment: {title: string, sub: string} = stringValue? JSON.parse(stringValue) : undefined
+  return lastPayment
 }

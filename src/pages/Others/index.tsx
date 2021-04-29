@@ -1,6 +1,7 @@
 import Address from './Address';
 import BottomTabs from './BottomTabs';
 import Cart from './Cart';
+import Devices from './Devices';
 import Filter from './Filter';
 import MyProfile from './MyProfile';
 import NewAddress from './NewAddress';
@@ -12,6 +13,7 @@ import Product, { ProductHeader } from './Product';
 import routes from '../../constants/routes';
 import Schedule from './Schedule';
 import Splash from './Splash';
+import SignIn from './SignIn';
 import Search from './Search';
 import Sugestao from './Sugestao';
 import UploadQuestion from './UploadQuestion';
@@ -20,6 +22,7 @@ export default {
   Address,
   BottomTabs,
   Cart,
+  Devices,
   Filter,
   MyProfile,
   NewAddress,
@@ -32,6 +35,7 @@ export default {
   routes,
   Schedule,
   Splash,
+  SignIn,
   Search,
   Sugestao,
   UploadQuestion,

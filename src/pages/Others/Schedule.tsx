@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Button, Divider } from 'react-native-elements';
 import { RadioButton } from 'react-native-paper';
+import MyButton from '../../components/MyButton';
 import { myColors, device } from '../../constants';
 import { scheduleModel } from './Cart';
 
@@ -22,10 +23,11 @@ function Schedule({ navigation, route }:
         {
           list.map((item, index) => (
             <View key={index} >
-              {index != 0 ? <Divider style={styles.divider} /> : null}
+              {index != 0?
+              <Divider style={styles.divider} /> : null}
               <RadioButton.Item
                 label={item.horarios}
-                labelStyle={styles.button}
+                labelStyle={styles.radioButton}
                 uncheckedColor={myColors.grey}
                 value=''
                 color={myColors.primaryColor}
@@ -35,12 +37,11 @@ function Schedule({ navigation, route }:
           ))
         }
       </ScrollView>
-      <Button
+      <MyButton
         title={'Confirmar'}
         type='outline'
         disabled={route.params.active === activeSchedule}
-        buttonStyle={{borderWidth: 2, width: 210, height: 46, backgroundColor: '#fff'}}
-        containerStyle={{position: 'absolute', alignSelf: 'center', bottom: device.iPhoneNotch ? 38 : 12}}
+        buttonStyle={styles.button}
         onPress={() => {
           navigation.navigate('Cart', {callback: 'activeSchedule', value: activeSchedule});
         }} />
@@ -54,20 +55,23 @@ const styles = StyleSheet.create({
     marginTop: 14,
     marginBottom: 2,
     fontSize: 18,
+    color: myColors.text5,
   },
   divider: {
     marginHorizontal: 10,
     color: myColors.divider
   },
-  button: {
+  radioButton: {
     color: myColors.text5
   },
-  buttonConteiner: {
-    width: '92%',
-    backgroundColor: '#FFF',
+  button: {
+    borderWidth: 2,
+    width: 210,
+    height: 46,
+    backgroundColor: '#fff',
     position: 'absolute',
-    bottom: device.iOS ? 42 : 8,
     alignSelf: 'center',
+    bottom: device.iPhoneNotch ? 38 : 12
   }
 })
 

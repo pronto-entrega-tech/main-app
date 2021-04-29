@@ -16,7 +16,7 @@ function ProductDetails({ navigation }:
   const {shoppingList, onPressAdd, onPressRemove} = useMyContext();
   const {item} = useProdContext();
   const quantity = shoppingList.get(item.prodKey)?.quantity;
-  const off = ((1-(item.preco / item.precoAntes))*100).toFixed(0);
+  const off = item.precoAntes? ((1-(item.preco.value / item.precoAntes.value))*100).toFixed(0) : undefined;
   const uriImage = item.image != null ? {uri: requests+'images/'+item.image} : images.loadProdImage;
   return(
     <View style={{backgroundColor: myColors.background, flex: 1}} >
@@ -30,13 +30,13 @@ function ProductDetails({ navigation }:
                 style={ styles.prodText }>
                 {item.nome}
               </Text>
-              {item.precoAntes != null ? 
+              {off? 
               <View style={styles.oldPriceConteiner} >
-                <Text style={styles.oldPriceText} >R${converter.toPrice(item.precoAntes)}</Text>
+                <Text style={styles.oldPriceText} >R${item.precoAntes?.toString()}</Text>
                 <View style={styles.offTextBox}><Text style={styles.offText} >-{off}%</Text></View>
               </View>
               : null }
-              <Text style={ styles.priceText } >R${converter.toPrice(item.preco)}</Text>
+              <Text style={ styles.priceText } >R${item.preco.toString()}</Text>
               <View style={ styles.brandWeightRow } >
                 <Text style={ styles.brandText } >{item.marca}</Text>
                 <Text style={ styles.weightText } >{item.quantidade}</Text>
@@ -47,7 +47,7 @@ function ProductDetails({ navigation }:
               <Image 
                 placeholderStyle={{backgroundColor: '#FFF'}}
                 source={uriImage}
-                style={styles.image} />
+                containerStyle={styles.image} />
               <View style={ styles.containerAdd } >
                 <IconButton 
                   icon='minus' 

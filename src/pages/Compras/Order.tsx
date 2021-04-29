@@ -6,21 +6,20 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Image,  Divider } from 'react-native-elements';
 import { converter } from '../../functions';
 import { getOrdersList } from '../../functions/dataStorage';
-import validate from '../../functions/validate';
 import requests from '../../services/requests';
 
 export interface orderModel {
   nome: string,
-  mercPosition: number,
+  mercKey: string,
   pedido: number,
   prodList: prodOrderModel[],
   previsao: string,
   scheduled: boolean,
   date: string,
-  subtotal: number,
-  off: number,
-  ship: number,
-  total: number,
+  subtotal: string,
+  off: string,
+  ship: string,
+  total: string,
   endereco: string,
   pagamento: string,
 }
@@ -38,27 +37,22 @@ function Order({route}: {route: any}) {
   const orderIndex: number = route.params;
   
   useEffect(() => {
+    setIsLoading(true)
     getOrdersList()
-      .then(list => setOrder(list[orderIndex]))
+    .then(list => {
+      setOrder(list[orderIndex])
+      setIsLoading(false)
+    })
   }, []);
 
-  useEffect(() => {
-    if (validate([order])) {
-      setIsLoading(false)
-    } else {
-      setIsLoading(true)
-    }
-  }, [order]);
-
   const space = (device.width-40)/5
-  var iconPaymento: ImageURISource;
+  let iconPaymento: ImageURISource;
   const pay = order?.pagamento;
   if (pay?.includes('Dinheiro')) {
     iconPaymento = images.cash;
   } else {
     iconPaymento = images.creditCard;
   }
-  console.log(pay, iconPaymento)
 
   const header = () => (
     <View key={-1} >
@@ -77,9 +71,9 @@ function Order({route}: {route: any}) {
       <Divider style={styles.divider} />
       <View style={styles.mercConteiner} >
         <Image
-          source={{uri: requests+'images/mercado.png'}}
+          source={{uri: requests+'images/'+'mercado'/*item.key*/+'.png'}}
           placeholderStyle={{backgroundColor: '#FFF'}}
-          style={{height: 65, width: 65}} />
+          containerStyle={{height: 65, width: 65}} />
         <Text style={styles.mercName} >{order?.nome}</Text>
       </View>
       <View style={styles.infoConteiner}>
@@ -95,27 +89,31 @@ function Order({route}: {route: any}) {
         <View style={styles.paymentConteiner} >
           <Text style={styles.text} >Pagar na entrega</Text>
           <Text style={styles.paymentText} >{order?.pagamento}</Text>
-          <Image source={iconPaymento} resizeMode='contain' containerStyle={{position: 'absolute', right: 0, width: 28, height: 28}} style={{top: 2}} />
+          <Image
+            source={iconPaymento}
+            resizeMode='contain'
+            containerStyle={{position: 'absolute', right: 0, width: 28, height: 28}}
+            childrenContainerStyle={{top: 2}} />
         </View>
       <Divider style={styles.divider} />
       <View style={styles.priceConteiner}>
         <Text style={styles.priceText} >Subtotal</Text>
-        <Text style={styles.priceText} >R${converter.toPrice(order.subtotal)}</Text>
+        <Text style={styles.priceText} >R${order?.subtotal}</Text>
       </View>
       <View style={styles.priceConteiner}>
         <Text style={styles.priceText} >Economizado</Text>
-        <Text style={styles.priceText} >R${converter.toPrice(order.off)}</Text>
+        <Text style={styles.priceText} >R${order?.off}</Text>
       </View>
       <View style={styles.priceConteiner}>
         <Text style={styles.priceText} >Taxa de entrega</Text>
-        <Text style={[styles.priceText, order?.ship == 0 ? {color: '#10b500'} : null]} >{
-        order?.ship == 0 ? 'Grátis' : 'R$'+converter.toPrice(order.ship)
+        <Text style={[styles.priceText, order?.ship == '0,00'? {color: '#10b500'} : null]} >{
+        order?.ship == '0,00'? 'Grátis' : 'R$'+order?.ship
         }</Text>
       </View>
       <Divider style={{backgroundColor: myColors.divider3, marginHorizontal: 16}} />
       <View style={styles.priceTotalConteiner}>
         <Text style={styles.priceTotalText} >Total</Text>
-        <Text style={styles.priceTotalText} >R${converter.toPrice(order.total)}</Text>
+        <Text style={styles.priceTotalText} >R${order?.total}</Text>
       </View>
       <Divider style={styles.divider} />
     </View>
@@ -127,41 +125,40 @@ function Order({route}: {route: any}) {
         <Text style={styles.quantity} >1x</Text>
         <View style={{marginLeft: 18}} >
           <Text style={styles.description} >{item.description}</Text>
-          <Text style={styles.price} >R${converter.toPrice(item.price)}</Text>
+          <Text style={styles.price} >R${item.price}</Text>
           <View style={{flexDirection: 'row'}} >
             <Text style={styles.brand} >{item.brand}</Text>
             <Text style={styles.weight} >{item.weight}</Text>
           </View>
         </View>
       </View>
-      <Divider style={{marginHorizontal: 12, marginTop: 12}} />
+      <Divider style={{marginHorizontal: 12, marginTop: 12, backgroundColor: myColors.divider3}} />
     </>
   )
 
-  if (isLoading) {
-    return (
-      <View style={{backgroundColor: myColors.background, flex: 1, justifyContent: 'center', alignItems: 'center'}} >
-       <ActivityIndicator color={myColors.loading} size='large' />
-      </View>
-    )
-  } else {
-    return (
-      <FlatList
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: 50}}
-        data={order.prodList}
-        keyExtractor={({description}) => description}
-        ListHeaderComponent={header}
-        renderItem={render_item} />
-    )
-  }
+  if (isLoading)
+  return (
+    <View style={{backgroundColor: myColors.background, flex: 1, justifyContent: 'center', alignItems: 'center'}} >
+     <ActivityIndicator color={myColors.loading} size='large' />
+    </View>
+  )
+
+  return (
+    <FlatList
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{paddingBottom: 50}}
+      data={order.prodList}
+      keyExtractor={({description}) => description}
+      ListHeaderComponent={header}
+      renderItem={render_item} />
+  )
 }
 
 
 const styles = StyleSheet.create({
   divider: {
     height: 2,
-    backgroundColor: myColors.divider2
+    backgroundColor: myColors.divider
   },
   text: {
     fontFamily: 'Regular',
@@ -180,7 +177,7 @@ const styles = StyleSheet.create({
   steps: {
     marginLeft: 8,
     fontFamily: 'Medium',
-    color: myColors.text3,
+    color: myColors.text2,
     fontSize: 14,
   },
   mercName: {

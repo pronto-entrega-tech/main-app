@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Animated } from 'react-native';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationProp, TransitionPreset, TransitionPresets } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
@@ -12,9 +12,8 @@ import Header3 from '../../components/Header3';
 import { device, myColors, myTitle } from '../../constants';
 import Header2 from '../../components/Header2';
 import Header from '../../components/Header';
-import MyButton from '../../components/MyButton';
+import MyTouchable from '../../components/MyTouchable';
 import MyText from '../../components/MyText';
-import { converter } from '../../functions';
 import useMyContext from '../../functions/MyContext';
 
 const Tab = createMaterialBottomTabNavigator();
@@ -27,7 +26,7 @@ const TransitionScreenOptions: TransitionPreset = {
 };
 
 function BottomTabs({ navigation, route }:
-{navigation: StackNavigationProp<any, any>}) {
+{navigation: StackNavigationProp<any, any>, route: any}) {
   return (
     <>
     <Tab.Navigator
@@ -162,24 +161,36 @@ function BottomTabs({ navigation, route }:
 
 function CartBarApp({navigation, toped = true}: {navigation: any, toped?: boolean}) {
   const {subtotal} = useMyContext();
-  if (subtotal === 0) {
-    return null;
-  } else {
-    return (
-      <View style={[styles.cartBar, toped? {marginBottom: device.iOS ? 54+34 : 54} : {height: device.iOS ? 50+24 : 50}]} >
-        <MyButton
-          style={[styles.cartBar2, {marginBottom: !toped && device.iOS? 24 : 0}]}
-          underlayColor={myColors.primaryColorDark}
+  const [state] = useState({
+    translateY: new Animated.Value(50+24)
+  })
+
+  useEffect(() => {
+    if (subtotal.value == 0) {
+      Animated.timing(state.translateY, {toValue: 50+24, duration: 200, useNativeDriver: true}).start()
+    } else {
+      Animated.timing(state.translateY, {toValue: 0, duration: 200, useNativeDriver: true}).start()
+    }
+  }, [subtotal])
+
+  return (
+    <View style={[
+      styles.cartBar, 
+      toped? {marginBottom: device.iPhoneNotch ? 54+34 : 54} : {}]} >
+      <Animated.View style={{transform: [{translateY: state.translateY}]}} >
+        <MyTouchable
+          solid
+          style={[styles.cartBar2, {height: !toped && device.iPhoneNotch? 50+24 : 50}]}
           onPress={() => navigation.navigate('Cart')} >
-          <>
+          <View style={[styles.cartBar3, !toped && device.iPhoneNotch? {marginBottom: 24} : {}]} >
             <Icon style={styles.iconCart} name={'cart'} size={28} color={'#FFF'} />
             <MyText style={styles.textCart}>Ver carrinho</MyText>
-            <MyText style={styles.priceCart} >R${converter.toPrice(subtotal)}</MyText>
-          </>
-        </MyButton>
-      </View>
-    )
-  }
+            <MyText style={styles.priceCart} >R${subtotal?.toString()}</MyText>
+          </View>
+        </MyTouchable>
+      </Animated.View>
+    </View>
+  )
 }
 
 export function CartBar({navigation}: {navigation: any}) {
@@ -190,21 +201,21 @@ export function CartBar({navigation}: {navigation: any}) {
 
 const styles = StyleSheet.create({
   cartBar: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    backgroundColor: myColors.primaryColor,
-    width: '100%',
-    height: 50, 
+    overflow: 'hidden',
     position: 'absolute', 
     bottom: 0,
-    alignItems: 'center'
+    width: '100%',
   },
   cartBar2: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    backgroundColor: myColors.primaryColor,
     width: '100%',
-    height: 50, 
-    alignItems: 'center'
+  },
+  cartBar3: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   iconCart: {
     position: 'absolute',

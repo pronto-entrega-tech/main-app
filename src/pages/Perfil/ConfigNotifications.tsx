@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { Divider, Switch } from 'react-native-elements';
-import { myColors, device } from '../../constants';
+import { Divider } from 'react-native-elements';
+import { Switch } from 'react-native-paper';
+import { myColors } from '../../constants';
 
 interface configModel {
   text: string, navigate: string, isEnabled: boolean, setIsEnabled: React.Dispatch<React.SetStateAction<boolean>>
@@ -29,8 +30,7 @@ function ConfigNotifications() {
           <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16}} >
             <Text style={{color: myColors.grey3, fontSize: 17}}>{item.text}</Text>
             <Switch
-              trackColor={ device.iOS ? { true: '#21ADF8', false: '' } : { true: '#a3dfff', false: '#d9d9d9' }}
-              thumbColor={ device.iOS ? '#FFF' : (item.isEnabled ? '#21ADF8' : '#FDFDFD')}
+              color={myColors.colorAccent}
               onValueChange={(value) => item.setIsEnabled(value)}
               value={item.isEnabled} />
           </View>

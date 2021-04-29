@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-elements';
 import MySearchbar from './MySearchBar';
-import { myColors } from '../constants';
+import { globalStyles, myColors } from '../constants';
 
 export function Header3({title}: {title: string}) {
   return (
     <>
-      <View style={styles.header}>
+      <View style={[styles.header, globalStyles.notch]}>
         <Text style={styles.textHeader}>{title}</Text>
         <Divider style={styles.headerDivider}/>
       </View>

@@ -1,76 +1,78 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Image } from 'react-native-elements';
 import { myColors, device, images, globalStyles } from '../constants';
-import { converter } from '../functions';
 import IconButton from './IconButton';
-import MyButton from './MyButton';
+import MyButton from './MyTouchable';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { prodModel } from './ProdItem';
 import requests from '../services/requests';
+import { moneyToString } from '../functions/converter';
 
-function ProdItemHorizontal({navigation, item, isFavorite, quantity = 0, onPressFav, onPressAdd, onPressRemove}:
-{navigation: StackNavigationProp<any, any>, item: prodModel, isFavorite: boolean, quantity?: number, onPressFav: (item: any) => void , onPressAdd: (item: any) => void , onPressRemove: (item: any) => void }) {
-  const off = ((1-(item.preco / item.precoAntes))*100).toFixed(0)
+function ProdItemHorizontal({navigation, item, isFavorite, quantity = 0, onPressFav, onPressAdd, onPressRemove, merc}:
+{navigation: StackNavigationProp<any, any>, item: prodModel, isFavorite: boolean, quantity?: number,
+   onPressFav: (item: any) => void , onPressAdd: (item: any) => void , onPressRemove: (item: any) => void, merc: boolean }) {
+  const off = item.precoAntes? ((1-(item.preco.value / item.precoAntes.value))*100).toFixed(0) : undefined;
   const uriImage = item.image != null ? {uri: requests+'images/'+item.image} : images.loadProdImage;
 
   return (
-    <View style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader]} >
-      <MyButton style={{borderRadius: 8}} onPress={() => navigation.push('Product', item)} >
-        <View style={ styles.container }> 
-          <Pressable style={ styles.containerAdd } >
-            <IconButton 
-              icon='plus' 
-              size={24} 
-              color={myColors.primaryColor} 
-              type='addHorizontal' 
-              onPress={onPressAdd} />
-            <Text style={ styles.centerNumText } >{typeof quantity !== 'undefined' ? quantity : 0}</Text>
-            <IconButton 
-              icon='minus' 
-              size={24} 
-              color={myColors.primaryColor} 
-              type='addHorizontal' 
-              onPress={onPressRemove} />
-          </Pressable>
-          <View style={ styles.containerImage } >
-            <Image 
-              placeholderStyle={{backgroundColor: '#FFF'}}
-              source={uriImage}
-              style={styles.image} />
-            { item.precoAntes != null ? <View style={styles.offTextBox}><Text style={styles.offText} >-{off}%</Text></View> : null }
-            <View style={styles.fav} >
-              <IconButton
-                icon={isFavorite ? 'heart' : 'heart-outline'}
-                size={24}
-                color={isFavorite ? myColors.primaryColor : myColors.grey2}
-                type='clear'
-                onPress={onPressFav} />
-            </View>
-          </View>
-          <View style={ styles.containerText } >
-            <Text
-              ellipsizeMode="tail"
-              numberOfLines={1} 
-              style={ styles.prodText }>
-              {item.nome}
-            </Text>
-            <Text style={ styles.oldPriceText } >{item.precoAntes != null ? 'R$'+converter.toPrice(item.precoAntes) : null }</Text>
-            <Text style={ styles.priceText } >R${converter.toPrice(item.preco)}</Text>
-            <View style={ styles.brandWeightRow } >
-              <Text style={ styles.brandText } >{item.marca}</Text>
-              <Text style={ styles.weightText } >{item.quantidade}</Text>
-            </View>
-          </View>
-          <View style={styles.mercContainer} >
-            <Image 
-              placeholderStyle={{backgroundColor: '#FFF'}}
-              source={{uri: requests+'images/mercado.png'}}
-              style={styles.mercImage} />
+    <MyButton
+      style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader]}
+      onPress={() => navigation.push('Product', device.web? {prod: item.prodKey} : {item: item})} >
+      <View style={ styles.container }> 
+        <View style={ styles.containerAdd } >
+          <IconButton 
+            icon='plus' 
+            size={24} 
+            color={myColors.primaryColor} 
+            type='addHorizontal' 
+            onPress={onPressAdd} />
+          <Text style={ styles.centerNumText } >{typeof quantity !== 'undefined' ? quantity : 0}</Text>
+          <IconButton 
+            icon='minus' 
+            size={24} 
+            color={myColors.primaryColor} 
+            type='addHorizontal' 
+            onPress={onPressRemove} />
+        </View>
+        <View style={ styles.containerImage } >
+          <Image 
+            placeholderStyle={{backgroundColor: '#FFF'}}
+            source={uriImage}
+            containerStyle={styles.image} />
+          {off? <View style={styles.offTextBox}><Text style={styles.offText} >-{off}%</Text></View> : null}
+          <View style={styles.fav} >
+            <IconButton
+              icon={isFavorite ? 'heart' : 'heart-outline'}
+              size={24}
+              color={isFavorite ? myColors.primaryColor : myColors.grey2}
+              type='clear'
+              onPress={onPressFav} />
           </View>
         </View>
-      </MyButton>
-    </View>
+        <View style={ styles.containerText } >
+          <Text
+            ellipsizeMode="tail"
+            numberOfLines={1} 
+            style={ styles.prodText }>
+            {item.nome}
+          </Text>
+          <Text style={ styles.oldPriceText } >{item.precoAntes? 'R$'+moneyToString(item.precoAntes) : null}</Text>
+          <Text style={ styles.priceText } >R${moneyToString(item.preco)}</Text>
+          <View style={ styles.brandWeightRow } >
+            <Text style={ styles.brandText } >{item.marca}</Text>
+            <Text style={ styles.weightText } >{item.quantidade}</Text>
+          </View>
+        </View>
+        <View style={styles.mercContainer} >
+          {!merc?
+          <Image 
+            placeholderStyle={{backgroundColor: '#FFF'}}
+            source={{uri: requests+'images/'+'mercado'/*item.key*/+'.png'}}
+            containerStyle={styles.mercImage} /> : null}
+        </View>
+      </View>
+    </MyButton>
   );
 }
 
@@ -90,7 +92,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 3,
-    paddingHorizontal: 3
+    paddingLeft: 3,
+    paddingRight: 9,
+    zIndex: 2,
   },
   centerNumText: {
     fontSize: 17,
@@ -98,6 +102,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Medium'
   },
   containerImage: {
+    marginLeft: -6,
     alignItems: 'center',
   },
   image: {

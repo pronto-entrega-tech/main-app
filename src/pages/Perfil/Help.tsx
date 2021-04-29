@@ -1,7 +1,8 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Button, Divider } from 'react-native-elements';
+import { Divider } from 'react-native-elements';
+import MyButton from '../../components/MyButton';
 import { myColors } from '../../constants';
 
 interface ajudaModel {
@@ -49,7 +50,12 @@ function List({title, list, navigation}:
       {
         list.map(( item, index ) => (
           <View key={index} >
-            <Button onPress={() => navigation.navigate(item.navigate, [item.text, item.resposta])} title={item.text} type='clear' buttonStyle={styles.button} titleStyle={styles.buttonText}/>
+            <MyButton
+              onPress={() => navigation.navigate(item.navigate, [item.text, item.resposta])}
+              type='clear'
+              title={item.text}
+              titleStyle={styles.buttonText}
+              buttonStyle={styles.button} />
             <Divider style={styles.divider} />
           </View>
         ))

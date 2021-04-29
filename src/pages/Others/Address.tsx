@@ -1,10 +1,11 @@
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Alert } from 'react-native';
-import { Divider, Button } from 'react-native-elements';
+import { Divider } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconButton from '../../components/IconButton';
 import MyButton from '../../components/MyButton';
+import MyTouchable from '../../components/MyTouchable';
 import { myColors, device, globalStyles } from '../../constants';
 import * as Location from 'expo-location'
 import { LocationGeocodedLocation } from 'expo-location';
@@ -24,7 +25,57 @@ export interface addressModel {
   longitude?: number 
 }
 
-async function getLocation(setCurrentAddress: React.Dispatch<React.SetStateAction<addressModel | null>>,
+export async function getAddress() {
+  const location = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest })
+  .catch(() => {return null});
+  
+  if (!location) {
+    alert('Erro ao obter localização!');
+    return false
+  }
+
+  if (device.web) {
+    const addressModel: addressModel = {
+      apelido: '',
+      rua: 'Rua Martins',
+      numero: '1159',
+      bairro: '',
+      cidade: 'Jataí',
+      estado: 'Goiás',
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude
+    };
+    return addressModel
+  }
+
+  const loc: LocationGeocodedLocation = {
+    latitude: location.coords.latitude, 
+    longitude: location.coords.longitude
+  }
+  let address = (await Location.reverseGeocodeAsync(loc))[0];
+  let state;
+  switch (address.region) {
+    case 'Goiás':
+      state = 'GO'
+      break;
+    default:
+      state = address.region+''
+      break;
+  }
+  const addressModel: addressModel = {
+    apelido: '',
+    rua: (device.iOS ? address.name : address.street)?.replace('Avenida', 'Av.')+'',
+    numero: (device.iOS ? '' : address.name)+'',
+    bairro: address.district != null ? address.district : '',
+    cidade: (device.iOS ? address.city : address.subregion)+'',
+    estado: state,
+    latitude: location.coords.latitude,
+    longitude: location.coords.longitude
+  };
+  return addressModel
+}
+
+async function getLocation(setCurrentAddress: React.Dispatch<React.SetStateAction<addressModel | undefined>>,
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>,
   setStatusText: React.Dispatch<React.SetStateAction<string>>,
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>) {
@@ -32,7 +83,7 @@ async function getLocation(setCurrentAddress: React.Dispatch<React.SetStateActio
   let { status } = await Location.requestForegroundPermissionsAsync();
 
   if (status !== 'granted') {
-    myAlert('Permissão de acesso à localização foi negada');
+    myAlert('Permissão de acesso à localização foi negada', '');
     setStatusText('Usar localização atual');
     setDisabled(false);
     return false;
@@ -40,7 +91,7 @@ async function getLocation(setCurrentAddress: React.Dispatch<React.SetStateActio
 
   Location.enableNetworkProviderAsync()
   .catch(() => {
-    myAlert('Serviço de localização está desativado');
+    myAlert('Serviço de localização está desativado', '');
     setStatusText('Usar localização atual');
     setDisabled(false);
     return false;
@@ -50,99 +101,36 @@ async function getLocation(setCurrentAddress: React.Dispatch<React.SetStateActio
   saveActiveAddressIndex(-1)
 
   setStatusText('Buscando...')
-  let { coords } = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest });
-  
 
-  if (!device.web) {
-    const loc: LocationGeocodedLocation = {
-      latitude: coords.latitude, 
-      longitude: coords.longitude
-    }
-    let address = (await Location.reverseGeocodeAsync(loc))[0];
-    const adress: addressModel = {
-      apelido: '',
-      rua: (device.iOS ? address.name : address.street)?.replace('Avenida', 'Av.')+'',
-      numero: (device.iOS ? '' : address.name)+'',
-      bairro: address.district != null ? address.district : '',
-      cidade: (device.iOS ? address.city : address.subregion)+'',
-      estado: address.region+'',
-      latitude: coords.latitude,
-      longitude: coords.longitude
-    };
-    setStatusText('Usar localização atual')
-    saveActiveAddress(adress)
-    setCurrentAddress(adress)
-    return true
-  } else {
-    const adress: addressModel = {
-      apelido: '',
-      rua: 'Rua Martins',
-      numero: '1159',
-      bairro: '',
-      cidade: 'Jataí',
-      estado: 'Goiás',
-      latitude: coords.latitude,
-      longitude: coords.longitude
-    };
-    setStatusText('Usar localização atual')
-    saveActiveAddress(adress)
-    setCurrentAddress(adress)
-    return true
-  }
+  const address = await getAddress();
+
+  if (address === false) return false;
+
+  setStatusText('Usar localização atual')
+  saveActiveAddress(address)
+  setCurrentAddress(address)
+  return true
 };
 
-async function tryGetLocation(setCurrentAddress: React.Dispatch<React.SetStateAction<addressModel | null>>, isFocus: boolean) {
+async function tryGetLocation(setCurrentAddress: React.Dispatch<React.SetStateAction<addressModel | undefined>>, isFocus: boolean) {
   let { status } = await Location.getForegroundPermissionsAsync();
 
   if (status !== 'granted') {
-    if (isFocus) setCurrentAddress(null)
+    if (isFocus) setCurrentAddress(undefined)
     return;
   }
 
-  let loc = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest })
-  .catch(() => {return null});
+  const address = await getAddress();
 
-  if (!loc) {
-    Alert.alert('Erro ao obter localização!');
-    return false
-  }
-  const location: LocationGeocodedLocation = {
-    latitude: loc.coords.latitude, 
-    longitude: loc.coords.longitude
-  }
-  if (!device.web) {
-    let address = (await Location.reverseGeocodeAsync(location))[0];
-    const adress: addressModel = {
-      apelido: '',
-      rua: (device.iOS ? address.name : address.street)?.replace('Avenida', 'Av.')+'',
-      numero: (device.iOS ? '' : address.name)+'',
-      bairro: address.district != null ? address.district : '',
-      cidade: (device.iOS ? address.city : address.subregion)+'',
-      estado: address.region+'',
-      latitude: loc.coords.latitude,
-      longitude: loc.coords.longitude
-    };
-    if (isFocus) setCurrentAddress(adress)
-  } else {
-    const adress: addressModel = {
-      apelido: '',
-      rua: 'Rua Martins',
-      numero: '1159',
-      bairro: '',
-      cidade: 'Jataí',
-      estado: 'Goiás',
-      latitude: loc.coords.latitude,
-      longitude: loc.coords.longitude
-    };
-    if (isFocus) setCurrentAddress(adress)
-  }
+  if (address === false) return false;
+  if (isFocus) setCurrentAddress(address)
 };
 
 function Address({ navigation, route }:
   {navigation: StackNavigationProp<any, any>, route: any}) {
   const [statusText, setStatusText] = useState<string>('Usar localização atual');
   const [activeIndex, setActiveIndex] = useState<number>(-1);
-  const [currentAddress, setCurrentAddress] = useState<addressModel | null>(null);
+  const [currentAddress, setCurrentAddress] = useState<addressModel | undefined>(undefined);
   const [addressList, setAddressList] = useState<addressModel[]>([]);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [isFocus, setFocus] = useState<boolean>(true);
@@ -163,7 +151,7 @@ function Address({ navigation, route }:
     const name = item.apelido != '' ? item.apelido : 'Endereço '+(index+1)
     const address = item.rua+(item.numero != '' ? ', '+item.numero : '')+(item.bairro != '' ? ', '+item.bairro : '')+', '+item.cidade+' - '+item.estado
     return (
-      <MyButton
+      <MyTouchable
         style={[styles.cardBase, globalStyles.elevation3, globalStyles.darkBoader, activeIndex == index ? styles.cardActive : styles.cardInactive ]}
         onPress={() => {
           setActiveIndex(index);
@@ -187,8 +175,10 @@ function Address({ navigation, route }:
         <Text style={styles.addressText}>{address}</Text>
         <View style={styles.line2} >
           <IconButton icon='pencil' size={24} color={myColors.grey3} type={'address'} onPress={() => 
-            navigation.navigate('NewAddress', {addressItem: item, addressList: addressList, position: index+1})} />
+            navigation.navigate('NewAddress', {address: addressList.indexOf(item)})} />
           <IconButton icon='delete' size={24} color={myColors.grey3} type={'address'} onPress={() => {
+            if (activeIndex == index) return myAlert('Este endereço está sendo usado!',
+            'Não é possivel excluir um endereço que está sendo utilizado')
             if (device.web) {
               if (activeIndex > index) {
                 const newActiveIndex = activeIndex-1
@@ -198,8 +188,8 @@ function Address({ navigation, route }:
               const newAddressList = addressList.filter(value => value != item)
               setAddressList(newAddressList);
               saveAddressList(newAddressList);
-            } else
-            if (activeIndex == index) return Alert.alert('Este endereço está sendo usado!','Não é possivel excluir um endereço que está sendo utilizado')
+              return
+            }
             Alert.alert("Apagar endereço",`Tem certeza que deseja apagar o endereço "${name}"?`,[
               {text: 'Cancelar', style: 'cancel'},{text: 'Confirmar', onPress: () => {
                 if (activeIndex > index) {
@@ -213,13 +203,13 @@ function Address({ navigation, route }:
               }}], {cancelable: true})
           }}/>
         </View>
-      </MyButton>
+      </MyTouchable>
     )
   }
 
   return (
     <View style={{backgroundColor: myColors.background, flex: 1}} >
-      <MyButton disabled={disabled} onPress={() => {
+      <MyTouchable disabled={disabled} onPress={() => {
         setDisabled(true)
         getLocation(setCurrentAddress, setActiveIndex, setStatusText, setDisabled).then(got => {
           if (got) {
@@ -245,12 +235,13 @@ function Address({ navigation, route }:
               <Text style={styles.text1} >{statusText}</Text>
               <Text style={styles.text2} >{
                 currentAddress != null ?
-                currentAddress.rua+(currentAddress.numero != '' ? ', '+currentAddress.numero : '')+(currentAddress.bairro != '' ? ' - '+currentAddress.bairro : '')
+                currentAddress.rua+(currentAddress.numero != '' ? ', '+currentAddress.numero : '')+
+                (currentAddress.bairro != '' ? ' - '+currentAddress.bairro : '')
                 : 'Ativar localização'
               }</Text>
           </View>
         </>
-      </MyButton>
+      </MyTouchable>
       <Divider style={styles.divider} />
       <FlatList
         contentContainerStyle={{paddingHorizontal: 18, paddingTop: 2, paddingBottom: 70}}
@@ -258,13 +249,14 @@ function Address({ navigation, route }:
         data={addressList}
         keyExtractor={(item, index) => index.toString()}
         renderItem={addressItem} />
-      <Button
-        onPress={() => navigation.navigate('NewAddress', {addressItem: currentAddress, addressList: addressList, position: addressList.length+1})}
+      <MyButton
+        onPress={() => {
+          const address = currentAddress;
+          navigation.navigate('NewAddress', {address: address})
+        }}
         title='Adicionar endereço'
         type='outline'
-        theme={{ colors: { primary: myColors.primaryColor}}}
-        buttonStyle={{borderWidth: 2, width: 210, height: 46, backgroundColor: '#FFF'}}
-        containerStyle={{position: 'absolute', bottom: device.iPhoneNotch ? 38 : 12, alignSelf:'center'}} />
+        buttonStyle={styles.button} />
     </View>
   )
 }
@@ -336,7 +328,16 @@ const styles = StyleSheet.create({
   },
   alertButton: {
     color: myColors.primaryColor
-  }
+  },
+  button: {
+    position: 'absolute',
+    bottom: device.iPhoneNotch ? 38 : 12,
+    alignSelf:'center',
+    borderWidth: 2,
+    width: 210,
+    height: 46,
+    backgroundColor: '#FFF'
+  },
 })
 
 export default Address

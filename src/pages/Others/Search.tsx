@@ -2,15 +2,16 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View } from 'react-native';
 import { CartBar } from './BottomTabs';
-import ProdList from '../../components/ProdList';
+import ProdList, { ListHeader } from '../../components/ProdList';
 import { myColors, device } from '../../constants';
 
 function Search({ navigation, route }:
-  {navigation: StackNavigationProp<any, any>}) {
+  {navigation: StackNavigationProp<any, any>, route: any}) {
   return(
-    <View style={[{backgroundColor: myColors.background, flex: 1}, device.web ? {height: device.height-110} : {}]}>
-      <ProdList navigation={navigation} title={route.params} header={({ key }: { key: number }) => (
+    <View style={[{backgroundColor: myColors.background}, device.web ? {height: device.height-114} : {flex: 1}]}>
+      <ProdList refreshless navigation={navigation} header={({ key }: { key: number }) => (
         <View key={key} >
+          <ListHeader navigation={navigation} title={route.params} />
         </View>
       )} />
       <CartBar navigation={navigation} />
