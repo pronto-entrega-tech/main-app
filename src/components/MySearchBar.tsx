@@ -8,9 +8,8 @@ function MySearchbar ({onSubmit}: {onSubmit: () => void}) {
 
   return (
     <Searchbar
-      theme={{ colors: { primary: myColors.primaryColor}, mode: 'exact', dark: false }}
-      style={{ borderRadius: 50, borderWidth: 2,
-         borderColor: myColors.primaryColor, height: 38, elevation: 2}}
+      theme={{colors: { primary: myColors.primaryColor}, mode: 'exact', dark: false}}
+      style={{borderRadius: 50, borderWidth: 2,borderColor: myColors.primaryColor, height: 38, elevation: 2, flexGrow: 1}}
       placeholder="O que você procura?"
       onChangeText={onChangeSearch}
       value={searchQuery}

@@ -1,27 +1,30 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { AirbnbRating, Image } from 'react-native-elements';
+import { View, StyleSheet } from 'react-native';
+import { Image } from 'react-native-elements';
 import { myColors, device, globalStyles } from '../constants';
 import { computeDistance, isMarketOpen, Money } from '../functions/converter';
 import requests from '../services/requests';
-import MyButton from './MyTouchable';
+import MyText from './MyText';
+import MyTouchable from './MyTouchable';
+import Rating from './Rating';
 
 export interface mercModel {
-  key: string,
-  nome: string,
-  endereco: string,
+  id: string,
+  name: string,
+  rating: number,
+  address: string,
   latitude: number,
   longitude: number,
   open: number,
   close: number,
-  openSab: number,
-  closeSab: number,
-  openDom: number,
-  closeDom: number,
-  minPrazo: number,
-  maxPrazo: number,
-  taxa: Money,
-  minPedido: Money,
+  open_sat: number,
+  close_sat: number,
+  open_sun: number,
+  close_sun: number,
+  time_min: number,
+  time_max: number,
+  fee: Money,
+  order_min: Money,
   info: string
 }
 
@@ -31,23 +34,26 @@ function MercItem({ item, coords, onPress } :
   const {isOpen, openHour} = isMarketOpen(item);
 
   return (
-    <MyButton
+    <MyTouchable
       style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader]}
       onPress={onPress} >
       <>
         <Image
-          source={{uri: requests+'images/'+'mercado'/*item.key*/+'.jpeg'}}
+          source={{uri: requests+'images/'+'mercado'/*item.id*/+'_full.webp'}}
           containerStyle={styles.image} />
         <View style={{marginLeft: 10, marginTop:-5, justifyContent: 'center'}}>
           <View style={{flexDirection: 'row'}}>
-            <Text style={styles.title}>{item.nome}</Text>
-            <AirbnbRating defaultRating={0} isDisabled={true} size={12} showRating={false} starStyle={{margin: 1}} />
+            <MyText style={styles.title}>{item.name}</MyText>
+            {item.rating?
+            <Rating value={item.rating} style={{alignSelf: 'center'}} /> :
+            <MyText style={styles.new}>Novo!</MyText>
+            }
           </View>
-          <Text style={styles.text1}><Text style={styles.openText}>{isOpen ? 'Aberto' : 'Fechado'}</Text> • {isOpen ? 'Fecha' : 'Abre'} ás {openHour}:00</Text>
-          <Text style={styles.text2}>{distance? `Á ${distance}km • ` : ''}{item.minPrazo}-{item.maxPrazo}min • R${item.taxa.toString()}</Text>
+          <MyText style={styles.text1}><MyText style={styles.openText}>{isOpen ? 'Aberto' : 'Fechado'}</MyText> • {isOpen ? 'Fecha' : 'Abre'} ás {openHour}:00</MyText>
+          <MyText style={styles.text2}>{distance? `Á ${distance}km • ` : ''}{item.time_min}-{item.time_max}min • R${item.fee.toString()}</MyText>
         </View>
       </>
-    </MyButton>
+    </MyTouchable>
   );
 }
 
@@ -69,18 +75,26 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     marginRight: 4,
-    color: myColors. text6,
+    color: myColors.text6,
+  },
+  new: {
+    alignSelf: 'flex-end',
+    fontSize: 13,
+    marginBottom: 1,
+    marginLeft: 4,
+    color: myColors.rating,
+    fontFamily: 'Medium',
   },
   openText: {
-    color: myColors. text5,
+    color: myColors.text5,
   },
   text1: {
     marginTop: 4,
     marginBottom: 2,
-    color: myColors. text4,
+    color: myColors.text4,
   },
   text2: {
-    color: myColors. text3,
+    color: myColors.text3,
   }
 })
 

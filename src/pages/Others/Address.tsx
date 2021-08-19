@@ -12,6 +12,7 @@ import { LocationGeocodedLocation } from 'expo-location';
 import { getActiveAddressIndex, getAddressList, saveActiveAddressIndex, saveAddressList, saveActiveAddress } from '../../functions/dataStorage';
 import myAlert from '../../functions/myAlert';
 import { useFocusEffect } from '@react-navigation/native';
+import { getStateCode } from '../../functions/converter';
 
 export interface addressModel {
   apelido: string 
@@ -23,56 +24,6 @@ export interface addressModel {
   estado: string,
   latitude?: number,
   longitude?: number 
-}
-
-export async function getAddress() {
-  const location = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest })
-  .catch(() => {return null});
-  
-  if (!location) {
-    alert('Erro ao obter localização!');
-    return false
-  }
-
-  if (device.web) {
-    const addressModel: addressModel = {
-      apelido: '',
-      rua: 'Rua Martins',
-      numero: '1159',
-      bairro: '',
-      cidade: 'Jataí',
-      estado: 'Goiás',
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude
-    };
-    return addressModel
-  }
-
-  const loc: LocationGeocodedLocation = {
-    latitude: location.coords.latitude, 
-    longitude: location.coords.longitude
-  }
-  let address = (await Location.reverseGeocodeAsync(loc))[0];
-  let state;
-  switch (address.region) {
-    case 'Goiás':
-      state = 'GO'
-      break;
-    default:
-      state = address.region+''
-      break;
-  }
-  const addressModel: addressModel = {
-    apelido: '',
-    rua: (device.iOS ? address.name : address.street)?.replace('Avenida', 'Av.')+'',
-    numero: (device.iOS ? '' : address.name)+'',
-    bairro: address.district != null ? address.district : '',
-    cidade: (device.iOS ? address.city : address.subregion)+'',
-    estado: state,
-    latitude: location.coords.latitude,
-    longitude: location.coords.longitude
-  };
-  return addressModel
 }
 
 async function getLocation(setCurrentAddress: React.Dispatch<React.SetStateAction<addressModel | undefined>>,
@@ -112,6 +63,49 @@ async function getLocation(setCurrentAddress: React.Dispatch<React.SetStateActio
   return true
 };
 
+export async function getAddress() {
+  const location = await Location.getCurrentPositionAsync({ accuracy: Location.LocationAccuracy.Highest })
+  .catch(() => {return null});
+  
+  if (!location) {
+    alert('Erro ao obter localização!');
+    return false
+  }
+
+  if (device.web) {
+    const addressModel: addressModel = {
+      apelido: '',
+      rua: 'Rua Martins',
+      numero: '1159',
+      bairro: '',
+      cidade: 'Jataí',
+      estado: 'GO',
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude
+    };
+    return addressModel
+  }
+
+  const loc: LocationGeocodedLocation = {
+    latitude: location.coords.latitude,
+    longitude: location.coords.longitude
+  }
+  let address = (await Location.reverseGeocodeAsync(loc))[0];
+  let state = address.region? getStateCode(address.region) : ''
+  
+  const addressModel: addressModel = {
+    apelido: '',
+    rua: (device.iOS ? address.name : address.street)?.replace('Avenida', 'Av.')+'',
+    numero: (device.iOS ? '' : address.name)+'',
+    bairro: address.district != null ? address.district : '',
+    cidade: (device.iOS ? address.city : address.subregion)+'',
+    estado: state,
+    latitude: location.coords.latitude,
+    longitude: location.coords.longitude
+  };
+  return addressModel
+}
+
 async function tryGetLocation(setCurrentAddress: React.Dispatch<React.SetStateAction<addressModel | undefined>>, isFocus: boolean) {
   let { status } = await Location.getForegroundPermissionsAsync();
 
@@ -147,6 +141,22 @@ function Address({ navigation, route }:
     }, [])
   );
 
+  const goBack = () => {
+    if (route.name == 'SelectAddress') {
+      navigation.navigate('BottomTabs')
+      return
+    }
+    if (route.params?.back == 'Cart') {
+      navigation.navigate('Cart', {callback: 'refresh', value: ''})
+      return
+    }
+    if (route.params?.back) {
+      navigation.navigate(route.params.back, {callback: 'refresh'})
+      return
+    }
+    navigation.goBack()
+  }
+
   const addressItem = ({item, index}: {item: addressModel, index: number}) => {
     const name = item.apelido != '' ? item.apelido : 'Endereço '+(index+1)
     const address = item.rua+(item.numero != '' ? ', '+item.numero : '')+(item.bairro != '' ? ', '+item.bairro : '')+', '+item.cidade+' - '+item.estado
@@ -154,18 +164,10 @@ function Address({ navigation, route }:
       <MyTouchable
         style={[styles.cardBase, globalStyles.elevation3, globalStyles.darkBoader, activeIndex == index ? styles.cardActive : styles.cardInactive ]}
         onPress={() => {
-          setActiveIndex(index);
-          saveActiveAddressIndex(index);
-          saveActiveAddress(item);
-          if (route.name == 'SelectAddress') {
-            navigation.navigate('BottomTabs');
-            return;
-          }
-          if (route.params?.back == 'Cart') {
-            navigation.navigate('Cart', {callback: 'refresh', value: ''});
-            return;
-          }
-          navigation.goBack();
+          setActiveIndex(index)
+          saveActiveAddressIndex(index)
+          saveActiveAddress(item)
+          goBack()
         }}>
         <View style={styles.line1}>
           <Icon style={{marginTop: 2}} name='map-marker' size={24} color={myColors.primaryColor}/>
@@ -213,15 +215,7 @@ function Address({ navigation, route }:
         setDisabled(true)
         getLocation(setCurrentAddress, setActiveIndex, setStatusText, setDisabled).then(got => {
           if (got) {
-            if (route.name == 'SelectAddress') {
-              navigation.navigate('BottomTabs');
-              return;
-            }
-            if (route.params?.back == 'Cart') {
-              navigation.navigate('Cart', {callback: 'Hi'});
-              return;
-            }
-            navigation.goBack();
+            goBack()
           }
         })}
       } style={{flexDirection: 'row'}}>

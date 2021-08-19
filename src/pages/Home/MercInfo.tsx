@@ -39,13 +39,13 @@ function MercInfo({route}: {route: any}) {
 
   const hour = getHour(mercItem.open, mercItem.close)
   const time = [
-    {day: 'Domingo', hour: getHour(mercItem.openDom, mercItem.closeDom)},
+    {day: 'Domingo', hour: getHour(mercItem.open_sun, mercItem.close_sun)},
     {day: 'Segunda', hour: hour},
     {day: 'Terça', hour: hour},
     {day: 'Quarta', hour: hour},
     {day: 'Quinta', hour: hour},
     {day: 'Sexta', hour: hour},
-    {day: 'Sábado', hour: getHour(mercItem.openSab, mercItem.closeDom)},
+    {day: 'Sábado', hour: getHour(mercItem.open_sat, mercItem.close_sun)},
   ]
 
   return(

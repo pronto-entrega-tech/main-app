@@ -6,23 +6,28 @@ import MyButton from '../../components/MyButton';
 import { myColors } from '../../constants';
 
 interface ajudaModel {
-  text: string, navigate: string, resposta: string
+  text: string, resposta: string, navigate?: string
 }
 
 const list1: ajudaModel[] = [
   {
     text: 'Como encontrar o melhor preço',
-    navigate: 'Questions',
     resposta: '[inserir resposta]',
   },
   {
+    text: 'Como receber notificações das promoções de um produto',
+    resposta: 'Toque no produto e depois toque no sininho no canto superior direito da tela',
+  },
+  {
+    text: 'Os preços na Poupa Preço e na loja física são os mesmos',
+    resposta: 'Os preços na plataforma são exclusivos para a Poupa Preço',
+  },
+  {
     text: 'Como funciona os cupons',
-    navigate: 'Questions',
     resposta: '[inserir resposta]',
   },
   {
     text: 'O aplicativo é seguro',
-    navigate: 'Questions',
     resposta: '[inserir resposta]',
   }
 ]
@@ -30,12 +35,11 @@ const list1: ajudaModel[] = [
 const list2: ajudaModel[] = [
   {
     text: 'Envie sua dúvida',
-    navigate: 'UploadQuestion',
     resposta: '',
+    navigate: 'UploadQuestion',
   },
   {
     text: 'Quero ser parceiro',
-    navigate: 'Questions',
     resposta: 'Contato: [inserir contato]',
   }
 ]
@@ -51,7 +55,7 @@ function List({title, list, navigation}:
         list.map(( item, index ) => (
           <View key={index} >
             <MyButton
-              onPress={() => navigation.navigate(item.navigate, [item.text, item.resposta])}
+              onPress={() => navigation.navigate(item.navigate? item.navigate : 'Questions', [item.text, item.resposta])}
               type='clear'
               title={item.text}
               titleStyle={styles.buttonText}

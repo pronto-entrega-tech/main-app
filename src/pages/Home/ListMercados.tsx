@@ -5,9 +5,9 @@ import IconButton from '../../components/IconButton';
 import { myColors, device, globalStyles } from '../../constants';
 import MercItem, { mercModel } from '../../components/MercItem'
 import { StackNavigationProp } from '@react-navigation/stack';
-import { getActiveAddress } from '../../functions/dataStorage';
+import { getActiveAddress, getCity } from '../../functions/dataStorage';
 import requests from '../../services/requests';
-import Loading from '../../components/Loading';
+import Loading, { Errors } from '../../components/Loading';
 import { createMercList } from '../../functions/converter';
 
 export function ListMercadosHeader({navigation, title}:
@@ -33,46 +33,65 @@ export function ListMercadosHeader({navigation, title}:
 
 function ListMercados({navigation}: {navigation: StackNavigationProp<any, any>}) {
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<'server'|'connection'|'nothing'|null>(null);
+  const [tryAgain, setTryAgain] = useState(false);
+  const [city, setCity] = useState('');
   const [mercList, setMercList] = useState<mercModel[]>();
   const [coords, setCoords] = useState<{lat: number | undefined, lon: number | undefined}>();
 
   useEffect(() => {
-    fetch(requests+'mercList.php')
-      .then((response) => response.json())
-      .then((json) => setMercList(createMercList(json)))
-      .catch((error) => console.error(error));
+    getCity().then(city => {
+      setCity(city)
+      fetch(requests+`mercList.php?city=${city}`).then((response) => {
+        response.json()
+        .then((json) => {
+          if (json[0] == 'nothing') return setError('nothing')
+          setMercList(createMercList(json))
+          setIsLoading(false)
+        })
+      }).catch(() => {
+        setError('server')
+      })
+    })
     getActiveAddress()
       .then(address => setCoords({lat: address.latitude, lon: address.longitude}))
   }, []);
 
   useEffect(() => {
-    if (mercList && coords) {
+    if (city && mercList && coords) {
       setIsLoading(false)
     } else {
       setIsLoading(true)
     }
-  }, [mercList, coords]);
+  }, [city, mercList, coords]);
 
-  if (isLoading || !coords) {
-    return (
-      <Loading/>
-    )
-  } else {
-    return (
-      <FlatList
-      style={{backgroundColor: myColors.background}}
-      contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 16}}
-      showsVerticalScrollIndicator={false}
-      data={mercList}
-      keyExtractor={({ key }) => key.toString()}
-      renderItem={({item}: {item: mercModel}) => (
-        <MercItem
-        coords={coords}
-        item={item}
-        onPress={() => navigation.navigate('Mercado', device.web? {merc: item.nome} : {item: item} )} />
-      )}/>
-    )
-  }
+  if (error)
+  return (
+    <Errors
+      error={error}
+      onPress={() => {
+        setError(null)
+        setTryAgain(!tryAgain)
+      }} />
+  )
+
+  if (isLoading || !coords)
+  return <Loading/>
+  
+  return (
+    <FlatList
+    style={{backgroundColor: myColors.background}}
+    contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 16}}
+    showsVerticalScrollIndicator={false}
+    data={mercList}
+    keyExtractor={({ id: key }) => key.toString()}
+    renderItem={({item}: {item: mercModel}) => (
+      <MercItem
+      coords={coords}
+      item={item}
+      onPress={() => navigation.navigate('Mercado', device.web? {city: city, market: item.name} : {item: item} )} />
+    )}/>
+  )
 }
 
 const styles = StyleSheet.create({

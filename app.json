@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Poupa Preço",
-    "slug": "poupapreco",
+    "name": "Pronto Entrega",
+    "slug": "prontoentrega",
     "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#2196F3",
     "backgroundColor": "#FEFEFE",
-    "scheme": "poupapreco",
+    "scheme": "prontoentrega",
     "icon": "./src/assets/icon.png",
     "splash": {
       "image": "./src/assets/splash.png",
@@ -24,7 +24,7 @@
       "**/*"
     ],
     "android": {
-      "package": "com.poupapreco.poupapreco",
+      "package": "com.prontoentrega.prontoentrega",
       "versionCode": 1,
       "icon": "./src/assets/round-icon.png",
       "adaptiveIcon": {
@@ -36,12 +36,12 @@
         "data": [
           {
             "scheme": "https",
-            "host": "www.poupapreco.com.br",
+            "host": "prontoentrega.com.br",
             "pathPrefix": "/produto"
           },
           {
             "scheme": "https",
-            "host": "www.poupapreco.com.br",
+            "host": "prontoentrega.com.br",
             "pathPrefix": "/mercado"
           }
         ],
@@ -52,7 +52,7 @@
       }]
     },
     "ios": {
-      "bundleIdentifier": "com.poupapreco.poupapreco",
+      "bundleIdentifier": "com.prontoentrega.prontoentrega",
       "supportsTablet": false,
       "icon": "./src/assets/icon.png",
       "usesIcloudStorage": true
@@ -60,7 +60,7 @@
     "web": {
       "favicon": "./src/assets/favicon.png",
       "themeColor": "#2196F3",
-      "shortName": "PoupaPreço"
+      "shortName": "Pronto"
     }
   }
 }

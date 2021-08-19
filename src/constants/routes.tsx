@@ -17,9 +17,9 @@ const linking: LinkingOptions = {
               Home: 'home',
               Cupons: 'cupons',
               Favoritos: 'favoritos',
-              ListMercados: 'mercados',
+              ListMercados: 'lista-mercados',
               Mercado: {
-                path: 'mercado',
+                path: 'mercado/:city/:market',
               },
               MercInfo: {
                 path: 'mercado-detalhes/:key',
@@ -49,10 +49,10 @@ const linking: LinkingOptions = {
         },
       },
       Product: {
-        path: 'produto/:prod',
+        path: 'produto/:city/:market/:prod',
         screens: {
           ProductDetails: '',
-          Mercado: 'mercado',
+          MercadoDetails: 'mercado',
         }
       },
       Payment: {

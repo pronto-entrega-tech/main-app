@@ -1,5 +1,4 @@
 import Address from './Address';
-import BottomTabs from './BottomTabs';
 import Cart from './Cart';
 import Devices from './Devices';
 import Filter from './Filter';
@@ -20,7 +19,6 @@ import UploadQuestion from './UploadQuestion';
 
 export default { 
   Address,
-  BottomTabs,
   Cart,
   Devices,
   Filter,

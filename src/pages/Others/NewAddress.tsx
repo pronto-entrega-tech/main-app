@@ -1,7 +1,8 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TextInput } from 'react-native';
-import { Button, Divider, Input } from 'react-native-elements';
+import * as Location from 'expo-location'
+import { Divider, Input } from 'react-native-elements';
 import IconButton from '../../components/IconButton';
 import Loading from '../../components/Loading';
 import MyButton from '../../components/MyButton';
@@ -13,6 +14,7 @@ import { addressModel } from './Address';
 
 function NewAddress({navigation, route}:
 {navigation: StackNavigationProp<any, any>, route: any}) {
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [addressList, setAddressList] = React.useState<addressModel[]>();
   const [addressItem, setAddressItem] = React.useState<addressModel>();
   const [isNew, setIsNew] = React.useState<boolean>(true);
@@ -27,7 +29,7 @@ function NewAddress({navigation, route}:
   React.useEffect(() => {
     getAddressList()
     .then(list => {
-      if (!address || !address.apelido) {
+      if (address === undefined) {
         setAddressItem({
           apelido: '',
           rua: '',
@@ -40,7 +42,7 @@ function NewAddress({navigation, route}:
         })
       } else if (typeof address == 'number') {
         setAddressItem(list[address])
-        setIsNew(list.includes(list[address]))
+        setIsNew(false)
       } else {
         setAddressItem(address)
       }
@@ -53,8 +55,8 @@ function NewAddress({navigation, route}:
   const inputNumero = React.useRef<TextInput | null>();
   const inputBairro = React.useRef<TextInput | null>();
 
-  if (!(addressList && addressItem))
-  return <Loading/>
+  if (!(addressList && addressItem) || isLoading)
+  return <Loading title={isLoading? 'Salvando endereço...': undefined} />
 
   return (
     <>
@@ -119,7 +121,7 @@ function NewAddress({navigation, route}:
           label='Cidade'
           style={{flex: 2}}
           errorMessage={cityError? 'Insira uma cidade' : ''}
-          items={['Jataí']}
+          items={['Jataí','Rio verde']}
           selectedValue={addressItem.cidade}
           onValueChange={v => {addressItem.cidade = v; setCityError(false)}} />
         <MyPicker
@@ -139,7 +141,7 @@ function NewAddress({navigation, route}:
     </ScrollView>
     <MyButton
       title='Salvar endereço'
-      onPress={() => {
+      onPress={async ()  => {
         let error = false;
         const wrong = [undefined, '', '-']
         if (wrong.includes(addressItem.rua)) {error = true; setStreetError(true)};
@@ -149,6 +151,17 @@ function NewAddress({navigation, route}:
         if (wrong.includes(addressItem.estado)) {error = true; setStateError(true)};
         if (error) return;
 
+        setIsLoading(true)
+        const address = `${addressItem.estado}, ${addressItem.cidade}, ${addressItem.bairro}, ${addressItem.rua}, ${addressItem.numero}`
+        if (device.web) {
+          addressItem.latitude = 0
+          addressItem.longitude = 0
+        } else {
+          const loc = await Location.geocodeAsync(address)
+          addressItem.latitude = loc[0].latitude
+          addressItem.longitude = loc[0].longitude
+        }
+
         let newAddressList
         if (isNew) {
           newAddressList = [...addressList, addressItem]
@@ -156,9 +169,10 @@ function NewAddress({navigation, route}:
           addressList[addressList.indexOf(addressItem)] = addressItem
           newAddressList = addressList
         }
+
+        await saveAddressList(newAddressList)
         toast('Endereço salvo')
-        saveAddressList(newAddressList)
-        .then(() => navigation.goBack())
+        navigation.goBack()
       }}
       type='outline'
       buttonStyle={styles.button} />

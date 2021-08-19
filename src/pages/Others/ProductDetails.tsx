@@ -2,65 +2,77 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Divider, Image } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import useMyContext from '../../functions/MyContext';
 import IconButton from '../../components/IconButton';
 import ProdListHorizontal from '../../components/ProdListHorizontal';
-import { myColors, device, images } from '../../constants'; 
-import { converter } from '../../functions';
+import { myColors, device } from '../../constants'; 
 import validate from '../../functions/validate';
 import requests from '../../services/requests';
 import { useProdContext } from '../../functions/ProdContext';
 
 function ProductDetails({ navigation }:
   {navigation: StackNavigationProp<any, any>}) {
-  const {shoppingList, onPressAdd, onPressRemove} = useMyContext();
+  const {favorites, onPressFav, shoppingList, onPressAdd, onPressRemove} = useMyContext();
   const {item} = useProdContext();
-  const quantity = shoppingList.get(item.prodKey)?.quantity;
-  const off = item.precoAntes? ((1-(item.preco.value / item.precoAntes.value))*100).toFixed(0) : undefined;
-  const uriImage = item.image != null ? {uri: requests+'images/'+item.image} : images.loadProdImage;
+  const quantity = shoppingList.get(item.prod_id)?.quantity;
+  const off = item.price_before? ((1-(item.price.value / item.price_before.value))*100).toFixed(0) : undefined;
+
   return(
     <View style={{backgroundColor: myColors.background, flex: 1}} >
       <ProdListHorizontal navigation={navigation} header={({ key }: { key: number }) => (
         <View key={key}>
-          <View style={{flexDirection: 'row', padding: 12}} >
+          <View style={{flexDirection: 'row', paddingHorizontal: 13,paddingTop: 6, paddingBottom: 10}} >
             <View style={{flex: 1, flexDirection: 'column'}} >
               <Text
                 ellipsizeMode="tail"
                 numberOfLines={3}
                 style={ styles.prodText }>
-                {item.nome}
+                {item.name}
               </Text>
               {off? 
               <View style={styles.oldPriceConteiner} >
-                <Text style={styles.oldPriceText} >R${item.precoAntes?.toString()}</Text>
-                <View style={styles.offTextBox}><Text style={styles.offText} >-{off}%</Text></View>
+                <Text style={styles.oldPriceText} >R${item.price_before?.toString()}</Text>
+                <View style={styles.offTextBox}>
+                  <Text style={styles.offText} >-{off}%</Text>
+                </View>
               </View>
               : null }
-              <Text style={ styles.priceText } >R${item.preco.toString()}</Text>
+              <Text style={ styles.priceText } >R${item.price.toString()}</Text>
               <View style={ styles.brandWeightRow } >
-                <Text style={ styles.brandText } >{item.marca}</Text>
-                <Text style={ styles.weightText } >{item.quantidade}</Text>
+                <Text style={ styles.brandText } >{item.brand}</Text>
+                <Text style={ styles.weightText } >{item.weight}</Text>
               </View>
             </View>
 
             <View style={{flexDirection: 'column'}}>
-              <Image 
-                placeholderStyle={{backgroundColor: '#FFF'}}
-                source={uriImage}
+              <Image
+                placeholderStyle={{backgroundColor: 'white'}}
+                PlaceholderContent={
+                  <Icon name='cart-outline' color={myColors.grey2} size={140} />
+                }
+                source={{uri: requests+'images/'+item.prod_id+'.webp'}}
                 containerStyle={styles.image} />
+              <IconButton
+                style={{position: 'absolute', right: -12, top: -4}}
+                icon={favorites.has(item.prod_id)? 'heart' : 'heart-outline'}
+                size={25}
+                color={favorites.has(item.prod_id)? myColors.primaryColor : myColors.grey2}
+                type='prodIcons'
+                onPress={() => onPressFav(item)} />
               <View style={ styles.containerAdd } >
                 <IconButton 
                   icon='minus' 
                   size={24} 
                   color={myColors.primaryColor} 
-                  type='add' 
+                  type='addLarge' 
                   onPress={() => onPressRemove(item)} />
                 <Text style={ styles.centerNumText } >{validate([quantity])? quantity : 0}</Text>
                 <IconButton 
                   icon='plus' 
                   size={24} 
                   color={myColors.primaryColor} 
-                  type='add' 
+                  type='addLarge' 
                   onPress={() => onPressAdd(item)} />
               </View>
             </View>
@@ -83,10 +95,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     height: 140,
     width: 140,
+    marginHorizontal: 4,
   },
   prodText: { 
     color: myColors.grey3,
     fontSize: 20,
+    marginTop: 8,
     marginBottom: 8,
     fontFamily: 'Condensed',
     position: 'absolute',
@@ -113,12 +127,12 @@ const styles = StyleSheet.create({
   offText: {
     color: '#FFF',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 15,
   },
   priceText: {
     color: myColors.text3,
-    marginTop: 114+textLinePad,
-    fontSize: 28,
+    marginTop: 112+textLinePad,
+    fontSize: 27,
     fontFamily: 'Medium'
   },
   brandWeightRow: {
@@ -128,13 +142,13 @@ const styles = StyleSheet.create({
   brandText: {
     color: myColors.grey2,
     fontFamily: 'Regular',
-    fontSize: 20,
+    fontSize: 19,
   },
   weightText: {
     marginLeft: 4,
     color: myColors.grey2,
     fontFamily: 'Regular',
-    fontSize: 20,
+    fontSize: 19,
   },
   containerAdd: {
     flexDirection: 'row',

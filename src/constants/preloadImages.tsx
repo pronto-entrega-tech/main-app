@@ -2,7 +2,7 @@ import { ImageURISource } from 'react-native';
 const loadProdImage: ImageURISource = require('../assets/icons/loadProdImage.png');
 const account: ImageURISource = require('../assets/icons/account.png');
 const splash: ImageURISource = require('../assets/splash.png');
-const logo: ImageURISource = require('../assets/logo2.png');
+const logo: ImageURISource = require('../assets/logo.png');
 const tomato: ImageURISource = require('../assets/icons/tomato.png');
 const broccoli: ImageURISource = require('../assets/icons/broccoli.png');
 const pineapple: ImageURISource = require('../assets/icons/pineapple.png');

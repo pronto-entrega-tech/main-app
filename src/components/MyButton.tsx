@@ -7,7 +7,15 @@ import MyTouchable from './MyTouchable';
 function MyButton ({onPress, title, icon, iconRight = false, disabled = false, type = 'solid', buttonStyle, titleStyle}: 
 {onPress: (item: any) => void, title: string, icon?: any, iconRight?: boolean, disabled?: boolean, type?: 'solid'|'outline'|'clear',
 buttonStyle?: StyleProp<ViewStyle>, titleStyle?: StyleProp<TextStyle>}) {
-  const baseStyle: StyleProp<ViewStyle> = {borderRadius: 4, minHeight: 44, minWidth: 44, padding: 8, justifyContent: 'center', alignItems: 'center', flexDirection: iconRight? 'row-reverse' : 'row'}
+  const baseStyle: StyleProp<ViewStyle> = {
+    borderRadius: 4,
+    minHeight: 44,
+    minWidth: 44,
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: iconRight? 'row-reverse' : 'row'}
+
   let typeStyle: StyleProp<ViewStyle>;
   switch (type) {
     case 'solid':
@@ -24,7 +32,7 @@ buttonStyle?: StyleProp<ViewStyle>, titleStyle?: StyleProp<TextStyle>}) {
   const ButtonText = () => {
     return (
       <>
-      {icon}
+        {icon}
         <MyText style={[{
           color: disabled? '#9CA3AA' : type == 'solid'? 'white' : myColors.primaryColor,
           fontFamily: device.iOS? 'Regular' : 'Medium',

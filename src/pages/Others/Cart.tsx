@@ -1,8 +1,9 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, Animated } from 'react-native';
-import { Button, Divider } from 'react-native-elements';
+import { Divider } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import NetInfo from "@react-native-community/netinfo";
 import useMyContext from '../../functions/MyContext';
 import IconButton from '../../components/IconButton';
 import { mercModel } from '../../components/MercItem';
@@ -12,7 +13,7 @@ import { prodModel } from '../../components/ProdItem';
 import ProdList from '../../components/ProdList';
 import ProdListHorizontal from '../../components/ProdListHorizontal';
 import { myColors, device, globalStyles } from '../../constants';
-import { getLongAddress, saveShoppingList, getActiveMarket, saveActiveMarketKey, saveOrdersList, getOrdersList, getActiveMarketKey, getLastPayment, saveLastPayment } from '../../functions/dataStorage';
+import { getLongAddress, saveShoppingList, getActiveMarket, saveActiveMarketKey, saveOrdersList, getOrdersList, getActiveMarketKey, getLastPayment, saveLastPayment, getCity } from '../../functions/dataStorage';
 import validate from '../../functions/validate';
 import { prodOrderModel } from '../Compras/Order';
 import MyText from '../../components/MyText';
@@ -20,7 +21,7 @@ import requests from '../../services/requests';
 import { PaymentsStripe as Payment } from 'expo-payments-stripe'
 import Header from '../../components/Header';
 import { money, Money, createMercItem, createProdList, moneyToString } from '../../functions/converter';
-import Loading from '../../components/Loading';
+import Loading, { Errors } from '../../components/Loading';
 
 export interface scheduleModel {
   dia: string,
@@ -104,16 +105,16 @@ function updateCart(shoppingList: Map<string, {quantity: number, item: prodModel
     const quantity = shoppingList.get(key)?.quantity;
     const item = shoppingList.get(key)?.item;
     if (!item || !quantity) return;
-    subtotal.add(item.preco.value * quantity)
-    if (item.precoAntes)
-      totalOff.add((item.precoAntes.value - item.preco.value) * quantity)
+    subtotal.add(item.price.value * quantity)
+    if (item.price_before)
+      totalOff.add((item.price_before.value - item.price.value) * quantity)
     prodList = [...prodList, item]
     prodOrder = [...prodOrder, {
       quantity: quantity.toString(),
-      description: item.nome,
-      price: item.preco.toString(),
-      brand: item.marca,
-      weight: item.quantidade,
+      description: item.name,
+      price: item.price.toString(),
+      brand: item.brand,
+      weight: item.weight,
     }]
   }
   setSubtotal(subtotal)
@@ -137,11 +138,11 @@ function updateSchedule(activeMarket: mercModel,
   let open;
   let close;
   if (weekday == 6) {
-    open = activeMarket.openSab;
-    close = activeMarket.closeSab;
+    open = activeMarket.open_sat;
+    close = activeMarket.close_sat;
   } else if (weekday == 0) {
-    open = activeMarket.openDom;
-    close = activeMarket.closeDom;
+    open = activeMarket.open_sun;
+    close = activeMarket.close_sun;
   } else {
     open = activeMarket.open;
     close = activeMarket.close;
@@ -153,14 +154,14 @@ function updateSchedule(activeMarket: mercModel,
   const dayText: string = hours < close2 ? 'Hoje' : 'Amanhã';
   const dayText2: number = hours < close2 ? day : day+1;
 
-  const deliveryHour = hours+(min+activeMarket.minPrazo)/60
+  const deliveryHour = hours+(min+activeMarket.time_min)/60
 
   const isOpen = hours >= open2 && hours < close2;
   if (isOpen) {
     const schedule: scheduleModel = {
       dia: dayText,
       diaDoMes: dayText2,
-      horarios: `${activeMarket.minPrazo} - ${activeMarket.maxPrazo} min`,
+      horarios: `${activeMarket.time_min} - ${activeMarket.time_max} min`,
       scheduled: false,
     }
     scheduleList = [schedule]
@@ -186,6 +187,8 @@ function updateSchedule(activeMarket: mercModel,
 
 function Cart({ navigation, route }:
 {navigation: StackNavigationProp<any, any>, route: any}) {
+  const [tryAgain, setTryAgain] = useState(false);
+  const [error, setError] = useState<'server'|'connection'|'nothing'|null>(null);
   const [readySubtotal, setReadySubtotal] = useState(false);
   const [readyActiveMarket, setReadyActiveMarket] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
@@ -205,36 +208,49 @@ function Cart({ navigation, route }:
   const [prodOrder, setProdOrder] = useState<prodOrderModel[]>([]);
   const {isGuest, refresh, shoppingList, setShoppingList, setActiveMarketKey, setSubtotal} = useMyContext();
 
+  React.useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(NetInfoChangeHandler => {
+      if (NetInfoChangeHandler.isInternetReachable == false) {
+        setError('connection')
+      } else {
+        setError(null)
+      }
+    })
+    return () => {
+      unsubscribe()
+    }
+  }, [])
+
   useEffect(() => {
     setReadyActiveMarket(false)
 
     getLastPayment()
     .then(lastPayment => {if (lastPayment) setPayment(lastPayment)})
 
-    fetch(requests+'prodList.php')
+    const setup = (activeMarket: mercModel) => {
+      fetch(requests+`prodList.php?market=${activeMarket}`)
       .then((response) => response.json())
       .then((json) => setBuyTooList(createProdList(json)))
-      .catch((error) => console.error(error))
-      
+      .catch(() => setError('server'));
+
+      setActiveMarket(activeMarket)
+      updateSchedule(activeMarket, setSchedules, setActiveSchedule)
+      setReadyActiveMarket(true)
+    }
+
     getActiveMarket().then(activeMarket => {
-      if (activeMarket) {
-        setActiveMarket(activeMarket)
-        updateSchedule(activeMarket, setSchedules, setActiveSchedule)
-        setReadyActiveMarket(true)
-        return;
-      }
+      if (activeMarket)
+      return setup(activeMarket)
+
       getActiveMarketKey().then(key => {
-        if (key !== '') {
-          fetch(requests+'mercList.php')
+        if (key == '') return
+        getCity().then(city => {
+          fetch(requests+`mercList.php?city=${city}&market=${key}`)
             .then((response) => response.json())
             .then((json: mercModel[]) => createMercItem(json[0]))
-            .then((activeMarket) => {
-              setActiveMarket(activeMarket)
-              updateSchedule(activeMarket, setSchedules, setActiveSchedule)
-            })
-            .then(() => setReadyActiveMarket(true))
-            .catch((error) => console.error(error));
-        }
+            .then((activeMarket) => setup(activeMarket))
+            .catch(() => setError('server'));
+        })
       })
     })
   }, []);
@@ -263,9 +279,9 @@ function Cart({ navigation, route }:
 
   useEffect(() => {
     if (activeMarket) {
-      if (cartSubtotal.value < activeMarket.minPedido.value) {
+      if (cartSubtotal.value < activeMarket.order_min.value) {
         setReady(false)
-        setButtonText('Subtotal mínimo de R$'+moneyToString(activeMarket.minPedido))
+        setButtonText('Subtotal mínimo de R$'+moneyToString(activeMarket.order_min))
       } else if (longAddress?.rua == '') {
         setReady(false)
         setButtonText('Escolha um endereço')
@@ -325,16 +341,16 @@ function Cart({ navigation, route }:
       const orderDate = `${d.getHours()}:${d.getMinutes().toString().padStart(2, '0')} - ${d.getDay().toString().padStart(2, '0')}/${d.getMonth().toString().padStart(2, '0')}/${d.getFullYear()}`;
       var previsao: string;
       if (!scheduled) {
-        const date1 = new Date(d.getTime() + activeMarket.minPrazo * 60000);
-        const date2 = new Date(d.getTime() + activeMarket.maxPrazo * 60000);
+        const date1 = new Date(d.getTime() + activeMarket.time_min * 60000);
+        const date2 = new Date(d.getTime() + activeMarket.time_max * 60000);
         previsao = `${date1.getHours()}:${date1.getMinutes().toString().padStart(2, '0')} - ${date2.getHours()}:${date2.getMinutes().toString().padStart(2, '0')}`;
       } else {
         previsao = activeSchedule.horarios;
       }
       getOrdersList().then(list => {
         saveOrdersList([{
-          nome: activeMarket.nome,
-          mercKey: activeMarket.key,
+          nome: activeMarket.name,
+          mercKey: activeMarket.id,
           pedido: list.length+1,
           prodList: prodOrder,
           scheduled: scheduled,
@@ -342,8 +358,8 @@ function Cart({ navigation, route }:
           date: orderDate,
           subtotal: cartSubtotal.toString(),
           off: off.toString(),
-          ship: activeMarket.taxa.toString(),
-          total: moneyToString(cartSubtotal.value + activeMarket.taxa.value),
+          ship: activeMarket.fee.toString(),
+          total: moneyToString(cartSubtotal.value + activeMarket.fee.value),
           endereco: longAddress.rua+' - '+longAddress.bairro,
           pagamento: payment.title,
         }, ...list])
@@ -375,6 +391,19 @@ function Cart({ navigation, route }:
       <View style={{backgroundColor: myColors.background, flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <MyText style={{fontSize: 15, color: myColors.text2}} >Carrinho vazio</MyText>
       </View>
+    </>
+  )
+
+  if (error)
+  return (
+    <>
+      <Header navigation={navigation} title='' />
+      <Errors
+        error={error}
+        onPress={() => {
+          setError(null)
+          setTryAgain(!tryAgain)
+        }} />
     </>
   )
 
@@ -412,7 +441,7 @@ function Cart({ navigation, route }:
               entregar?
               !longAddress? 'Carregando...' : 
               longAddress.rua != '' ? longAddress.rua : 'Escolha um endereço' :
-              activeMarket?.endereco
+              activeMarket?.address
             }</MyText>
             {entregar && longAddress?.bairro != '' && longAddress?.rua != '' ? <MyText style={styles.addressSubtext} >{longAddress?.bairro}</MyText> : null}
           </View>
@@ -499,8 +528,8 @@ function Cart({ navigation, route }:
         </View>
         <View style={styles.priceConteiner}>
           <MyText style={styles.priceText} >{entregar? 'Taxa de entrega' : 'Retirada'}</MyText>
-          <MyText style={[styles.priceText, activeMarket?.taxa.value == 0 || !entregar ? {color: '#109c00'} : null]} >{
-          activeMarket?.taxa.value == 0 || !entregar ? 'Grátis' : 'R$'+moneyToString(activeMarket?.taxa)
+          <MyText style={[styles.priceText, activeMarket?.fee.value == 0 || !entregar ? {color: '#109c00'} : null]} >{
+          activeMarket?.fee.value == 0 || !entregar ? 'Grátis' : 'R$'+moneyToString(activeMarket?.fee)
           }</MyText>
         </View>
         <Divider style={{backgroundColor: '#DDD', marginHorizontal: 16}} />
@@ -520,7 +549,7 @@ function Cart({ navigation, route }:
         <Divider style={styles.divider2} />
         <View style={styles.prodListTopbar} >
           <MyText style={{color: myColors.text5, fontSize: 16}} >Lista de compras</MyText>
-          <MyText style={{color: myColors.text5, fontSize: 16}} >{activeMarket?.nome}</MyText>
+          <MyText style={{color: myColors.text5, fontSize: 16}} >{activeMarket?.name}</MyText>
         </View>
       </View>
     )

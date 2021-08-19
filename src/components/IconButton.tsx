@@ -1,55 +1,58 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { View, StyleSheet, TouchableNativeFeedback } from 'react-native';
-import { myColors, device, globalStyles } from '../constants';
+import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { myColors, globalStyles } from '../constants';
 import colors from '../constants/colors';
-import { TouchableRipple } from 'react-native-paper';
 import MyTouchable from './MyTouchable';
 
-function IconButton ({onPress, icon, size=24, color=myColors.primaryColor, type } : 
-{onPress: (item: any) => void, icon: string, size?: number, color?: string, 
-  type?: 'clear'|'add'|'addHorizontal'|'fill'|'back'|'profile'|'address'|'prodIcons'|'profile2'|'cancel' }) {
+function IconButton ({onPress, icon, size=24, color=myColors.primaryColor, style, type } : 
+{onPress: (item: any) => void, icon: string, size?: number, color?: string, style?: StyleProp<ViewStyle>,
+  type?: 'clear'|'add'|'addHorizontal'|'addLarge'|'fill'|'back'|'profile'|'address'|'prodIcons'|'profile2'|'cancel' }) {
   let hitSlop;
-  let style = {};
+  let iconStyle = {};
   switch(type){
     case 'clear':
-      style = styles.buttonClear;
+      iconStyle = styles.buttonClear;
       break;
     case 'add':
-      style = [styles.buttonAdd, globalStyles.elevation4, globalStyles.darkBoader];
+      iconStyle = [styles.buttonAdd, globalStyles.elevation4, globalStyles.darkBoader];
       hitSlop = {top: 9, bottom: 9, left: 12, right: 12};
       break;
     case 'addHorizontal':
-      style = [styles.buttonAddHorizontal, globalStyles.elevation4, globalStyles.darkBoader];
+      iconStyle = [styles.buttonAddHorizontal, globalStyles.elevation4, globalStyles.darkBoader];
       hitSlop = {top: 10, bottom: 10, left: 10, right: 12};
       break;
+    case 'addLarge':
+      iconStyle = [styles.buttonAddLarge, globalStyles.elevation4, globalStyles.darkBoader];
+      hitSlop = {top: 9, bottom: 9, left: 12, right: 12};
+      break;
     case 'back':
-      style = styles.buttonBack;
+      iconStyle = styles.buttonBack;
       break;
     case 'cancel':
-      style = styles.cancel;
+      iconStyle = styles.cancel;
       break;
     case 'prodIcons':
-      style = styles.buttonProdIcons;
+      iconStyle = styles.buttonProdIcons;
       break;
     case 'profile':
-      style = [styles.buttonProfile, globalStyles.elevation4, globalStyles.darkBoader];
+      iconStyle = [styles.buttonProfile, globalStyles.elevation4, globalStyles.darkBoader];
       break;
     case 'profile2':
-      style = [styles.buttonProfile2, globalStyles.elevation4];
+      iconStyle = [styles.buttonProfile2, globalStyles.elevation4];
       break;
     case 'address':
-      style = styles.buttonAddress;
+      iconStyle = styles.buttonAddress;
       break;
     default:
-      style = [styles.button, globalStyles.elevation4, globalStyles.darkBoader];
+      iconStyle = [styles.button, globalStyles.elevation4, globalStyles.darkBoader];
   }
   
   return (
     <MyTouchable
       hitSlop={hitSlop}
       onPress={onPress}
-      style={style} >
+      style={[iconStyle, style]} >
       <Icon name={icon} size={size} color={color} />
     </MyTouchable>
   )
@@ -85,6 +88,15 @@ const styles = StyleSheet.create({
   buttonAddHorizontal: {
     width: 26,
     height: 26,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 60,
+    margin: 2,
+  },
+  buttonAddLarge: {
+    width: 34,
+    height: 30,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Image } from 'react-native-elements';
-import { myColors, device, images, globalStyles } from '../constants';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { myColors, device, globalStyles } from '../constants';
 import IconButton from './IconButton';
 import MyButton from './MyTouchable';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -9,16 +10,15 @@ import { prodModel } from './ProdItem';
 import requests from '../services/requests';
 import { moneyToString } from '../functions/converter';
 
-function ProdItemHorizontal({navigation, item, isFavorite, quantity = 0, onPressFav, onPressAdd, onPressRemove, merc}:
+function ProdItemHorizontal({navigation, item, isFavorite, quantity = 0, onPressFav, onPressAdd, onPressRemove, merc, city}:
 {navigation: StackNavigationProp<any, any>, item: prodModel, isFavorite: boolean, quantity?: number,
-   onPressFav: (item: any) => void , onPressAdd: (item: any) => void , onPressRemove: (item: any) => void, merc: boolean }) {
-  const off = item.precoAntes? ((1-(item.preco.value / item.precoAntes.value))*100).toFixed(0) : undefined;
-  const uriImage = item.image != null ? {uri: requests+'images/'+item.image} : images.loadProdImage;
+  onPressFav: (item: any) => void , onPressAdd: (item: any) => void , onPressRemove: (item: any) => void, merc: boolean, city: string }) {
+  const off = item.price_before? ((1-(item.price.value / item.price_before.value))*100).toFixed(0) : undefined
 
   return (
     <MyButton
       style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader]}
-      onPress={() => navigation.push('Product', device.web? {prod: item.prodKey} : {item: item})} >
+      onPress={() => navigation.push('Product', device.web? {city: city, market: item.market_id, prod: item.prod_id} : {item: item})} >
       <View style={ styles.container }> 
         <View style={ styles.containerAdd } >
           <IconButton 
@@ -38,37 +38,39 @@ function ProdItemHorizontal({navigation, item, isFavorite, quantity = 0, onPress
         <View style={ styles.containerImage } >
           <Image 
             placeholderStyle={{backgroundColor: '#FFF'}}
-            source={uriImage}
+            PlaceholderContent={
+              <Icon name='cart-outline' color={myColors.grey2} size={80} />
+            }
+            source={{uri: requests+'images/'+item.prod_id+'.webp'}}
             containerStyle={styles.image} />
           {off? <View style={styles.offTextBox}><Text style={styles.offText} >-{off}%</Text></View> : null}
-          <View style={styles.fav} >
-            <IconButton
-              icon={isFavorite ? 'heart' : 'heart-outline'}
-              size={24}
-              color={isFavorite ? myColors.primaryColor : myColors.grey2}
-              type='clear'
-              onPress={onPressFav} />
-          </View>
+          <IconButton
+            style={styles.fav}
+            icon={isFavorite ? 'heart' : 'heart-outline'}
+            size={24}
+            color={isFavorite ? myColors.primaryColor : myColors.grey2}
+            type='clear'
+            onPress={onPressFav} />
         </View>
         <View style={ styles.containerText } >
           <Text
             ellipsizeMode="tail"
             numberOfLines={1} 
             style={ styles.prodText }>
-            {item.nome}
+            {item.name}
           </Text>
-          <Text style={ styles.oldPriceText } >{item.precoAntes? 'R$'+moneyToString(item.precoAntes) : null}</Text>
-          <Text style={ styles.priceText } >R${moneyToString(item.preco)}</Text>
+          <Text style={ styles.oldPriceText } >{item.price_before? 'R$'+moneyToString(item.price_before) : null}</Text>
+          <Text style={ styles.priceText } >R${moneyToString(item.price)}</Text>
           <View style={ styles.brandWeightRow } >
-            <Text style={ styles.brandText } >{item.marca}</Text>
-            <Text style={ styles.weightText } >{item.quantidade}</Text>
+            <Text style={ styles.brandText } >{item.brand}</Text>
+            <Text style={ styles.weightText } >{item.weight}</Text>
           </View>
         </View>
         <View style={styles.mercContainer} >
           {!merc?
           <Image 
             placeholderStyle={{backgroundColor: '#FFF'}}
-            source={{uri: requests+'images/'+'mercado'/*item.key*/+'.png'}}
+            source={{uri: requests+'images/'+'mercado'/*item.id*/+'.webp'}}
             containerStyle={styles.mercImage} /> : null}
         </View>
       </View>

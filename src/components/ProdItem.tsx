@@ -2,68 +2,68 @@ import React from 'react';
 import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { Image } from 'react-native-elements';
 import { Divider } from 'react-native-paper';
-import { myColors, device, images, globalStyles } from '../constants';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { myColors, device, globalStyles } from '../constants';
 import IconButton from './IconButton';
-import MyButton from './MyTouchable';
+import MyTouchable from './MyTouchable';
 import { StackNavigationProp } from '@react-navigation/stack';
 import requests from '../services/requests';
 import { Money } from '../functions/converter';
 import MyText from './MyText';
 
 export interface prodModel {
-  prodKey: string,
-  image: string,
-  nome: string,
-  mercKey: string,
-  marca: string,
-  quantidade: string,
-  preco: Money,
-  precoAntes?: Money,
+  prod_id: string,
+  name: string,
+  brand: string,
+  weight: string,
+  price: Money,
+  price_before?: Money,
+  market_id: string,
 }
 
-function ProdItem({navigation, item, isFavorite, quantity = 0, onPressFav, onPressAdd, onPressRemove, style={}, merc}:
-{navigation: StackNavigationProp<any, any>, item: prodModel, isFavorite: boolean, quantity?: number, 
-  onPressFav: (item: any) => void , onPressAdd: (item: any) => void , onPressRemove: (item: any) => void,
-   style?: StyleProp<ViewStyle>, merc: boolean }) {
-  const off = item.precoAntes? ((1-(item.preco.value / item.precoAntes.value))*100).toFixed(0) : undefined;
-  const uriImage = item.image != null ? {uri: requests+'images/'+item.image} : images.loadProdImage;
+function ProdItem({navigation, item, isFavorite, quantity = 0, style={}, merc, city, onPressFav, onPressAdd, onPressRemove}:
+{navigation: StackNavigationProp<any, any>, item: prodModel, isFavorite: boolean, quantity?: number, style?: StyleProp<ViewStyle>, merc: boolean, city: string, 
+onPressFav: (item: any) => void , onPressAdd: (item: any) => void , onPressRemove: (item: any) => void}) {
+  const off = item.price_before? ((1-(item.price.value / item.price_before.value))*100).toFixed(0) : undefined;
 
   return (
-    <MyButton
+    <MyTouchable
       style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader, style]}
-      onPress={() => navigation.push('Product', device.web? {prod: item.prodKey} : {item: item})} >
+      onPress={() => navigation.push('Product', device.web? {city: city, market: item.market_id, prod: item.prod_id} : {item: item})} >
       <View style={ styles.top } >
         {off? <View style={styles.offTextBox}><MyText style={styles.offText} >-{off}%</MyText></View> : null}
         <Image 
           placeholderStyle={{backgroundColor: '#FFF'}}
-          source={uriImage}
+          PlaceholderContent={
+            <Icon name='cart-outline' color={myColors.grey2} size={80} />
+          }
+          source={{uri: requests+'images/'+item.prod_id+'.webp'}}
           containerStyle={styles.image} />
-        <View style={styles.fav} >
-          <IconButton
-            icon={isFavorite ? 'heart' : 'heart-outline'}
-            size={24}
-            color={isFavorite ? myColors.primaryColor : myColors.grey2}
-            type='clear'
-            onPress={onPressFav} />
-        </View>
+        <IconButton
+          style={styles.fav}
+          icon={isFavorite ? 'heart' : 'heart-outline'}
+          size={24}
+          color={isFavorite ? myColors.primaryColor : myColors.grey2}
+          type='clear'
+          onPress={onPressFav} />
       </View>
       {!merc?
       <Image 
         placeholderStyle={{backgroundColor: '#FFF'}}
-        source={{uri: requests+'images/'+'mercado'/*item.key*/+'.png'}}
+        source={{uri: requests+'images/'+'mercado'/*item.id*/+'.webp'}}
         containerStyle={styles.mercImage} /> : null}
       <View style={ styles.container } >
-        {item.precoAntes != null ? <MyText style={ styles.oldPriceText } >R${item.precoAntes.toString()}</MyText> : null }
-        <MyText style={ styles.priceText } >R${item.preco.toString()}</MyText>
+        {item.price_before != null ? <MyText style={ styles.oldPriceText } >R${item.price_before.toString()}</MyText> : null }
+        <MyText style={ styles.priceText } >R${item.price.toString()}</MyText>
         <View style={ styles.brandWeightRow } >
-          <MyText style={ styles.brandText } >{item.marca}</MyText>
-          <MyText style={ styles.weightText } >{item.quantidade}</MyText>
+          <MyText style={ styles.brandText } >{item.brand}</MyText>
+          <MyText style={ styles.weightText } >{item.weight}</MyText>
         </View>
         <MyText
           ellipsizeMode="tail"
           numberOfLines={2}
           style={ styles.prodText }>
-          {item.nome}
+          {item.name}
         </MyText>
       </View>
       <Divider style={{backgroundColor: myColors.divider2, height: 1, marginBottom: 0 }}/>
@@ -82,7 +82,7 @@ function ProdItem({navigation, item, isFavorite, quantity = 0, onPressFav, onPre
           type='add' 
           onPress={onPressAdd} />
       </View>
-    </MyButton>
+    </MyTouchable>
   );
 }
 

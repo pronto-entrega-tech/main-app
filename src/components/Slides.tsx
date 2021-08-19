@@ -1,18 +1,34 @@
 import React from 'react';
-import { ImageSourcePropType, ScrollView, StyleSheet, View, Text } from 'react-native';
+import { ImageURISource, ScrollView, StyleSheet, View } from 'react-native';
 import { Image } from 'react-native-elements';
 import { device, globalStyles } from '../constants'
 import requests from '../services/requests';
 
-const slidesData: ImageSourcePropType[] = [
-  {uri: requests+'images/slide1.jpeg'}, 
-  {uri: requests+'images/slide2.jpeg'},
-];
+const slideWidth = 1024;
+const slideHeight = 456;
 
-function AdsSlider() {
+function createSlideList(json: []) {
+  let slideList: ImageURISource[] = []
+  for (let i = 0; i < json.length; i++) {
+    slideList = [...slideList, {
+      uri: requests+'images/'+json[i]
+    }]
+  }
+  return slideList
+}
+
+function Slider() {
   const [index, setIndex] = React.useState(0)
+  const [slidesData, setSlidesData] = React.useState<ImageURISource[]>([{uri: '_'}])
   const indexRef = React.useRef(index);
   indexRef.current = index;
+
+  React.useEffect(() => {
+    fetch(requests+'slides.json')
+      .then((response) => response.json())
+      .then((json) => setSlidesData(createSlideList(json)))
+      .catch((error) => console.error(error));
+  }, []);
   
   const onScroll = React.useCallback((event) => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
@@ -40,22 +56,22 @@ function AdsSlider() {
         disableIntervalMomentum={ true } 
         decelerationRate={0.9}
         snapToInterval={width - 24}
-        style={{ width}}>
+        style={{width}}>
         {
           slidesData.map((image, index) => (
-            <View key={index} style={[index === 0 ? styles.ad1 : styles.ad2, globalStyles.elevation5]} >
+            <View key={index} style={[styles.slide, index === 0 ? {marginLeft: 16} : {}, globalStyles.elevation5]} >
               <Image 
                 source={image} 
                 containerStyle={{
-                  height: Math.round((itemWidth * 320) / 720),
+                  height: Math.round((itemWidth * slideHeight) / slideWidth),
                   width: itemWidth,
                   borderRadius: 8}} />
             </View>
           ))
         }
       </ScrollView>
-      <View style={{alignSelf: 'center', flexDirection: 'row', top: -20}} >
-        {
+      <View style={{alignSelf: 'center', flexDirection: 'row', top: -22, height: 7}} >
+        {slidesData.length < 2? null:
           slidesData.map((_item, i) => (
             <View key={i} style={[styles.dot, index == i? styles.active:styles.inactive]} />
           ))
@@ -68,22 +84,12 @@ function AdsSlider() {
 const width = device.width;
 const itemWidth = device.width - 32;
 const styles = StyleSheet.create({
-  ad1: {
-    height: Math.round((itemWidth * 320) / 720),
+  slide: {
+    height: Math.round((itemWidth * slideHeight) /slideWidth),
     width: itemWidth,
     borderRadius: 8,
-    marginTop: 2,
-    marginBottom: 6,
-    marginLeft: 16,
-    marginRight: 8,
-  },
-  ad2: {
-    height: Math.round((itemWidth * 320) / 720),
-    width: itemWidth,
-    borderRadius: 8,
-    marginTop: 2,
-    marginBottom: 6,
-    marginLeft: 0,
+    marginTop: 4,
+    marginBottom: 8,
     marginRight: 8,
   },
   dot: {
@@ -100,4 +106,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default AdsSlider
+export default Slider

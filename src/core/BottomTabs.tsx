@@ -4,17 +4,16 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createStackNavigator, StackNavigationProp, TransitionPreset, TransitionPresets } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Home from '../Home';
-import Categorias from '../Categorias';
-import Compras from '../Compras';
-import Perfil from '../Perfil';
-import Header3 from '../../components/Header3';
-import { device, myColors, myTitle } from '../../constants';
-import Header2 from '../../components/Header2';
-import Header from '../../components/Header';
-import MyTouchable from '../../components/MyTouchable';
-import MyText from '../../components/MyText';
-import useMyContext from '../../functions/MyContext';
+import Home from '../pages/Home';
+import Categorias from '../pages/Categorias';
+import Compras from '../pages/Compras';
+import Perfil from '../pages/Perfil';
+import Header3 from '../components/Header3';
+import { device, myColors, myTitle } from '../constants';
+import Header from '../components/Header';
+import MyTouchable from '../components/MyTouchable';
+import MyText from '../components/MyText';
+import useMyContext from '../functions/MyContext';
 
 const Tab = createMaterialBottomTabNavigator();
 const HomeStack = createStackNavigator();
@@ -64,7 +63,7 @@ function BottomTabs({ navigation, route }:
             <HomeStack.Screen
               name='Mercado'
               component={Home.Mercado}
-              options={{header: props => <Header2 {...props} fallback='ListMercados' />, title: myTitle}} />
+              options={{headerShown: false, title: myTitle}} />
             <HomeStack.Screen
               name='MercInfo'
               component={Home.MercInfo}
@@ -162,7 +161,7 @@ function BottomTabs({ navigation, route }:
 function CartBarApp({navigation, toped = true}: {navigation: any, toped?: boolean}) {
   const {subtotal} = useMyContext();
   const [state] = useState({
-    translateY: new Animated.Value(50+24)
+    translateY: new Animated.Value(subtotal.value == 0? 50+24 : 0)
   })
 
   useEffect(() => {

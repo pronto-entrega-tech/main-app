@@ -10,50 +10,76 @@ export function CategoriasHeader() {
   return (
     <View style={[styles.header, globalStyles.notch]}>
       <Text style={styles.textHeader}>Categorias</Text>
-      <Divider style={styles.headerDivider}/>
+      <Divider style={styles.headerDivider} />
     </View>
-  )
+  );
 }
 
 export const categorias: string[] = [
-  "Alimentos", "Bebidas", "Carnes e cia", "Padaria",
-  "Frios e Laticínios", "Hortifrúti", "Enlatados",
-  "Cosméticos", "Limpeza", "Utilitários"
-]
+  'Alimentos básicos',
+  'Bebidas',
+  'Bebidas alcoólicas',
+  'Laticínios',
+  'Biscoitos e salgadinho',
+  'Doces e sobremesas',
+  'Açougue e peixaria',
+  'Congelados',
+  'Padaria',
+  'Queijos e frios',
+  'Hortifrúti',
+  'Higiene e cosméticos',
+  'Limpeza',
+];
 
-function Categorias({ navigation }:
-  {navigation: StackNavigationProp<any, any>}) {
+function Categorias({
+  navigation,
+}: {
+  navigation: StackNavigationProp<any, any>;
+}) {
   return (
     <>
-      <CategoriasHeader/>
+      <CategoriasHeader />
       <ScrollView
-      contentContainerStyle={{paddingBottom: 50}}
-      showsVerticalScrollIndicator={false} >
-        <View style={[styles.card, globalStyles.elevation3, globalStyles.darkBoader]} >
-          {
-            categorias.map(( item, index ) => (
-            <View key={index} >
-              {index != 0 ? <Divider style={styles.divider}/> : null}
-              <View style={{justifyContent: 'center'}} >
+        contentContainerStyle={{ paddingBottom: 50 }}
+        showsVerticalScrollIndicator={false}>
+        <View
+          style={[
+            styles.card,
+            globalStyles.elevation3,
+            globalStyles.darkBoader,
+          ]}>
+          {categorias.map((item, index) => (
+            <View key={index}>
+              {index != 0 ? <Divider style={styles.divider} /> : null}
+              <View style={{ justifyContent: 'center' }}>
                 <Icon
-                  style={{position: 'absolute', alignSelf: 'flex-end'}}
+                  style={{ position: 'absolute', alignSelf: 'flex-end' }}
                   name='chevron-right'
                   size={32}
-                  color={myColors.grey2} />
+                  color={myColors.grey2}
+                />
                 <MyButton
-                  onPress={() => navigation.navigate('Search', item)}
+                  onPress={() =>
+                    navigation.navigate('Search', { categoria: item })
+                  }
                   title={item}
-                  buttonStyle={index == 0? styles.top : index == categorias.length-1? styles.bottom : {borderRadius: 0}}
-                  titleStyle={{color: myColors.grey3, fontSize: 17}}
-                  type='clear'/>
+                  buttonStyle={
+                    index == 0
+                      ? styles.top
+                      : index == categorias.length - 1
+                      ? styles.bottom
+                      : { borderRadius: 0 }
+                  }
+                  titleStyle={{ color: myColors.grey3, fontSize: 17 }}
+                  type='clear'
+                />
               </View>
             </View>
-            ))
-          }
+          ))}
         </View>
       </ScrollView>
     </>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -94,9 +120,9 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
   },
-})
+});
 
 export default {
   Categorias,
   CategoriasHeader,
-}
+};

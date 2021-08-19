@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Divider } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AdsSlider from '../../components/Slides';
@@ -9,11 +9,12 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import ProdList, { ListHeader } from '../../components/ProdList';
 import MySearchbar from '../../components/MySearchBar';
 import { getShortAddress } from '../../functions/dataStorage';
-import { useFocusEffect } from '@react-navigation/native';
+import { RouteProp, useFocusEffect } from '@react-navigation/native';
 import MyButton from '../../components/MyButton';
+import MyText from '../../components/MyText';
 
-export function HomeHeader({ navigation }:
-  {navigation: StackNavigationProp<any, any>}) {
+function HomeHeader({ navigation }:
+{navigation: StackNavigationProp<any, any>}) {
   const [shortAdress, setShortAdress] = useState<string>('Carregando endereço...');
 
   useFocusEffect(
@@ -24,7 +25,7 @@ export function HomeHeader({ navigation }:
 
   return (
     <View style={[{backgroundColor: myColors.background, width: '100%', paddingTop: 4, paddingBottom: 12}, globalStyles.notch]} >
-      <Text style={styles.text} >Mostrando ofertas próximas à</Text>
+      <MyText style={styles.text} >Mostrando ofertas próximas à</MyText>
       <View style={styles.icon} >
         <Icon 
           name='map-marker'
@@ -37,7 +38,7 @@ export function HomeHeader({ navigation }:
           iconRight
           icon={<Icon name='chevron-right' size={24} color={myColors.text5} />}
           onPress={() => {
-            navigation.navigate('Address')
+            navigation.navigate('Address', {back: 'Home'})
             }} />
       </View>
       <View style={{ marginHorizontal: 16 }} >
@@ -48,11 +49,22 @@ export function HomeHeader({ navigation }:
   )
 }
 
-function Home({ navigation }:
-  {navigation: StackNavigationProp<any, any>}) {
+function Home({ navigation, route }:
+{navigation: StackNavigationProp<any, any>, route: RouteProp<any, any>}) {
+  const [tryAgain, setTryAgain] = useState(false);
+
+  React.useEffect(() => {
+    if (route.params?.callback === 'refresh') {
+      setTryAgain(!tryAgain)
+    }
+  }, [route]);
+
   return (
     <View style={{backgroundColor: myColors.background, flex: 1}} >
-      <ProdList navigation={navigation} header={({ key }: { key: number }) => (
+      <ProdList
+        tryAgain={tryAgain}
+        navigation={navigation}
+        header={({ key }: { key: number }) => (
         <View key={key} >
           <AdsSlider/>
 
@@ -96,6 +108,7 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    marginTop: -4,
     marginHorizontal: 16,
     paddingBottom: 6,
   },
@@ -119,4 +132,5 @@ const styles = StyleSheet.create({
   }
 })
 
+export { HomeHeader }
 export default Home
