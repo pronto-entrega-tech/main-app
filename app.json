@@ -20,9 +20,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "android": {
       "package": "com.prontoentrega.prontoentrega",
       "versionCode": 1,
@@ -31,25 +29,30 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#2196F3"
       },
-      "intentFilters": [{
-        "action": "VIEW",
-        "data": [
-          {
-            "scheme": "https",
-            "host": "prontoentrega.com.br",
-            "pathPrefix": "/produto"
-          },
-          {
-            "scheme": "https",
-            "host": "prontoentrega.com.br",
-            "pathPrefix": "/mercado"
-          }
-        ],
-        "category":[
-          "BROWSABLE",
-          "DEFAULT"
-        ]
-      }]
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "prontoentrega.com.br",
+              "pathPrefix": "/produto"
+            },
+            {
+              "scheme": "https",
+              "host": "prontoentrega.com.br",
+              "pathPrefix": "/mercado"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "ios": {
       "bundleIdentifier": "com.prontoentrega.prontoentrega",
@@ -61,6 +64,15 @@
       "favicon": "./src/assets/favicon.png",
       "themeColor": "#2196F3",
       "shortName": "Pronto"
-    }
+    },
+    "plugins": [
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "",
+          "enableGooglePay": true
+        }
+      ]
+    ]
   }
 }

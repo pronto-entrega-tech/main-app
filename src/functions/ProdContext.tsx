@@ -1,28 +1,24 @@
 import React from 'react';
-import { prodModel } from '../components/ProdItem';
+import { prodModel } from '~/components/ProdItem';
 
 interface contextModel {
-  item: prodModel,
-  city: string,
-  market: string,
+  product: prodModel;
+  city: string;
+  marketId: string;
 }
 
 const ProdContext = React.createContext<contextModel | undefined>(undefined);
 
 function useProdContext() {
-  const context = React.useContext(ProdContext)
+  const context = React.useContext(ProdContext);
   if (!context) {
-    throw new Error(`useProdContext must be used within a ProdContext`)
+    throw new Error(`useProdContext must be used within a ProdContext`);
   }
-  return context
+  return context;
 }
 
 function useProdContext2() {
-  return React.useContext(ProdContext)
+  return React.useContext(ProdContext);
 }
 
-export {
-  useProdContext,
-  useProdContext2,
-  ProdContext,
-}
+export { useProdContext, useProdContext2, ProdContext };

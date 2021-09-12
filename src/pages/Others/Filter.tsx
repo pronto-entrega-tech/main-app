@@ -3,86 +3,138 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MyTouchable from '../../components/MyTouchable';
-import MyButton from '../../components/MyButton';
-import { myColors, device, globalStyles } from '../../constants';
-import { categorias } from '../Categorias';
+import MyTouchable from '~/components/MyTouchable';
+import MyButton from '~/components/MyButton';
+import { myColors, device, globalStyles } from '~/constants';
+import { categoriesArray } from '../Categorias';
 import { Chip } from 'react-native-paper';
 
-function FilterButton({icon, text, onPress, selected}:
-   {icon: string, text: string, onPress: (i: number) => void, selected: boolean}) {
+function FilterButton({
+  icon,
+  text,
+  onPress,
+  selected,
+}: {
+  icon: string;
+  text: string;
+  onPress: (i: number) => void;
+  selected: boolean;
+}) {
   return (
-    <MyTouchable onPress={onPress} style={styles.filterButton} >
-      <View style={[styles.iconConteiner, {backgroundColor: selected? myColors.primaryColor : '#FFF'}, selected? globalStyles.elevation5 : globalStyles.elevation3]} >
-        <Icon name={icon} size={24} color={selected? '#FFF' : myColors.grey2} />
+    <MyTouchable onPress={onPress} style={styles.filterButton}>
+      <View
+        style={[
+          styles.iconConteiner,
+          { backgroundColor: selected ? myColors.primaryColor : '#FFF' },
+          selected ? globalStyles.elevation5 : globalStyles.elevation3,
+        ]}>
+        <Icon
+          name={icon}
+          size={24}
+          color={selected ? '#FFF' : myColors.grey2}
+        />
       </View>
-      <Text style={[styles.buttonText, {color: selected? myColors.primaryColor : myColors.text2}]} >{text}</Text>
+      <Text
+        style={[
+          styles.buttonText,
+          { color: selected ? myColors.primaryColor : myColors.text2 },
+        ]}>
+        {text}
+      </Text>
     </MyTouchable>
-  )
+  );
 }
 
-function Filter({ navigation }:
-  {navigation: StackNavigationProp<any, any>}) {
+function Filter({ navigation }: { navigation: StackNavigationProp<any, any> }) {
   const [filter, setFilter] = useState<number>(0);
   const [distance, setDistance] = useState<number>(14);
-  const [categoriasList, setCategoriasList] = useState<string[]>([]);
-  return(
+  const [categoriasList, setCategoriasList] = useState<number[]>([]);
+  return (
     <>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={{height: device.height-(device.web? 56 : 0)}}
-        contentContainerStyle={styles.conteiner} >
-        <Text style={styles.title} >Ordernar por</Text>
-        <FilterButton icon='sort-variant' text='Padrão' onPress={() => setFilter(0)} selected={filter===0} />
-        <FilterButton icon='star' text='Avaliação' onPress={() => setFilter(1)} selected={filter===1} />
-        <FilterButton icon='clock' text='Tempo de entrega' onPress={() => setFilter(2)} selected={filter===2} />
-        <FilterButton icon='map-marker' text='Distância' onPress={() => setFilter(3)} selected={filter===3} />
-        <View style={styles.distanceConteiner} >
-          <Text style={styles.distance} >Distância</Text>
-          <Text style={styles.distance2} >Menos de {distance+1}km</Text>
+        style={{ height: device.height - (device.web ? 56 : 0) }}
+        contentContainerStyle={styles.conteiner}>
+        <Text style={styles.title}>Ordernar por</Text>
+        <FilterButton
+          icon='sort-variant'
+          text='Padrão'
+          onPress={() => setFilter(0)}
+          selected={filter === 0}
+        />
+        <FilterButton
+          icon='star'
+          text='Avaliação'
+          onPress={() => setFilter(1)}
+          selected={filter === 1}
+        />
+        <FilterButton
+          icon='clock'
+          text='Tempo de entrega'
+          onPress={() => setFilter(2)}
+          selected={filter === 2}
+        />
+        <FilterButton
+          icon='map-marker'
+          text='Distância'
+          onPress={() => setFilter(3)}
+          selected={filter === 3}
+        />
+        <View style={styles.distanceConteiner}>
+          <Text style={styles.distance}>Distância</Text>
+          <Text style={styles.distance2}>Menos de {distance + 1}km</Text>
         </View>
-        <View style={device.web? {height: 28} : {}} >
+        <View style={device.web ? { height: 28 } : {}}>
           <Slider
             value={distance}
             onValueChange={(v) => setDistance(v)}
             maximumValue={14}
             step={1}
             style={styles.slider}
-            thumbTintColor={device.iOS? '#FFF' : myColors.colorAccent}
-            minimumTrackTintColor={myColors.colorAccent} />
+            thumbTintColor={device.iOS ? '#FFF' : myColors.colorAccent}
+            minimumTrackTintColor={myColors.colorAccent}
+          />
         </View>
-        <Text style={styles.title} >Categorias</Text>
-        <View style={{flexDirection: 'row', flexWrap: 'wrap', padding: 8}}>
-          {
-            categorias.map((item) => {
-              const isSelected = categoriasList.includes(item);
-              return (
+        <Text style={styles.title}>Categorias</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', padding: 8 }}>
+          {categoriesArray.map((item, index) => {
+            const categoryId = index + 1;
+            const isSelected = categoriasList.includes(categoryId);
+            return (
               <Chip
-                key={item}
+                key={categoryId}
                 onPress={() => {
-                    if (isSelected) {
-                      setCategoriasList(c => c.filter(i => i != item))
-                    } else {
-                      setCategoriasList(c => [...c, item])
-                    }
-                  }}
+                  if (isSelected) {
+                    setCategoriasList((c) => c.filter((i) => i !== categoryId));
+                  } else {
+                    setCategoriasList((c) => [...c, categoryId]);
+                  }
+                }}
                 icon={{}}
-                selectedColor={isSelected? '#FFF' : '#191919'}
-                style={{margin: 4, backgroundColor: isSelected? myColors.colorAccent : '#ECECEC'}} >{item}</Chip>
-            )})
-          }
+                selectedColor={isSelected ? '#FFF' : '#191919'}
+                style={{
+                  margin: 4,
+                  backgroundColor: isSelected
+                    ? myColors.colorAccent
+                    : '#ECECEC',
+                }}>
+                {item}
+              </Chip>
+            );
+          })}
         </View>
       </ScrollView>
       <MyButton
         title='Ver resultados'
         type='outline'
         buttonStyle={styles.button}
-        onPress={()=> {
-          navigation.pop(1)
-          navigation.navigate('Search')
-          }} />
+        onPress={() => {
+          navigation.pop(1);
+          navigation.navigate('Search', { categories: categoriasList });
+        }}
+      />
     </>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -101,16 +153,16 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingVertical: 10,
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   iconConteiner: {
     padding: 8,
-    borderRadius: 24
+    borderRadius: 24,
   },
   buttonText: {
     marginLeft: 12,
     fontSize: 17,
-    fontFamily: 'Regular'
+    fontFamily: 'Regular',
   },
   distanceConteiner: {
     flexDirection: 'row',
@@ -140,6 +192,6 @@ const styles = StyleSheet.create({
     height: 46,
     backgroundColor: '#fff',
   },
-})
+});
 
-export default Filter
+export default Filter;

@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Button, Divider } from 'react-native-elements';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { myColors, globalStyles, device } from '../../constants';
-import MyButton from '../../components/MyButton';
+import { myColors, globalStyles, device } from '~/constants';
+import MyButton from '~/components/MyButton';
 
 export function CategoriasHeader() {
   return (
@@ -15,7 +15,7 @@ export function CategoriasHeader() {
   );
 }
 
-export const categorias: string[] = [
+export const categoriesArray: string[] = [
   'Alimentos básicos',
   'Bebidas',
   'Bebidas alcoólicas',
@@ -48,7 +48,7 @@ function Categorias({
             globalStyles.elevation3,
             globalStyles.darkBoader,
           ]}>
-          {categorias.map((item, index) => (
+          {categoriesArray.map((item, index) => (
             <View key={index}>
               {index != 0 ? <Divider style={styles.divider} /> : null}
               <View style={{ justifyContent: 'center' }}>
@@ -59,14 +59,14 @@ function Categorias({
                   color={myColors.grey2}
                 />
                 <MyButton
-                  onPress={() =>
-                    navigation.navigate('Search', { categoria: item })
-                  }
+                  onPress={() => {
+                    navigation.navigate('Search', { categories: [index + 1] });
+                  }}
                   title={item}
                   buttonStyle={
                     index == 0
                       ? styles.top
-                      : index == categorias.length - 1
+                      : index == categoriesArray.length - 1
                       ? styles.bottom
                       : { borderRadius: 0 }
                   }

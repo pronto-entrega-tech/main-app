@@ -1,7 +1,12 @@
-import Compras from './Compras';
-import Order from './Order';
+import loadable from '@loadable/component';
+const Compras = loadable(
+  () => import(/* webpackChunkName: 'ComprasChunk' */ './Compras')
+);
+const Order = loadable(
+  () => import(/* webpackChunkName: 'OrderChunk' */ './Order')
+);
 
-export default { 
+export default {
   Compras,
   Order,
 };

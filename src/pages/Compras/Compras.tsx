@@ -2,74 +2,96 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Divider, Image } from 'react-native-elements';
-import Loading from '../../components/Loading';
-import MyText from '../../components/MyText';
-import MyTouchable from '../../components/MyTouchable';
-import { myColors, globalStyles } from '../../constants';
-import { getOrdersList } from '../../functions/dataStorage';
-import validate from '../../functions/validate';
-import requests from '../../services/requests';
+import Loading from '~/components/Loading';
+import MyText from '~/components/MyText';
+import MyTouchable from '~/components/MyTouchable';
+import { myColors, globalStyles } from '~/constants';
+import { getImageUrl } from '~/functions/converter';
+import { getOrdersList } from '~/functions/dataStorage';
+import validate from '~/functions/validate';
 import { orderModel } from './Order';
 
-function Compras({ navigation, route }:
-  {navigation: StackNavigationProp<any, any>, route: any}) {
+function Compras({
+  navigation,
+  route,
+}: {
+  navigation: StackNavigationProp<any, any>;
+  route: any;
+}) {
   const [isLoading, setIsLoading] = useState(true);
   const [ordersList, setOrdersList] = useState<orderModel[]>();
 
   useEffect(() => {
-    getOrdersList()
-      .then(list => setOrdersList(list))
+    getOrdersList().then((list) => setOrdersList(list));
   }, [route]);
 
   useEffect(() => {
     if (validate([ordersList])) {
-      setIsLoading(false)
+      setIsLoading(false);
     } else {
-      setIsLoading(true)
+      setIsLoading(true);
     }
   }, [ordersList]);
 
-  const render_item = ({item}: {item: orderModel}) => {
+  const render_item = ({ item }: { item: orderModel }) => {
     return (
-    <MyTouchable
-      onPress={()=> navigation.navigate('Order', ordersList?.indexOf(item))}
-      style={[styles.card, globalStyles.elevation3, globalStyles.darkBoader]} >
-      <View style={{flexDirection: 'row'}} >
-        <Image
-          source={{uri: requests+'images/'+'mercado'/*item.key*/+'.png'}}
-          placeholderStyle={{backgroundColor: '#FFF'}}
-          containerStyle={{height: 50, width: 50}} />
-        <View style={{marginLeft: 16}} >
-          <MyText style={styles.mercName} >{item.nome}</MyText>
-          <MyText style={styles.orderText} >Pedido em Andamento • {item.pedido.toString().padStart(3, '0')}</MyText>
+      <MyTouchable
+        onPress={() => navigation.navigate('Order', ordersList?.indexOf(item))}
+        style={[styles.card, globalStyles.elevation3, globalStyles.darkBoader]}>
+        <View style={{ flexDirection: 'row' }}>
+          <Image
+            source={{ uri: getImageUrl('market', item.marketId) }}
+            placeholderStyle={{ backgroundColor: '#FFF' }}
+            containerStyle={{ height: 50, width: 50 }}
+          />
+          <View style={{ marginLeft: 16 }}>
+            <MyText style={styles.mercName}>{item.marketName}</MyText>
+            <MyText style={styles.orderText}>
+              Pedido em Andamento •{' '}
+              {item.orderMarketId.toString().padStart(3, '0')}
+            </MyText>
+          </View>
         </View>
-      </View>
-      <Divider style={{marginHorizontal: -4, marginTop: 10, marginBottom: 6}} />
-      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}} >
-        <MyText style={styles.previsionText} >{item.scheduled? 'Agendado para':'Previsão de entrega'}</MyText>
-        <MyText style={styles.previsionTime} >{item.previsao}</MyText>
-      </View>
-    </MyTouchable>
-  )}
+        <Divider
+          style={{ marginHorizontal: -4, marginTop: 10, marginBottom: 6 }}
+        />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+          <MyText style={styles.previsionText}>
+            {item.scheduled ? 'Agendado para' : 'Previsão de entrega'}
+          </MyText>
+          <MyText style={styles.previsionTime}>{item.deliveryTime}</MyText>
+        </View>
+      </MyTouchable>
+    );
+  };
 
   if (isLoading) {
-    return <Loading/>
+    return <Loading />;
   } else {
     if (ordersList?.length == 0) {
       return (
-        <View style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
-          <MyText style={{fontSize: 15, color: myColors.text2}} >Nenhum pedido realizado ainda</MyText>
+        <View
+          style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+          <MyText style={{ fontSize: 15, color: myColors.text2 }}>
+            Nenhum pedido realizado ainda
+          </MyText>
         </View>
-      )
+      );
     } else {
       return (
         <FlatList
           showsVerticalScrollIndicator={false}
           data={ordersList}
-          contentContainerStyle={{paddingBottom: 50}}
-          keyExtractor={({pedido}) => pedido.toString()}
-          renderItem={render_item} />
-      )
+          contentContainerStyle={{ paddingBottom: 50 }}
+          keyExtractor={({ orderMarketId: pedido }) => pedido.toString()}
+          renderItem={render_item}
+        />
+      );
     }
   }
 }
@@ -124,6 +146,6 @@ const styles = StyleSheet.create({
     color: myColors.text3,
     fontFamily: 'Medium',
   },
-})
+});
 
-export default Compras
+export default Compras;

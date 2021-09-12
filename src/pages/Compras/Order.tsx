@@ -1,53 +1,70 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, ImageURISource } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  ImageURISource,
+} from 'react-native';
 import { ProgressBar } from 'react-native-paper';
-import { myColors, device, images } from '../../constants';
+import { myColors, device, images } from '~/constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Image,  Divider } from 'react-native-elements';
-import { converter } from '../../functions';
-import { getOrdersList } from '../../functions/dataStorage';
-import requests from '../../services/requests';
+import { Image, Divider } from 'react-native-elements';
+import { getOrdersList } from '~/functions/dataStorage';
+import { getImageUrl } from '~/functions/converter';
 
 export interface orderModel {
-  nome: string,
-  mercKey: string,
-  pedido: number,
-  prodList: prodOrderModel[],
-  previsao: string,
-  scheduled: boolean,
-  date: string,
-  subtotal: string,
-  off: string,
-  ship: string,
-  total: string,
-  endereco: string,
-  pagamento: string,
+  marketName: string;
+  marketId: string;
+  orderMarketId: number;
+  prodList: prodOrderModel[];
+  deliveryTime: string;
+  scheduled: boolean;
+  date: string;
+  subtotal: string;
+  discount: string;
+  deliveryFee: string;
+  total: string;
+  address: string;
+  payment: string;
 }
 export interface prodOrderModel {
-  quantity: string,
-  description: string,
-  price: string,
-  brand: string,
-  weight: string,
+  quantity: string;
+  description: string;
+  price: string;
+  weight: string;
 }
 
-function Order({route}: {route: any}) {
+function Order({ route }: { route: any }) {
   const [isLoading, setIsLoading] = useState(true);
   const [order, setOrder] = useState<orderModel>();
   const orderIndex: number = route.params;
-  
+
   useEffect(() => {
-    setIsLoading(true)
-    getOrdersList()
-    .then(list => {
-      setOrder(list[orderIndex])
-      setIsLoading(false)
-    })
+    setIsLoading(true);
+    getOrdersList().then((list) => {
+      setOrder(list[orderIndex]);
+      setIsLoading(false);
+    });
   }, []);
 
-  const space = (device.width-40)/5
+  if (isLoading || !order)
+    return (
+      <View
+        style={{
+          backgroundColor: myColors.background,
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <ActivityIndicator color={myColors.loading} size='large' />
+      </View>
+    );
+
+  const space = (device.width - 40) / 5;
   let iconPaymento: ImageURISource;
-  const pay = order?.pagamento;
+  const pay = order.payment;
   if (pay?.includes('Dinheiro')) {
     iconPaymento = images.cash;
   } else {
@@ -55,110 +72,142 @@ function Order({route}: {route: any}) {
   }
 
   const header = () => (
-    <View key={-1} >
-      <View style={{marginHorizontal: 16, marginVertical: 12}}>
-        <Text style={styles.previsionText} >{order?.scheduled? 'Agendado para':'Previsão de entrega'}</Text>
-        <Text style={styles.previsionTime} >{order?.previsao}</Text>
+    <View key={-1}>
+      <View style={{ marginHorizontal: 16, marginVertical: 12 }}>
+        <Text style={styles.previsionText}>
+          {order.scheduled ? 'Agendado para' : 'Previsão de entrega'}
+        </Text>
+        <Text style={styles.previsionTime}>{order.deliveryTime}</Text>
       </View>
-      <View style={{flexDirection: 'row', marginHorizontal: 16}} >
-        <ProgressBar color={myColors.colorAccent} indeterminate style={{width: space}} />
-        <ProgressBar color={myColors.divider3} style={{marginLeft: 8, width: space*4}} />
+      <View style={{ flexDirection: 'row', marginHorizontal: 16 }}>
+        <ProgressBar
+          color={myColors.colorAccent}
+          indeterminate
+          style={{ width: space }}
+        />
+        <ProgressBar
+          color={myColors.divider3}
+          style={{ marginLeft: 8, width: space * 4 }}
+        />
       </View>
-      <View style={{flexDirection: 'row', marginHorizontal: 16, height: 40, alignItems: 'center'}} >
+      <View
+        style={{
+          flexDirection: 'row',
+          marginHorizontal: 16,
+          height: 40,
+          alignItems: 'center',
+        }}>
         <Icon name='circle' color='green' size={8} />
-        <Text style={styles.steps} >Aguardado confirmação do mercado</Text>
+        <Text style={styles.steps}>Aguardado confirmação do mercado</Text>
       </View>
       <Divider style={styles.divider} />
-      <View style={styles.mercConteiner} >
+      <View style={styles.mercConteiner}>
         <Image
-          source={{uri: requests+'images/'+'mercado'/*item.key*/+'.png'}}
-          placeholderStyle={{backgroundColor: '#FFF'}}
-          containerStyle={{height: 65, width: 65}} />
-        <Text style={styles.mercName} >{order?.nome}</Text>
+          source={{ uri: getImageUrl('market', order.marketId) }}
+          placeholderStyle={{ backgroundColor: '#FFF' }}
+          containerStyle={{ height: 65, width: 65 }}
+        />
+        <Text style={styles.mercName}>{order.marketName}</Text>
       </View>
       <View style={styles.infoConteiner}>
-        <Text style={styles.text} >Realizado {order?.date}</Text>
-        <Text style={styles.text} >Pedido {order?.pedido.toString().padStart(3, '0')}</Text>
+        <Text style={styles.text}>Realizado {order.date}</Text>
+        <Text style={styles.text}>
+          Pedido {order.orderMarketId.toString().padStart(3, '0')}
+        </Text>
       </View>
       <Divider style={styles.divider} />
-        <View style={{marginHorizontal: 16, marginVertical: 12}}>
-          <Text style={styles.text} >Endereço de entrega</Text>
-          <Text style={styles.address} >{order?.endereco}</Text>
-        </View>
+      <View style={{ marginHorizontal: 16, marginVertical: 12 }}>
+        <Text style={styles.text}>Endereço de entrega</Text>
+        <Text style={styles.address}>{order.address}</Text>
+      </View>
       <Divider style={styles.divider} />
-        <View style={styles.paymentConteiner} >
-          <Text style={styles.text} >Pagar na entrega</Text>
-          <Text style={styles.paymentText} >{order?.pagamento}</Text>
-          <Image
-            source={iconPaymento}
-            resizeMode='contain'
-            containerStyle={{position: 'absolute', right: 0, width: 28, height: 28}}
-            childrenContainerStyle={{top: 2}} />
-        </View>
+      <View style={styles.paymentConteiner}>
+        <Text style={styles.text}>Pagar na entrega</Text>
+        <Text style={styles.paymentText}>{order.payment}</Text>
+        <Image
+          source={iconPaymento}
+          resizeMode='contain'
+          containerStyle={{
+            position: 'absolute',
+            right: 0,
+            width: 28,
+            height: 28,
+          }}
+          childrenContainerStyle={{ top: 2 }}
+        />
+      </View>
       <Divider style={styles.divider} />
       <View style={styles.priceConteiner}>
-        <Text style={styles.priceText} >Subtotal</Text>
-        <Text style={styles.priceText} >R${order?.subtotal}</Text>
+        <Text style={styles.priceText}>Subtotal</Text>
+        <Text style={styles.priceText}>R${order.subtotal}</Text>
       </View>
       <View style={styles.priceConteiner}>
-        <Text style={styles.priceText} >Economizado</Text>
-        <Text style={styles.priceText} >R${order?.off}</Text>
+        <Text style={styles.priceText}>Economizado</Text>
+        <Text style={styles.priceText}>R${order.discount}</Text>
       </View>
       <View style={styles.priceConteiner}>
-        <Text style={styles.priceText} >Taxa de entrega</Text>
-        <Text style={[styles.priceText, order?.ship == '0,00'? {color: '#10b500'} : null]} >{
-        order?.ship == '0,00'? 'Grátis' : 'R$'+order?.ship
-        }</Text>
+        <Text style={styles.priceText}>Taxa de entrega</Text>
+        <Text
+          style={[
+            styles.priceText,
+            order.deliveryFee == '0,00' ? { color: '#10b500' } : null,
+          ]}>
+          {order.deliveryFee == '0,00' ? 'Grátis' : 'R$' + order.deliveryFee}
+        </Text>
       </View>
-      <Divider style={{backgroundColor: myColors.divider3, marginHorizontal: 16}} />
+      <Divider
+        style={{ backgroundColor: myColors.divider3, marginHorizontal: 16 }}
+      />
       <View style={styles.priceTotalConteiner}>
-        <Text style={styles.priceTotalText} >Total</Text>
-        <Text style={styles.priceTotalText} >R${order?.total}</Text>
+        <Text style={styles.priceTotalText}>Total</Text>
+        <Text style={styles.priceTotalText}>R${order.total}</Text>
       </View>
       <Divider style={styles.divider} />
     </View>
-  )
+  );
 
-  const render_item = ({item}: {item: prodOrderModel}) => (
+  const render_item = ({ item }: { item: prodOrderModel }) => (
     <>
-      <View style={{flexDirection: 'row', paddingTop: 10, paddingHorizontal: 16, alignItems: 'center'}} >
-        <Text style={styles.quantity} >1x</Text>
-        <View style={{marginLeft: 18}} >
-          <Text style={styles.description} >{item.description}</Text>
-          <Text style={styles.price} >R${item.price}</Text>
-          <View style={{flexDirection: 'row'}} >
-            <Text style={styles.brand} >{item.brand}</Text>
-            <Text style={styles.weight} >{item.weight}</Text>
-          </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          paddingTop: 10,
+          paddingHorizontal: 16,
+          alignItems: 'center',
+        }}>
+        <Text style={styles.quantity}>1x</Text>
+        <View style={{ marginLeft: 18 }}>
+          <Text style={styles.description}>{item.description}</Text>
+          <Text style={styles.price}>R${item.price}</Text>
+          <Text style={styles.weight}>{item.weight}</Text>
         </View>
       </View>
-      <Divider style={{marginHorizontal: 12, marginTop: 12, backgroundColor: myColors.divider3}} />
+      <Divider
+        style={{
+          marginHorizontal: 12,
+          marginTop: 12,
+          backgroundColor: myColors.divider3,
+        }}
+      />
     </>
-  )
-
-  if (isLoading)
-  return (
-    <View style={{backgroundColor: myColors.background, flex: 1, justifyContent: 'center', alignItems: 'center'}} >
-     <ActivityIndicator color={myColors.loading} size='large' />
-    </View>
-  )
+  );
 
   return (
     <FlatList
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{paddingBottom: 50}}
+      contentContainerStyle={{ paddingBottom: 50 }}
       data={order.prodList}
-      keyExtractor={({description}) => description}
+      keyExtractor={(v) => v.description}
       ListHeaderComponent={header}
-      renderItem={render_item} />
-  )
+      renderItem={render_item}
+    />
+  );
 }
-
 
 const styles = StyleSheet.create({
   divider: {
     height: 2,
-    backgroundColor: myColors.divider
+    backgroundColor: myColors.divider,
   },
   text: {
     fontFamily: 'Regular',
@@ -208,33 +257,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 16,
-    marginVertical: 12
+    marginVertical: 12,
   },
   paymentText: {
     fontFamily: 'Regular',
     color: myColors.text5,
     fontSize: 16,
-    marginRight: 34
+    marginRight: 34,
   },
   priceConteiner: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 16,
-    marginVertical: 6
+    marginVertical: 6,
   },
   priceTotalConteiner: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 16,
-    marginVertical: 8
+    marginVertical: 8,
   },
   priceText: {
     fontSize: 16,
-    color: myColors.text4
+    color: myColors.text4,
   },
   priceTotalText: {
     fontSize: 20,
-    color: myColors.text5
+    color: myColors.text5,
   },
   quantity: {
     fontFamily: 'Medium',
@@ -252,17 +301,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 4,
   },
-  brand: {
-    fontFamily: 'Regular',
-    color: myColors.text4,
-    fontSize: 14,
-  },
   weight: {
     fontFamily: 'Regular',
     color: myColors.text4,
     fontSize: 14,
-    marginLeft: 4,
+    marginTop: 2,
   },
-})
+});
 
-export default Order
+export default Order;

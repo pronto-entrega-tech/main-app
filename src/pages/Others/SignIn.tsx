@@ -11,171 +11,241 @@ import useMyContext from '../../functions/MyContext';
 import BottomModal from '../../components/BottomModal';
 import { getUserStatus, saveUserStatus } from '../../functions/dataStorage';
 
-function SignIn({ navigation, route }:
-{navigation: StackNavigationProp<any, any>, route: any}) {
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [isModalVisible, setIsModalVisible] = React.useState(false)
-  const [isLogged, setIsLogged] = React.useState(false)
-  const {setIsGuest} = useMyContext()
+function SignIn({
+  navigation,
+  route,
+}: {
+  navigation: StackNavigationProp<any, any>;
+  route: any;
+}) {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isModalVisible, setIsModalVisible] = React.useState(false);
+  const [isLogged, setIsLogged] = React.useState(false);
+  const { setIsGuest } = useMyContext();
 
   React.useEffect(() => {
-    getUserStatus()
-    .then(status => setIsLogged(status == 'returning&logged'))
-  }, [])
+    getUserStatus().then((status) => setIsLogged(status == 'returning&logged'));
+  }, []);
 
   const next = async (isGuest = false) => {
-    
-    saveUserStatus('returning&logged')
-    await setIsGuest(isGuest)
+    saveUserStatus('returning&logged');
+    await setIsGuest(isGuest);
 
-    if (route.params == 'c')
-    return navigation.goBack()
+    if (route.params == 'c') return navigation.goBack();
 
-    const got = await getLocation()
+    const got = await getLocation();
 
-    if (got)
-    return navigation.replace('BottomTabs', {screen: 'Home'})
+    if (got) return navigation.replace('BottomTabs', { screen: 'Home' });
 
-    navigation.replace('SelectAddress')
-  }
+    navigation.replace('SelectAddress');
+  };
 
   const GoogleButton = () => {
     return (
       <MyButton
         title='Entrar com o Google'
         type='outline'
-        icon={<Image source={images.google} style={{height: 42, width: 42, position: 'absolute', left: 7}} />}
-        buttonStyle={[styles.button, {backgroundColor: 'white', borderColor: myColors.divider2}]}
-        titleStyle={{fontFamily: 'Medium', color: myColors.text2}}
+        icon={
+          <Image
+            source={images.google}
+            style={{ height: 42, width: 42, position: 'absolute', left: 7 }}
+          />
+        }
+        buttonStyle={[
+          styles.button,
+          { backgroundColor: 'white', borderColor: myColors.divider2 },
+        ]}
+        titleStyle={{ fontFamily: 'Medium', color: myColors.text2 }}
         onPress={() => {
-          setIsLoading(true)
-          setIsModalVisible(false)
-          setTimeout(next, 500)
-          }} />
-    )
-  }
+          setIsLoading(true);
+          setIsModalVisible(false);
+          setTimeout(next, 500);
+        }}
+      />
+    );
+  };
 
   const AppleButton = () => {
     return (
       <MyButton
         title='Entrar com a Apple'
-        icon={<Image source={images.apple} style={{height: 38, width: 38, position: 'absolute', left: 12}} />}
-        buttonStyle={[styles.button, {backgroundColor: 'black'}]}
-        titleStyle={{fontFamily: 'Medium'}}
+        icon={
+          <Image
+            source={images.apple}
+            style={{ height: 38, width: 38, position: 'absolute', left: 12 }}
+          />
+        }
+        buttonStyle={[styles.button, { backgroundColor: 'black' }]}
+        titleStyle={{ fontFamily: 'Medium' }}
         onPress={() => {
-          setIsModalVisible(false)
-          alert('Ainda não')
-          }} />
-    )
-  }
+          setIsModalVisible(false);
+          alert('Ainda não');
+        }}
+      />
+    );
+  };
 
   const FacebookButton = () => {
     return (
       <MyButton
         title='Entrar com o Facebook'
-        icon={<Image source={images.facebook} style={{width: 28, height: 28, position: 'absolute', left: 16}} />}
-        buttonStyle={[styles.button, {backgroundColor: '#1877f2'}]}
+        icon={
+          <Image
+            source={images.facebook}
+            style={{ width: 28, height: 28, position: 'absolute', left: 16 }}
+          />
+        }
+        buttonStyle={[styles.button, { backgroundColor: '#1877f2' }]}
         onPress={() => {
-          setIsModalVisible(false)
-          alert('Ainda não')
-          }} />
-    )
-  }
+          setIsModalVisible(false);
+          alert('Ainda não');
+        }}
+      />
+    );
+  };
 
   const SignUpButtons = () => {
     return (
-      <View style={{flexDirection: 'row', justifyContent: 'space-evenly', width: '100%'}} >
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+          width: '100%',
+        }}>
         <MyButton
           title='Celular'
           type='outline'
-          titleStyle={{color: myColors.text2}}
-          buttonStyle={{width: '42.5%', paddingVertical: 14, borderColor: myColors.grey_1}}
+          titleStyle={{ color: myColors.text2 }}
+          buttonStyle={{
+            width: '42.5%',
+            paddingVertical: 14,
+            borderColor: myColors.grey_1,
+          }}
           onPress={() => {
-            setIsModalVisible(false)
-            alert('Ainda não')
-            }} />
+            setIsModalVisible(false);
+            alert('Ainda não');
+          }}
+        />
         <MyButton
           title='Email'
           type='outline'
-          titleStyle={{color: myColors.text2}}
-          buttonStyle={{width: '42.5%', paddingVertical: 14, borderColor: myColors.grey_1}}
+          titleStyle={{ color: myColors.text2 }}
+          buttonStyle={{
+            width: '42.5%',
+            paddingVertical: 14,
+            borderColor: myColors.grey_1,
+          }}
           onPress={() => {
-            setIsModalVisible(false)
-            alert('Ainda não')
-            }} />
+            setIsModalVisible(false);
+            alert('Ainda não');
+          }}
+        />
       </View>
-    )
-  }
+    );
+  };
 
   const Buttons = () => {
-    if (isLoading)
-    return (
-      <Loading/>
-    )
+    if (isLoading) return <Loading />;
 
     return (
       <>
-        <Text style={{fontSize: 17, color: myColors.text2, marginBottom: 16, fontFamily: 'Regular'}} >Como deseja entrar?</Text>
-        <GoogleButton/>
-        {device.web?
-        <>
-          <FacebookButton/>
-          <AppleButton/>
-          <SignUpButtons/>
-        </>
-        :
-        <>
-        <MyButton
-          title='Outras opções'
-          type='outline'
-          buttonStyle={{width: '90%', marginBottom: 24, paddingVertical: 13, borderColor: myColors.divider3}}
-          titleStyle={{color: myColors.text_1}}
-          onPress={() => setIsModalVisible(true)} />
-        {!isLogged?
-          <MyButton
-          title='Entrar como convidado'
-          type='clear'
-          buttonStyle={{padding: 14}}
-          titleStyle={{color: myColors.grey2}}
-          onPress={() => {
-            setIsLoading(true)
-            next(true)
-          }} />
-        : null}
-        </>
-        }
+        <Text
+          style={{
+            fontSize: 17,
+            color: myColors.text2,
+            marginBottom: 16,
+            fontFamily: 'Regular',
+          }}>
+          Como deseja entrar?
+        </Text>
+        <GoogleButton />
+        {device.web ? (
+          <>
+            <FacebookButton />
+            <AppleButton />
+            <SignUpButtons />
+          </>
+        ) : (
+          <>
+            <MyButton
+              title='Outras opções'
+              type='outline'
+              buttonStyle={{
+                width: '90%',
+                marginBottom: 24,
+                paddingVertical: 13,
+                borderColor: myColors.divider3,
+              }}
+              titleStyle={{ color: myColors.text_1 }}
+              onPress={() => setIsModalVisible(true)}
+            />
+            {!isLogged ? (
+              <MyButton
+                title='Entrar como convidado'
+                type='clear'
+                buttonStyle={{ padding: 14 }}
+                titleStyle={{ color: myColors.grey2 }}
+                onPress={() => {
+                  setIsLoading(true);
+                  next(true);
+                }}
+              />
+            ) : null}
+          </>
+        )}
       </>
-    )
-  }
-  
+    );
+  };
+
   return (
-    <View style={device.web? {height: 630} : styles.conteiner} >
+    <View style={device.web ? { height: 630 } : styles.conteiner}>
       <View style={[styles.conteiner, globalStyles.notch]}>
         <Image source={images.pineapple} style={styles.pineapple} />
         <Image source={images.tomato} style={styles.tomato} />
         <Image source={images.broccoli} style={styles.broccoli} />
         <Image source={images.logo} style={styles.logo} />
-        <View style={styles.bottomConteiner} >
-          <Text style={{fontSize: 22, color: myColors.text4, marginBottom: 24, fontFamily: 'Medium', textAlign: 'center'}} >{
-          'Entre para conhecer\nas melhores promoções!'}</Text>
-          <View style={{height: device.web? 268 : 212, width: '100%', alignItems: 'center'}} >
-            <Buttons/>
+        <View style={styles.bottomConteiner}>
+          <Text
+            style={{
+              fontSize: 22,
+              color: myColors.text4,
+              marginBottom: 24,
+              fontFamily: 'Medium',
+              textAlign: 'center',
+            }}>
+            {'Entre para conhecer\nas melhores promoções!'}
+          </Text>
+          <View
+            style={{
+              height: device.web ? 268 : 212,
+              width: '100%',
+              alignItems: 'center',
+            }}>
+            <Buttons />
           </View>
         </View>
       </View>
-      {!device.web?
-      <BottomModal
-        isVisible={isModalVisible}
-        onDismiss={() => setIsModalVisible(false)}
-        style={{alignItems: 'center', paddingBottom: 32, paddingTop: 28}} >
-        <Text style={{fontSize: 18, color: myColors.text4_5, marginBottom: 28, fontFamily: 'Regular'}} >Como deseja entrar?</Text>
-        <FacebookButton/>
-        <AppleButton/>
-        <SignUpButtons/>
-      </BottomModal>
-      : null}
+      {!device.web ? (
+        <BottomModal
+          isVisible={isModalVisible}
+          onDismiss={() => setIsModalVisible(false)}
+          style={{ alignItems: 'center', paddingBottom: 32, paddingTop: 28 }}>
+          <Text
+            style={{
+              fontSize: 18,
+              color: myColors.text4_5,
+              marginBottom: 28,
+              fontFamily: 'Regular',
+            }}>
+            Como deseja entrar?
+          </Text>
+          <FacebookButton />
+          <AppleButton />
+          <SignUpButtons />
+        </BottomModal>
+      ) : null}
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -206,9 +276,9 @@ const styles = StyleSheet.create({
   },
   logo: {
     alignSelf: 'center',
-    marginTop: 120,
-    width: 170,
-    height: 92,
+    marginTop: 130,
+    width: 150,
+    height: 100,
   },
   button: {
     height: 50,
@@ -220,8 +290,8 @@ const styles = StyleSheet.create({
     width: '100%',
     position: 'absolute',
     alignItems: 'center',
-    bottom: device.iPhoneNotch? 90 : 40
+    bottom: device.iPhoneNotch ? 90 : 40,
   },
-})
+});
 
-export default SignIn
+export default SignIn;

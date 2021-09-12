@@ -1,35 +1,35 @@
 import React from 'react';
 import { ImageURISource, ScrollView, StyleSheet, View } from 'react-native';
 import { Image } from 'react-native-elements';
-import { device, globalStyles } from '../constants'
-import requests from '../services/requests';
+import { getImageUrl } from '~/functions/converter';
+import { device, globalStyles } from '~/constants';
+import { getSlidesJson } from '~/services/requests';
 
 const slideWidth = 1024;
 const slideHeight = 456;
 
-function createSlideList(json: []) {
-  let slideList: ImageURISource[] = []
-  for (let i = 0; i < json.length; i++) {
-    slideList = [...slideList, {
-      uri: requests+'images/'+json[i]
-    }]
+function createSlideList(json: any[]) {
+  const slideList = [] as ImageURISource[];
+  for (const i in json) {
+    slideList.push({
+      uri: getImageUrl('slide', json[i]),
+    });
   }
-  return slideList
+  return slideList;
 }
 
 function Slider() {
-  const [index, setIndex] = React.useState(0)
-  const [slidesData, setSlidesData] = React.useState<ImageURISource[]>([{uri: '_'}])
+  const [index, setIndex] = React.useState(0);
+  const [slidesData, setSlidesData] = React.useState<ImageURISource[]>([]);
   const indexRef = React.useRef(index);
   indexRef.current = index;
 
   React.useEffect(() => {
-    fetch(requests+'slides.json')
-      .then((response) => response.json())
-      .then((json) => setSlidesData(createSlideList(json)))
+    getSlidesJson()
+      .then(({ data }) => setSlidesData(createSlideList(data)))
       .catch((error) => console.error(error));
   }, []);
-  
+
   const onScroll = React.useCallback((event) => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
     const index = event.nativeEvent.contentOffset.x / slideSize;
@@ -53,39 +53,58 @@ function Slider() {
         onScroll={onScroll}
         scrollEventThrottle={100}
         showsHorizontalScrollIndicator={false}
-        disableIntervalMomentum={ true } 
+        disableIntervalMomentum={true}
         decelerationRate={0.9}
         snapToInterval={width - 24}
-        style={{width}}>
-        {
-          slidesData.map((image, index) => (
-            <View key={index} style={[styles.slide, index === 0 ? {marginLeft: 16} : {}, globalStyles.elevation5]} >
-              <Image 
-                source={image} 
-                containerStyle={{
-                  height: Math.round((itemWidth * slideHeight) / slideWidth),
-                  width: itemWidth,
-                  borderRadius: 8}} />
-            </View>
-          ))
-        }
+        style={{ width, height: itemHeight + 4 + 8 }}>
+        {slidesData.map((image, index) => (
+          <View
+            key={index}
+            style={[
+              styles.slide,
+              index === 0 ? { marginLeft: 16 } : {},
+              globalStyles.elevation5,
+            ]}>
+            <Image
+              source={image}
+              containerStyle={{
+                height: itemHeight,
+                width: itemWidth,
+                borderRadius: 8,
+              }}
+            />
+          </View>
+        ))}
       </ScrollView>
-      <View style={{alignSelf: 'center', flexDirection: 'row', top: -22, height: 7}} >
-        {slidesData.length < 2? null:
-          slidesData.map((_item, i) => (
-            <View key={i} style={[styles.dot, index == i? styles.active:styles.inactive]} />
-          ))
-        }
+      <View
+        style={{
+          alignSelf: 'center',
+          flexDirection: 'row',
+          top: -22,
+          height: 7,
+        }}>
+        {slidesData.length < 2
+          ? null
+          : slidesData.map((_item, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.dot,
+                  index == i ? styles.active : styles.inactive,
+                ]}
+              />
+            ))}
       </View>
     </>
-  )
+  );
 }
 
 const width = device.width;
 const itemWidth = device.width - 32;
+const itemHeight = Math.round((itemWidth * slideHeight) / slideWidth);
 const styles = StyleSheet.create({
   slide: {
-    height: Math.round((itemWidth * slideHeight) /slideWidth),
+    height: itemHeight,
     width: itemWidth,
     borderRadius: 8,
     marginTop: 4,
@@ -99,11 +118,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   active: {
-    backgroundColor: "#444"
+    backgroundColor: '#444',
   },
   inactive: {
-    backgroundColor: "#ECECEC"
+    backgroundColor: '#ECECEC',
   },
-})
+});
 
-export default Slider
+export default Slider;

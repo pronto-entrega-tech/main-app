@@ -1,15 +1,28 @@
-import Profile from './Profile';
-import Notifications from './Notifications';
-import Help from './Help';
-import Questions from './Questions';
-import Config from './Config';
-import ConfigNotifications from './ConfigNotifications';
+import loadable from '@loadable/component';
+const Profile = loadable(
+  () => import(/* webpackChunkName: 'ProfileChunk' */ './Profile')
+);
+const Notifications = loadable(
+  () => import(/* webpackChunkName: 'NotificationsChunk' */ './Notifications')
+);
+const Help = loadable(
+  () => import(/* webpackChunkName: 'HelpChunk' */ './Help')
+);
+const Questions = loadable(
+  () => import(/* webpackChunkName: 'QuestionsChunk' */ './Questions')
+);
+const Config = loadable(
+  () => import(/* webpackChunkName: 'ConfigChunk' */ './Config')
+);
+const ConfigNoti = loadable(
+  () => import(/* webpackChunkName: 'ConfigNotiChunk' */ './ConfigNoti')
+);
 
-export default { 
+export default {
   Profile,
   Notifications,
   Help,
   Questions,
   Config,
-  ConfigNotifications,
+  ConfigNoti,
 };

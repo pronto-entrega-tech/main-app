@@ -1,23 +1,54 @@
+import loadable from '@loadable/component';
+import routes from '~/constants/routes';
 import Address from './Address';
-import Cart from './Cart';
-import Devices from './Devices';
-import Filter from './Filter';
-import MyProfile from './MyProfile';
-import NewAddress from './NewAddress';
-import NewUser from './NewUser';
-import Payment from './Payment';
-import PaymentInApp from './PaymentInApp';
-import PaymentOnDelivery from './PaymentOnDelivery';
+const Cart = loadable(
+  () => import(/* webpackChunkName: 'CartChunk' */ './Cart')
+);
+const Devices = loadable(
+  () => import(/* webpackChunkName: 'DevicesChunk' */ './Devices')
+);
+const Filter = loadable(
+  () => import(/* webpackChunkName: 'FilterChunk' */ './Filter')
+);
+const MyProfile = loadable(
+  () => import(/* webpackChunkName: 'MyProfileChunk' */ './MyProfile')
+);
+const NewAddress = loadable(
+  () => import(/* webpackChunkName: 'NewAddressChunk' */ './NewAddress')
+);
+const NewUser = loadable(
+  () => import(/* webpackChunkName: 'NewUserChunk' */ './NewUser')
+);
+const Payment = loadable(
+  () => import(/* webpackChunkName: 'NewUserChunk' */ './Payment')
+);
+const PaymentInApp = loadable(
+  () => import(/* webpackChunkName: 'PaymentInAppChunk' */ './PaymentInApp')
+);
+const PaymentOnDelivery = loadable(
+  () =>
+    import(
+      /* webpackChunkName: 'PaymentOnDeliveryChunk' */ './PaymentOnDelivery'
+    )
+);
 import Product, { ProductHeader } from './Product';
-import routes from '../../constants/routes';
-import Schedule from './Schedule';
+const Schedule = loadable(
+  () => import(/* webpackChunkName: 'ScheduleChunk' */ './Schedule')
+);
 import Splash from './Splash';
-import SignIn from './SignIn';
+const SignIn = loadable(
+  () => import(/* webpackChunkName: 'SignInChunk' */ './SignIn')
+);
 import Search from './Search';
-import Sugestao from './Sugestao';
-import UploadQuestion from './UploadQuestion';
+const Sugestao = loadable(
+  () => import(/* webpackChunkName: 'SugestaoChunk' */ './Sugestao')
+);
+const UploadQuestion = loadable(
+  () => import(/* webpackChunkName: 'UploadQuestionChunk' */ './UploadQuestion')
+);
 
-export default { 
+export default {
+  routes,
   Address,
   Cart,
   Devices,
@@ -30,7 +61,6 @@ export default {
   PaymentOnDelivery,
   Product,
   ProductHeader,
-  routes,
   Schedule,
   Splash,
   SignIn,

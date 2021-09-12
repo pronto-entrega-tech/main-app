@@ -1,6 +1,6 @@
 import * as Linking from 'expo-linking';
 const prefix = Linking.createURL('/');
-import { LinkingOptions } from "@react-navigation/native";
+import { LinkingOptions } from '@react-navigation/native';
 
 const linking: LinkingOptions = {
   prefixes: [prefix],
@@ -14,18 +14,18 @@ const linking: LinkingOptions = {
         screens: {
           HomeTab: {
             screens: {
-              Home: 'home',
+              Home: 'inicio',
               Cupons: 'cupons',
               Favoritos: 'favoritos',
               ListMercados: 'lista-mercados',
               Mercado: {
-                path: 'mercado/:city/:market',
+                path: 'mercado/:city/:marketId',
               },
               MercInfo: {
-                path: 'mercado-detalhes/:key',
+                path: 'mercado-detalhes/:city/:marketId',
               },
               MercRating: {
-                path: 'mercado-avaliacao/:key',
+                path: 'mercado-avaliacao/:city/:marketId',
               },
             },
           },
@@ -33,7 +33,7 @@ const linking: LinkingOptions = {
           ComprasTab: {
             screens: {
               Compras: 'compras',
-              Order: 'pedido'
+              Order: 'pedido',
             },
           },
           PerfilTab: {
@@ -43,23 +43,23 @@ const linking: LinkingOptions = {
               Help: 'ajuda',
               Config: 'config',
               ConfigNotifications: 'config-notificoes',
-              Questions: 'perguntas'
+              Questions: 'perguntas',
             },
           },
         },
       },
       Product: {
-        path: 'produto/:city/:market/:prod',
+        path: 'produto/:city/:marketId/:prodId',
         screens: {
           ProductDetails: '',
           MercadoDetails: 'mercado',
-        }
+        },
       },
       Payment: {
         screens: {
           PaymentInApp: 'pagamento',
           PaymentOnDelivery: 'pagamento-entrega',
-        }
+        },
       },
       Cart: 'carrinho',
       Schedule: 'agendamento',
@@ -75,4 +75,4 @@ const linking: LinkingOptions = {
   },
 };
 
-export default linking
+export default linking;

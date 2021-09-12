@@ -5,26 +5,66 @@ import { myColors, globalStyles } from '../constants';
 import colors from '../constants/colors';
 import MyTouchable from './MyTouchable';
 
-function IconButton ({onPress, icon, size=24, color=myColors.primaryColor, style, type } : 
-{onPress: (item: any) => void, icon: string, size?: number, color?: string, style?: StyleProp<ViewStyle>,
-  type?: 'clear'|'add'|'addHorizontal'|'addLarge'|'fill'|'back'|'profile'|'address'|'prodIcons'|'profile2'|'cancel' }) {
+function IconButton({
+  onPress,
+  icon,
+  size = 24,
+  color = myColors.primaryColor,
+  style,
+  type,
+}: {
+  onPress: (item: any) => void;
+  icon: string;
+  size?: number;
+  color?: string;
+  style?: StyleProp<ViewStyle>;
+  type?:
+    | 'clear'
+    | 'add'
+    | 'add2'
+    | 'addHorizontal'
+    | 'addLarge'
+    | 'fill'
+    | 'back'
+    | 'profile'
+    | 'address'
+    | 'prodIcons'
+    | 'profile2'
+    | 'cancel';
+}) {
   let hitSlop;
   let iconStyle = {};
-  switch(type){
+  switch (type) {
     case 'clear':
       iconStyle = styles.buttonClear;
       break;
     case 'add':
-      iconStyle = [styles.buttonAdd, globalStyles.elevation4, globalStyles.darkBoader];
-      hitSlop = {top: 9, bottom: 9, left: 12, right: 12};
+      iconStyle = [
+        styles.buttonAdd,
+        globalStyles.elevation4,
+        globalStyles.darkBoader,
+      ];
+      hitSlop = { top: 9, bottom: 9, left: 12, right: 12 };
+      break;
+    case 'add2':
+      iconStyle = styles.buttonAdd2;
+      hitSlop = { top: 9, bottom: 9, left: 9, right: 9 };
       break;
     case 'addHorizontal':
-      iconStyle = [styles.buttonAddHorizontal, globalStyles.elevation4, globalStyles.darkBoader];
-      hitSlop = {top: 10, bottom: 10, left: 10, right: 12};
+      iconStyle = [
+        styles.buttonAddHorizontal,
+        globalStyles.elevation4,
+        globalStyles.darkBoader,
+      ];
+      hitSlop = { top: 10, bottom: 10, left: 10, right: 12 };
       break;
     case 'addLarge':
-      iconStyle = [styles.buttonAddLarge, globalStyles.elevation4, globalStyles.darkBoader];
-      hitSlop = {top: 9, bottom: 9, left: 12, right: 12};
+      iconStyle = [
+        styles.buttonAddLarge,
+        globalStyles.elevation4,
+        globalStyles.darkBoader,
+      ];
+      hitSlop = { top: 9, bottom: 9, left: 12, right: 12 };
       break;
     case 'back':
       iconStyle = styles.buttonBack;
@@ -36,7 +76,11 @@ function IconButton ({onPress, icon, size=24, color=myColors.primaryColor, style
       iconStyle = styles.buttonProdIcons;
       break;
     case 'profile':
-      iconStyle = [styles.buttonProfile, globalStyles.elevation4, globalStyles.darkBoader];
+      iconStyle = [
+        styles.buttonProfile,
+        globalStyles.elevation4,
+        globalStyles.darkBoader,
+      ];
       break;
     case 'profile2':
       iconStyle = [styles.buttonProfile2, globalStyles.elevation4];
@@ -45,17 +89,18 @@ function IconButton ({onPress, icon, size=24, color=myColors.primaryColor, style
       iconStyle = styles.buttonAddress;
       break;
     default:
-      iconStyle = [styles.button, globalStyles.elevation4, globalStyles.darkBoader];
+      iconStyle = [
+        styles.button,
+        globalStyles.elevation4,
+        globalStyles.darkBoader,
+      ];
   }
-  
+
   return (
-    <MyTouchable
-      hitSlop={hitSlop}
-      onPress={onPress}
-      style={[iconStyle, style]} >
+    <MyTouchable hitSlop={hitSlop} onPress={onPress} style={[iconStyle, style]}>
       <Icon name={icon} size={size} color={color} />
     </MyTouchable>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -74,7 +119,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 48,
-    padding: 10
+    padding: 10,
   },
   buttonAdd: {
     width: 32,
@@ -84,6 +129,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 60,
     margin: 2,
+  },
+  buttonAdd2: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 60,
   },
   buttonAddHorizontal: {
     width: 26,
@@ -108,7 +160,7 @@ const styles = StyleSheet.create({
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 56
+    borderRadius: 56,
   },
   buttonProdIcons: {
     marginLeft: -8,
@@ -116,7 +168,7 @@ const styles = StyleSheet.create({
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 56
+    borderRadius: 56,
   },
   buttonProfile: {
     width: 50,
@@ -153,7 +205,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 48,
-  }
-})
+  },
+});
 
-export default IconButton
+export default IconButton;
