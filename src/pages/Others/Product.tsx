@@ -5,7 +5,7 @@ import { View, Share, StatusBar } from 'react-native';
 import { Divider } from 'react-native-elements';
 import { CartBar } from '~/core/BottomTabs';
 import IconButton from '~/components/IconButton';
-import { myColors, device } from '~/constants';
+import { myColors, device, myTitle } from '~/constants';
 import Mercado from '../Home/Mercado';
 import ProductDetails from './ProductDetails';
 import { prodModel } from '~/components/ProdItem';
@@ -144,12 +144,12 @@ function Product({
             <Tab.Screen
               name='ProductDetails'
               component={ProductDetails}
-              options={{ tabBarLabel: 'Produto' }}
+              options={{ tabBarLabel: 'Produto', title: myTitle }}
             />
             <Tab.Screen
               name='MercadoDetails'
               component={Mercado}
-              options={{ tabBarLabel: 'Mercado' }}
+              options={{ tabBarLabel: 'Mercado', title: myTitle }}
             />
           </Tab.Navigator>
         </ProdContext.Provider>

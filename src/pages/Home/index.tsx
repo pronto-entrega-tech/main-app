@@ -1,48 +1,14 @@
 import loadable from '@loadable/component';
 import Home, { HomeHeader } from './Home';
 import ListMercados, { ListMercadosHeader } from './ListMercados';
-const Cupons = loadable(
-  () =>
-    import(
-      /* webpackChunkName: 'CuponsChunk' */
-      /* webpackMode: 'lazy-once' */
-      './Cupons'
-    )
-);
-const Favoritos = loadable(
-  () =>
-    import(
-      /* webpackChunkName: 'FavoritosChunk' */
-      /* webpackMode: 'lazy-once' */
-      './Favoritos'
-    )
-);
+const Cupons = loadable(() => import('./Cupons'));
+const Favoritos = loadable(() => import('./Favoritos'));
 const FavoritosHeader = loadable(async () => {
-  return (
-    await import(
-      /* webpackChunkName: 'FavoritosHeaderChunk' */
-      /* webpackMode: 'lazy-once' */
-      './Favoritos'
-    )
-  ).FavoritosHeader;
+  return (await import('./Favoritos')).FavoritosHeader;
 });
 import Mercado from './Mercado';
-const MercInfo = loadable(
-  () =>
-    import(
-      /* webpackChunkName: 'MercInfoChunk' */
-      /* webpackMode: 'lazy-once' */
-      './MercInfo'
-    )
-);
-const MercRating = loadable(
-  () =>
-    import(
-      /* webpackChunkName: 'MercRatingChunk' */
-      /* webpackMode: 'lazy-once' */
-      './MercRating'
-    )
-);
+const MercInfo = loadable(() => import('./MercInfo'));
+const MercRating = loadable(() => import('./MercRating'));
 
 export default {
   Home,

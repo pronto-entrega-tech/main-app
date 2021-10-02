@@ -3,13 +3,13 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Divider, Image } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import useMyContext from '../../functions/MyContext';
-import IconButton from '../../components/IconButton';
-import ProdListHorizontal from '../../components/ProdListHorizontal';
-import { myColors, device } from '../../constants';
-import validate from '../../functions/validate';
-import requests from '../../services/requests';
-import { useProdContext } from '../../functions/ProdContext';
+import useMyContext from '~/functions/MyContext';
+import IconButton from '~/components/IconButton';
+import ProdListHorizontal from '~/components/ProdListHorizontal';
+import { myColors, device } from '~/constants';
+import validate from '~/functions/validate';
+import requests from '~/services/requests';
+import { useProdContext } from '~/functions/ProdContext';
 import { getImageUrl } from '~/functions/converter';
 
 function ProductDetails({

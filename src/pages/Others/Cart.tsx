@@ -319,36 +319,37 @@ function Cart({
       if (lastPayment) setPayment(lastPayment);
     });
 
-    const setup = (activeMarket: marketModel) => {
-      getCity()
-        .then(async (city) => {
-          const { data } = await getProdFeedByMarket(
-            city,
-            activeMarket.market_id
-          );
-          setBuyTooList(createProdList(data));
-        })
-        .catch(() => setError('server'));
+    const setup = async (activeMarket: marketModel) => {
+      try {
+        const city = await getCity();
+        const { data } = await getProdFeedByMarket(
+          city,
+          activeMarket.market_id
+        );
+        setBuyTooList(createProdList(data));
+      } catch {
+        setError('server');
+      }
 
       setActiveMarket(activeMarket);
       updateSchedule(activeMarket, setSchedules, setActiveSchedule);
       setReadyActiveMarket(true);
     };
 
-    getActiveMarket().then((activeMarket) => {
+    getActiveMarket().then(async (activeMarket) => {
       if (activeMarket) return setup(activeMarket);
 
-      getActiveMarketKey().then((market_id) => {
-        if (market_id === '') return;
-        getCity().then(async (city) => {
-          try {
-            const { data } = await getMarket(city, market_id);
-            setup(createMercItem(data));
-          } catch {
-            setError('server');
-          }
-        });
-      });
+      const market_id = await getActiveMarketKey();
+      if (!market_id) return setError('nothing');
+
+      const city = await getCity();
+
+      try {
+        const { data } = await getMarket(city, market_id);
+        setup(createMercItem(data));
+      } catch {
+        setError('server');
+      }
     });
   }, []);
 

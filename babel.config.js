@@ -11,7 +11,6 @@ module.exports = function (api) {
             '~': './src',
           },
         },
-        '@babel/plugin-syntax-dynamic-import',
       ],
     ],
   };

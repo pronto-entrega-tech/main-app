@@ -2,11 +2,11 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Button } from 'react-native-elements';
-import { myColors, device, globalStyles, images } from '../../constants';
+import { myColors, device, globalStyles, images } from '~/constants';
 import {
   saveActiveAddress,
   saveActiveAddressIndex,
-} from '../../functions/dataStorage';
+} from '~/functions/dataStorage';
 import { addressModel } from './Address';
 import { useLinkTo } from '@react-navigation/native';
 
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginLeft: 25,
     top: -50,
-    width: 200,
+    width: 170,
     height: 160,
   },
   tomato: {

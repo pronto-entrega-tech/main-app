@@ -1,51 +1,25 @@
 import loadable from '@loadable/component';
 import routes from '~/constants/routes';
-import Address from './Address';
-const Cart = loadable(
-  () => import(/* webpackChunkName: 'CartChunk' */ './Cart')
+const Address = loadable(() => import('./Address'));
+const Cart = loadable(() => import('./Cart'));
+const Devices = loadable(() => import('./Devices'));
+const Filter = loadable(() => import('./Filter'));
+const MyProfile = loadable(() => import('./MyProfile'));
+const NewAddress = loadable(() => import('./NewAddress'));
+const NewUser = loadable(() => import('./NewUser'));
+const Payment = loadable(() => import('./Payment'));
+const PaymentInApp = loadable(() => import('./PaymentInApp'));
+const PaymentOnDelivery = loadable(() => import('./PaymentOnDelivery'));
+const Product = loadable(() => import('./Product'));
+const ProductHeader = loadable(
+  async () => (await import('./Product')).ProductHeader
 );
-const Devices = loadable(
-  () => import(/* webpackChunkName: 'DevicesChunk' */ './Devices')
-);
-const Filter = loadable(
-  () => import(/* webpackChunkName: 'FilterChunk' */ './Filter')
-);
-const MyProfile = loadable(
-  () => import(/* webpackChunkName: 'MyProfileChunk' */ './MyProfile')
-);
-const NewAddress = loadable(
-  () => import(/* webpackChunkName: 'NewAddressChunk' */ './NewAddress')
-);
-const NewUser = loadable(
-  () => import(/* webpackChunkName: 'NewUserChunk' */ './NewUser')
-);
-const Payment = loadable(
-  () => import(/* webpackChunkName: 'NewUserChunk' */ './Payment')
-);
-const PaymentInApp = loadable(
-  () => import(/* webpackChunkName: 'PaymentInAppChunk' */ './PaymentInApp')
-);
-const PaymentOnDelivery = loadable(
-  () =>
-    import(
-      /* webpackChunkName: 'PaymentOnDeliveryChunk' */ './PaymentOnDelivery'
-    )
-);
-import Product, { ProductHeader } from './Product';
-const Schedule = loadable(
-  () => import(/* webpackChunkName: 'ScheduleChunk' */ './Schedule')
-);
-import Splash from './Splash';
-const SignIn = loadable(
-  () => import(/* webpackChunkName: 'SignInChunk' */ './SignIn')
-);
-import Search from './Search';
-const Sugestao = loadable(
-  () => import(/* webpackChunkName: 'SugestaoChunk' */ './Sugestao')
-);
-const UploadQuestion = loadable(
-  () => import(/* webpackChunkName: 'UploadQuestionChunk' */ './UploadQuestion')
-);
+const Schedule = loadable(() => import('./Schedule'));
+const Splash = loadable(() => import('./Splash'));
+const SignIn = loadable(() => import('./SignIn'));
+const Search = loadable(() => import('./Search'));
+const Sugestao = loadable(() => import('./Sugestao'));
+const UploadQuestion = loadable(() => import('./UploadQuestion'));
 
 export default {
   routes,

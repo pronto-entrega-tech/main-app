@@ -54,9 +54,10 @@ function Slider() {
         scrollEventThrottle={100}
         showsHorizontalScrollIndicator={false}
         disableIntervalMomentum={true}
-        decelerationRate={0.9}
-        snapToInterval={width - 24}
-        style={{ width, height: itemHeight + 4 + 8 }}>
+        decelerationRate='fast'
+        snapToEnd={false}
+        snapToInterval={device.width - 24}
+        style={styles.scroll}>
         {slidesData.map((image, index) => (
           <View
             key={index}
@@ -99,16 +100,19 @@ function Slider() {
   );
 }
 
-const width = device.width;
-const itemWidth = device.width - 32;
+const itemWidth = device.width / 1 - 32;
 const itemHeight = Math.round((itemWidth * slideHeight) / slideWidth);
 const styles = StyleSheet.create({
+  scroll: {
+    //width: device.width,
+    height: itemHeight + 4 + 8,
+    paddingTop: 4,
+    paddingBottom: 8,
+  },
   slide: {
     height: itemHeight,
     width: itemWidth,
     borderRadius: 8,
-    marginTop: 4,
-    marginBottom: 8,
     marginRight: 8,
   },
   dot: {

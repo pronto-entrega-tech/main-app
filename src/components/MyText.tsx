@@ -3,7 +3,7 @@ import { StyleProp, Text, TextStyle } from 'react-native';
 
 function MyText({
   children,
-  style = {},
+  style,
   ellipsizeMode,
   numberOfLines,
 }: {

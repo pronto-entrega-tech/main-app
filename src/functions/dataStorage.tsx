@@ -142,9 +142,8 @@ export async function getShoppingList() {
 export async function saveActiveMarketKey(value: string, city?: string) {
   const stringValue = JSON.stringify(value);
   await AsyncStorage.setItem(suffix + 'activeMarketKey', stringValue);
-  if (value === '') {
-    await AsyncStorage.removeItem(suffix + 'activeMarket');
-    return;
+  if (!value) {
+    return AsyncStorage.removeItem(suffix + 'activeMarket');
   }
   fetch(requests + `mercList.php?city=${city}&market=${value}`)
     .then((response) => response.json())

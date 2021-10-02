@@ -104,6 +104,27 @@ function SignIn({
     );
   };
 
+  const EmailButton = () => {
+    return (
+      <MyButton
+        title='Email'
+        type='outline'
+        titleStyle={{ color: myColors.text2 }}
+        buttonStyle={[
+          styles.button,
+          {
+            paddingVertical: 14,
+            borderColor: myColors.grey_1,
+          },
+        ]}
+        onPress={() => {
+          setIsModalVisible(false);
+          alert('Ainda não');
+        }}
+      />
+    );
+  };
+
   const SignUpButtons = () => {
     return (
       <View
@@ -163,7 +184,7 @@ function SignIn({
           <>
             <FacebookButton />
             <AppleButton />
-            <SignUpButtons />
+            <EmailButton />
           </>
         ) : (
           <>
@@ -241,7 +262,7 @@ function SignIn({
           </Text>
           <FacebookButton />
           <AppleButton />
-          <SignUpButtons />
+          <EmailButton />
         </BottomModal>
       ) : null}
     </View>

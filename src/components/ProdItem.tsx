@@ -251,12 +251,20 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginHorizontal: 8,
   },
+  priceText: {
+    color: myColors.text3,
+    marginTop: -22,
+    marginBottom: 1,
+    fontSize: 18,
+    fontFamily: 'Medium',
+  },
   oldPriceRow: {
+    marginTop: -1,
     flexDirection: 'row',
     alignItems: 'center',
   },
   offTextBox: {
-    paddingVertical: 2,
+    paddingVertical: device.web ? 2 : 1,
     paddingHorizontal: 3,
     backgroundColor: myColors.primaryColor,
     borderRadius: 6,
@@ -272,20 +280,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginLeft: 4,
   },
-  priceText: {
-    color: myColors.text3,
-    marginTop: -22,
-    marginBottom: 1,
-    fontSize: 18,
-    fontFamily: 'Medium',
-  },
   nameText: {
+    maxHeight: 40,
+    includeFontPadding: false,
     color: myColors.grey3,
     marginTop: 2,
     fontFamily: 'Condensed',
   },
   quantityText: {
-    marginLeft: 0,
+    includeFontPadding: false,
     color: myColors.grey2,
   },
 });

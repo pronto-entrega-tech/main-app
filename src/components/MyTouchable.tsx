@@ -7,7 +7,7 @@ import {
   Insets,
 } from 'react-native';
 import { TouchableRipple } from 'react-native-paper';
-import { device } from '../constants';
+import { device } from '~/constants';
 
 function MyTouchable({
   onPress,

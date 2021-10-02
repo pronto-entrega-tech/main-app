@@ -1,5 +1,5 @@
 import axios from 'axios';
-import qs from 'qs';
+import { stringify } from 'qs';
 
 // Set true to use a dev API
 const USE_DEV_API = false;
@@ -19,8 +19,7 @@ export interface searchParams {
 export function getProdFeed(city: string, params?: searchParams) {
   return axios.get(`${API}products/${city}/`, {
     params,
-    paramsSerializer: (params) =>
-      qs.stringify(params, { arrayFormat: 'repeat' }),
+    paramsSerializer: (params) => stringify(params, { arrayFormat: 'repeat' }),
   });
 }
 
@@ -31,8 +30,7 @@ export function getProdFeedByMarket(
 ) {
   return axios.get(`${API}products/${city}/${market}`, {
     params,
-    paramsSerializer: (params) =>
-      qs.stringify(params, { arrayFormat: 'repeat' }),
+    paramsSerializer: (params) => stringify(params, { arrayFormat: 'repeat' }),
   });
 }
 
