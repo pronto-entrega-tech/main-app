@@ -63,6 +63,9 @@ function ProdList(props: {
   const numColumns = horizontal ? 1 : columns;
 
   async function tryFeed() {
+    const city = await getCity();
+    setCity(city);
+
     if (data) return;
     try {
       setIsLoading(true);
@@ -70,8 +73,6 @@ function ProdList(props: {
 
       if (!(await hasInternet())) return setError('connection');
 
-      const city = await getCity();
-      setCity(city);
       const prodFeed = await getProdFeed(city, searchParams);
 
       if (!prodFeed.length)
