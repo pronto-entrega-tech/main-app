@@ -1,129 +1,133 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Image } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { myColors, device, globalStyles } from '../constants';
-import IconButton from './IconButton';
-import MyButton from './MyTouchable';
+import { Image } from 'react-native-elements/dist/image/Image';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { prodModel } from './ProdItem';
-import { getImageUrl, moneyToString } from '../functions/converter';
+import { myColors, device, globalStyles } from '~/constants';
+import { calcOff, getImageUrl, moneyToString } from '~/functions/converter';
+import IconButton from './IconButton';
+import { Product } from './ProdItem';
+import MyIcon from './MyIcon';
+import useRouting from '~/hooks/useRouting';
+import MyTouchable from './MyTouchable';
+import AnimatedText from './AnimatedText';
 
-function ProdItemHorizontal({
-  navigation,
-  item,
-  isFavorite,
-  quantity = 0,
-  onPressFav,
-  onPressAdd,
-  onPressRemove,
-  merc,
-  city,
-}: {
-  navigation: StackNavigationProp<any, any>;
-  item: prodModel;
-  isFavorite: boolean;
-  quantity?: number;
-  onPressFav: (item: any) => void;
-  onPressAdd: (item: any) => void;
-  onPressRemove: (item: any) => void;
-  merc: boolean;
+function ProdItemHorizontal(props: {
+  navigation?: StackNavigationProp<any, any>;
+  item: Product;
   city: string;
+  showsMarketLogo: boolean;
+  isFavorite?: boolean;
+  quantity?: number;
+  onPressFav?: () => void;
+  onPressAdd: () => void;
+  onPressRemove: () => void;
 }) {
-  const off = item.previous_price
-    ? ((1 - item.price.value / item.previous_price.value) * 100).toFixed(0)
-    : undefined;
+  const {
+    item,
+    city,
+    showsMarketLogo,
+    quantity = 0,
+    onPressAdd,
+    onPressRemove,
+  } = props;
+  const { params, push } = useRouting();
+  const atualCity = city || params.city;
+  const off = calcOff(item);
+
+  const nav = device.web
+    ? { path: `/produto/${atualCity}/${item.market_id}/${item.prod_id}` }
+    : {
+        onPress: () =>
+          push(
+            { screen: 'ProductTabs', path: '' },
+            {
+              city: atualCity,
+              marketId: item.market_id,
+              prodId: item.prod_id,
+              path: `/produto/${atualCity}/${item.market_id}/${item.prod_id}`, // pathname inside tabs are undefined
+            }
+          ),
+      };
 
   return (
-    <MyButton
-      style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader]}
-      onPress={() =>
-        navigation.push(
-          'Product',
-          device.web
-            ? { city: city, market: item.market_id, prod: item.prod_id }
-            : { item: item }
-        )
-      }>
-      <View style={styles.container}>
-        <View style={styles.containerAdd}>
-          <IconButton
-            icon='plus'
-            size={24}
-            color={myColors.primaryColor}
-            type='addHorizontal'
-            onPress={onPressAdd}
-          />
-          <Text style={styles.centerNumText}>
-            {typeof quantity !== 'undefined' ? quantity : 0}
-          </Text>
-          <IconButton
-            icon='minus'
-            size={24}
-            color={myColors.primaryColor}
-            type='addHorizontal'
-            onPress={onPressRemove}
-          />
-        </View>
-        <View style={styles.containerImage}>
-          {item.images_names ? (
-            <Image
-              placeholderStyle={{ backgroundColor: '#FFF' }}
-              PlaceholderContent={
-                <Icon name='cart-outline' color={myColors.grey2} size={80} />
-              }
-              source={{ uri: getImageUrl('product', item.images_names[0]) }}
-              containerStyle={styles.image}
-            />
-          ) : (
-            <Icon
-              name='cart-outline'
-              color={myColors.grey2}
-              size={80}
-              style={styles.image}
-            />
-          )}
-          <IconButton
+    <View
+      style={[globalStyles.elevation4, globalStyles.darkBorder, styles.card]}>
+      <MyTouchable style={{ flex: 1 }} {...nav}>
+        <View style={styles.container}>
+          <View style={styles.containerImage}>
+            {item.images_names ? (
+              <Image
+                placeholderStyle={{ backgroundColor: '#FFF' }}
+                PlaceholderContent={
+                  <MyIcon
+                    name='cart-outline'
+                    color={myColors.grey2}
+                    size={80}
+                  />
+                }
+                source={{ uri: getImageUrl('product', item.images_names[0]) }}
+                containerStyle={styles.image}
+              />
+            ) : (
+              <MyIcon
+                name='cart-outline'
+                color={myColors.grey2}
+                size={80}
+                style={styles.image}
+              />
+            )}
+            {/* <IconButton
             style={styles.fav}
             icon={isFavorite ? 'heart' : 'heart-outline'}
             size={24}
             color={isFavorite ? myColors.primaryColor : myColors.grey2}
             type='clear'
             onPress={onPressFav}
-          />
-        </View>
-        <View style={styles.containerText}>
-          <Text ellipsizeMode='tail' numberOfLines={1} style={styles.prodText}>
-            {item.name} {item.brand}
-          </Text>
-          {off ? (
-            <View style={styles.oldPriceRow}>
-              <View style={styles.offTextBox}>
-                <Text style={styles.offText}>-{off}%</Text>
+          /> */}
+          </View>
+          <View style={styles.containerText}>
+            <Text
+              ellipsizeMode='tail'
+              numberOfLines={1}
+              style={styles.prodText}>
+              {item.name} {item.brand}
+            </Text>
+            {off && (
+              <View style={styles.oldPriceRow}>
+                <View style={styles.offTextBox}>
+                  <Text style={styles.offText}>-{off}%</Text>
+                </View>
+                <Text style={styles.oldPriceText}>
+                  {moneyToString(item.previous_price, 'R$')}
+                </Text>
               </View>
-              <Text style={styles.oldPriceText}>
-                {item.previous_price
-                  ? 'R$' + moneyToString(item.previous_price)
-                  : null}
-              </Text>
-            </View>
-          ) : null}
-          <Text style={styles.priceText}>R${moneyToString(item.price)}</Text>
-          <Text style={styles.quantityText}>{item.quantity}</Text>
+            )}
+            <Text style={styles.priceText}>
+              {moneyToString(item.price, 'R$')}
+            </Text>
+            <Text style={styles.quantityText}>{item.quantity}</Text>
+          </View>
+          <View style={styles.mercContainer}>
+            {showsMarketLogo && (
+              <Image
+                placeholderStyle={{ backgroundColor: '#FFF' }}
+                source={{
+                  uri: getImageUrl('market', item.market_id),
+                }}
+                containerStyle={styles.mercImage}
+              />
+            )}
+          </View>
         </View>
-        <View style={styles.mercContainer}>
-          {!merc ? (
-            <Image
-              placeholderStyle={{ backgroundColor: '#FFF' }}
-              source={{
-                uri: getImageUrl('market', item.market_id),
-              }}
-              containerStyle={styles.mercImage}
-            />
-          ) : null}
-        </View>
+      </MyTouchable>
+      <View style={styles.containerAdd}>
+        <IconButton icon='plus' type='addHorizontal' onPress={onPressAdd} />
+        <AnimatedText style={styles.centerNumText} distace={10} animateZero>
+          {quantity}
+        </AnimatedText>
+        <IconButton icon='minus' type='addHorizontal' onPress={onPressRemove} />
       </View>
-    </MyButton>
+    </View>
   );
 }
 
@@ -138,13 +142,15 @@ const styles = StyleSheet.create({
   },
   container: {
     flexDirection: 'row',
+    paddingLeft: 36,
   },
   containerAdd: {
+    position: 'absolute',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 3,
+    height: 104,
+    paddingVertical: 6,
     paddingLeft: 3,
-    paddingRight: 9,
     zIndex: 2,
   },
   centerNumText: {
@@ -172,7 +178,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   prodText: {
-    height: 17.5,
+    height: 20,
     color: myColors.grey3,
     marginTop: 12,
     width: device.width - 160,
@@ -193,7 +199,7 @@ const styles = StyleSheet.create({
   offText: {
     color: '#FFF',
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 12,
   },
   oldPriceText: {
     textDecorationLine: 'line-through',

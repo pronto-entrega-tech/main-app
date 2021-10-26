@@ -1,34 +1,51 @@
 import React from 'react';
-import { ImageURISource, ScrollView, StyleSheet, View } from 'react-native';
-import { Image } from 'react-native-elements';
+import {
+  ImageURISource,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import { Image } from 'react-native-elements/dist/image/Image';
+import { globalStyles } from '~/constants';
 import { getImageUrl } from '~/functions/converter';
-import { device, globalStyles } from '~/constants';
 import { getSlidesJson } from '~/services/requests';
 
-const slideWidth = 1024;
 const slideHeight = 456;
+const slideWidth = 1024;
 
-function createSlideList(json: any[]) {
-  const slideList = [] as ImageURISource[];
-  for (const i in json) {
-    slideList.push({
-      uri: getImageUrl('slide', json[i]),
-    });
-  }
-  return slideList;
-}
-
-function Slider() {
+function Slider({ data }: { data?: string[] }) {
   const [index, setIndex] = React.useState(0);
-  const [slidesData, setSlidesData] = React.useState<ImageURISource[]>([]);
+  const [slidesData, setSlidesData] = React.useState(data);
+  const { width } = useWindowDimensions();
   const indexRef = React.useRef(index);
   indexRef.current = index;
 
   React.useEffect(() => {
-    getSlidesJson()
-      .then(({ data }) => setSlidesData(createSlideList(data)))
-      .catch((error) => console.error(error));
-  }, []);
+    if (slidesData) return;
+    getSlidesJson().then(setSlidesData).catch(console.error);
+  }, [slidesData]);
+
+  const [columns, setColumns] = React.useState(1);
+  const [itemWidth, setItemWidth] = React.useState(0);
+  const [itemHeight, setItemHeight] = React.useState(0);
+
+  React.useEffect(() => {
+    const columns = (() => {
+      if (width > 768) return 3; // desktop
+      if (width > 425) return 2; // tablet
+      return 1; // mobile
+    })();
+
+    const itemWidth_ = (width - 32) / columns;
+    const itemHeight_ = Math.round((itemWidth_ * slideHeight) / slideWidth);
+    setItemWidth(itemWidth_);
+    setItemHeight(itemHeight_);
+    setColumns(columns);
+  }, [width]);
+
+  /* const itemWidth = (width - 32) / columns;
+  const itemHeight = Math.round((itemWidth * slideHeight) / slideWidth); */
 
   const onScroll = React.useCallback((event) => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
@@ -55,63 +72,62 @@ function Slider() {
         showsHorizontalScrollIndicator={false}
         disableIntervalMomentum={true}
         decelerationRate='fast'
-        snapToEnd={false}
-        snapToInterval={device.width - 24}
-        style={styles.scroll}>
-        {slidesData.map((image, index) => (
-          <View
+        /* snapToEnd={false} */
+        snapToInterval={itemWidth + 8}
+        style={[
+          styles.scroll,
+          {
+            paddingBottom: columns === 1 ? 0 : 8,
+            aspectRatio: ((slideWidth + 32) / slideHeight) * columns,
+          },
+        ]}>
+        {slidesData?.map((image, index) => (
+          <Image
             key={index}
-            style={[
-              styles.slide,
-              index === 0 ? { marginLeft: 16 } : {},
+            source={{
+              uri: getImageUrl('slide', image),
+            }}
+            containerStyle={[
               globalStyles.elevation5,
-            ]}>
-            <Image
-              source={image}
-              containerStyle={{
-                height: itemHeight,
+              styles.slide,
+              {
                 width: itemWidth,
-                borderRadius: 8,
-              }}
-            />
-          </View>
+                height: itemHeight,
+                marginLeft: index === 0 ? 20 - 4 * columns : 0,
+              },
+            ]}
+          />
         ))}
       </ScrollView>
       <View
         style={{
           alignSelf: 'center',
           flexDirection: 'row',
-          top: -22,
+          top: columns === 1 ? -22 : -4,
           height: 7,
         }}>
-        {slidesData.length < 2
-          ? null
-          : slidesData.map((_item, i) => (
-              <View
-                key={i}
-                style={[
-                  styles.dot,
-                  index == i ? styles.active : styles.inactive,
-                ]}
-              />
-            ))}
+        {slidesData &&
+          slidesData.length >= 2 &&
+          slidesData.map((_item, i) => (
+            <View
+              key={i}
+              style={[
+                styles.dot,
+                index === i ? styles.active : styles.inactive,
+              ]}
+            />
+          ))}
       </View>
     </>
   );
 }
 
-const itemWidth = device.width / 1 - 32;
-const itemHeight = Math.round((itemWidth * slideHeight) / slideWidth);
 const styles = StyleSheet.create({
   scroll: {
-    //width: device.width,
-    height: itemHeight + 4 + 8,
+    width: '100%',
     paddingTop: 4,
-    paddingBottom: 8,
   },
   slide: {
-    height: itemHeight,
-    width: itemWidth,
     borderRadius: 8,
     marginRight: 8,
   },

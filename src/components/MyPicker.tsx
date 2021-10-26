@@ -10,10 +10,9 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import { Divider } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { device, myColors } from '../constants';
-import colors from '~/constants/colors';
+import { device, myColors } from '~/constants';
+import MyIcon from './MyIcon';
+import MyDivider from './MyDivider';
 
 function MyPicker({
   items,
@@ -41,7 +40,7 @@ function MyPicker({
           key={item}
           label={item}
           value={item}
-          color={i === 0 ? '#9EA0A4' : colors.text4_5}
+          color={i === 0 ? '#9EA0A4' : myColors.text4_5}
           style={{ fontSize: 18 }}
         />
       );
@@ -60,14 +59,9 @@ function MyPicker({
           }}
           onPress={() => setVisible(true)}>
           <Text style={styles.input}>{value}</Text>
-          <Icon
-            name='menu-down'
-            size={24}
-            color='#777'
-            style={{ marginRight: 12 }}
-          />
+          <MyIcon name='menu-down' color='#777' style={{ marginRight: 12 }} />
         </TouchableOpacity>
-        <Divider style={styles.divider} />
+        <MyDivider style={styles.divider} />
         <Text style={styles.error}>{errorMessage}</Text>
         <Modal transparent visible={visible} animationType='slide'>
           <Pressable
@@ -117,14 +111,9 @@ function MyPicker({
             height: 46,
           }}>
           <Text style={styles.input}>{value}</Text>
-          <Icon
-            name='menu-down'
-            size={24}
-            color='#777'
-            style={{ marginRight: 12 }}
-          />
+          <MyIcon name='menu-down' color='#777' style={{ marginRight: 12 }} />
         </View>
-        <Divider style={styles.divider} />
+        <MyDivider style={styles.divider} />
         <Text style={styles.error}>{errorMessage}</Text>
       </View>
     );
@@ -141,7 +130,7 @@ function MyPicker({
         }}>
         {PickerItems()}
       </Picker>
-      <Divider style={[styles.divider, { top: 8 }]} />
+      <MyDivider style={[styles.divider, { top: 8 }]} />
       <Text style={styles.error}>{errorMessage}</Text>
     </View>
   );

@@ -1,3 +1,3 @@
-import converter from './converter';
+import * as converter from './converter';
 
 export { converter };

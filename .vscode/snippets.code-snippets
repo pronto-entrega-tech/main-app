@@ -1,0 +1,28 @@
+{
+  "Create component": {
+    "scope": "javascriptreact,typescriptreact",
+    "prefix": ["react-component", "rc"],
+    "body": [
+      "import React from \"react\";",
+      "",
+      "function $TM_FILENAME_BASE() {",
+      "  return (",
+      "    ",
+      "  )",
+      "}",
+      "",
+      "export default $TM_FILENAME_BASE;"
+    ],
+    "description": "Create a React component."
+  },
+  "Create useEffect": {
+    "scope": "javascriptreact,typescriptreact",
+    "prefix": ["use-effect", "us"],
+    "body": ["useEffect(() => {", "", "}, [])"]
+  },
+  "Create StyleSheet": {
+    "scope": "javascriptreact,typescriptreact",
+    "prefix": ["create-stylesheet", "cs"],
+    "body": ["const styles = StyleSheet.create({", "", "})"]
+  }
+}

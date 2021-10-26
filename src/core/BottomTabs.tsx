@@ -1,41 +1,53 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
-import {
-  createStackNavigator,
-  StackNavigationProp,
-  TransitionPreset,
-  TransitionPresets,
-} from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Home from '~/pages/Home';
-import Categorias from '~/pages/Categorias';
-import Compras from '~/pages/Compras';
-import Perfil from '~/pages/Perfil';
-import Header3 from '~/components/Header3';
-import { device, myColors, myTitle } from '~/constants';
-import Header from '~/components/Header';
-import MyTouchable from '~/components/MyTouchable';
-import MyText from '~/components/MyText';
-import useMyContext from '~/functions/MyContext';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { myColors } from '~/constants';
+import { myScreenOptions } from '~/constants/others';
+import Home from '@pages/inicio';
+import Cupons from '@pages/inicio/cupons';
+import Favorites from '@pages/inicio/favoritos';
+import MarketList from '@pages/inicio/lista-mercados';
+import Market from '@pages/inicio/mercado/[city]/[marketId]';
+import MarketRating from '@pages/inicio/mercado/[city]/[marketId]/avaliacao';
+import MarketDetails from '@pages/inicio/mercado/[city]/[marketId]/detalhes';
+import Categories from '@pages/categorias';
+import Shopping from '@pages/compras';
+import Order from '@pages/compras/pedido';
+import Profile from '@pages/perfil';
+import ConfigNoti from '@pages/perfil/config-notificoes';
+import Config from '@pages/perfil/config';
+import Help from '@pages/perfil/ajuda';
+import Questions from '@pages/perfil/perguntas/[question]';
+import Notifications from '@pages/perfil/notificacoes';
+import CartBar from '~/components/CartBar';
 
 const Tab = createMaterialBottomTabNavigator();
 const HomeStack = createStackNavigator();
-const ComprasStack = createStackNavigator();
-const PerfilStack = createStackNavigator();
+const ShoppingStack = createStackNavigator();
+const ProfileStack = createStackNavigator();
 
-const TransitionScreenOptions: TransitionPreset = {
-  ...TransitionPresets.SlideFromRightIOS,
-};
+type IconNames = keyof typeof Icon.glyphMap;
+function TabBarIcon(name: IconNames) {
+  const TabBarIcon = ({
+    focused,
+    color,
+  }: {
+    focused: boolean;
+    color: string;
+  }) => (
+    <Icon
+      name={focused ? name : (`${name}-outline` as IconNames)}
+      color={color}
+      size={24}
+    />
+  );
+  return TabBarIcon;
+}
 
-function BottomTabs({
-  navigation,
-  route,
-}: {
-  navigation: StackNavigationProp<any, any>;
-  route: any;
-}) {
+function BottomTabs({ route }: { route?: any }) {
   return (
     <>
       <Tab.Navigator
@@ -46,324 +58,89 @@ function BottomTabs({
           name='HomeTab'
           options={{
             tabBarLabel: 'Início',
-            tabBarIcon: ({ focused, color }) => (
-              <Icon
-                name={focused ? 'home' : 'home-outline'}
-                color={color}
-                size={24}
-              />
-            ),
+            tabBarIcon: TabBarIcon('home'),
           }}>
           {() => {
             return (
               <HomeStack.Navigator
                 detachInactiveScreens
-                screenOptions={TransitionScreenOptions}
-                headerMode='screen'>
+                screenOptions={myScreenOptions}>
+                <HomeStack.Screen name='Home' component={Home} />
+                <HomeStack.Screen name='Explore' component={Home} />
+                <HomeStack.Screen name='MarketList' component={MarketList} />
+                <HomeStack.Screen name='Cupons' component={Cupons} />
+                <HomeStack.Screen name='Favorites' component={Favorites} />
+                <HomeStack.Screen name='Market' component={Market} />
                 <HomeStack.Screen
-                  name='Home'
-                  component={Home.Home}
-                  options={{ header: Home.HomeHeader, title: myTitle }}
+                  name='MarketDetails'
+                  component={MarketDetails}
                 />
                 <HomeStack.Screen
-                  name='ListMercados'
-                  component={Home.ListMercados}
-                  options={{
-                    header: (props) => (
-                      <Home.ListMercadosHeader {...props} title={'Mercados'} />
-                    ),
-                    title: myTitle,
-                  }}
-                />
-                <HomeStack.Screen
-                  name='Cupons'
-                  component={Home.Cupons}
-                  options={{
-                    header: (props) => (
-                      <Home.ListMercadosHeader {...props} title={'Cupons'} />
-                    ),
-                    title: myTitle,
-                  }}
-                />
-                <HomeStack.Screen
-                  name='Favoritos'
-                  component={Home.Favoritos}
-                  options={{
-                    header: (props) => <Home.FavoritosHeader {...props} />,
-                    title: myTitle,
-                  }}
-                />
-                <HomeStack.Screen
-                  name='Mercado'
-                  component={Home.Mercado}
-                  options={{ headerShown: false, title: myTitle }}
-                />
-                <HomeStack.Screen
-                  name='MercInfo'
-                  component={Home.MercInfo}
-                  options={{
-                    header: (props) => (
-                      <Header {...props} title={'Informações'} />
-                    ),
-                    title: myTitle,
-                  }}
-                />
-                <HomeStack.Screen
-                  name='MercRating'
-                  component={Home.MercRating}
-                  options={{
-                    header: (props) => (
-                      <Header {...props} title={'Avaliações'} />
-                    ),
-                    title: myTitle,
-                  }}
+                  name='MarketRating'
+                  component={MarketRating}
                 />
               </HomeStack.Navigator>
             );
           }}
         </Tab.Screen>
         <Tab.Screen
-          name='CategoriasTab'
-          component={Categorias.Categorias}
+          name='Categories'
+          component={Categories}
           options={{
             tabBarLabel: 'Categorias',
-            title: myTitle,
-            tabBarIcon: ({ focused, color }) => (
-              <Icon
-                name={focused ? 'view-grid' : 'view-grid-outline'}
-                color={color}
-                size={24}
-              />
-            ),
+            tabBarIcon: TabBarIcon('view-grid'),
           }}
         />
         <Tab.Screen
-          name='ComprasTab'
+          name='ShoppingTab'
           options={{
             tabBarLabel: 'Compras',
-            tabBarIcon: ({ focused, color }) => (
-              <Icon
-                name={focused ? 'shopping' : 'shopping-outline'}
-                color={color}
-                size={24}
-              />
-            ),
+            tabBarIcon: TabBarIcon('shopping'),
           }}>
           {() => {
             const routeName = getFocusedRouteNameFromRoute(route);
             return (
-              <View style={{ flex: routeName === 'ComprasTab' ? 1 : 0 }}>
-                <ComprasStack.Navigator
-                  screenOptions={TransitionScreenOptions}
-                  headerMode='screen'>
-                  <ComprasStack.Screen
-                    name='Compras'
-                    component={Compras.Compras}
-                    options={{
-                      header: (props) => <Header3 title={'Compras'} />,
-                      title: myTitle,
-                    }}
-                  />
-                  <ComprasStack.Screen
-                    name='Order'
-                    component={Compras.Order}
-                    options={{
-                      header: (props) => (
-                        <Header {...props} title={'Detalhes do pedido'} />
-                      ),
-                      title: myTitle,
-                    }}
-                  />
-                </ComprasStack.Navigator>
+              <View style={{ flex: routeName === 'ShoppingTab' ? 1 : 0 }}>
+                <ShoppingStack.Navigator screenOptions={myScreenOptions}>
+                  <ShoppingStack.Screen name='Shopping' component={Shopping} />
+                  <ShoppingStack.Screen name='Order' component={Order} />
+                </ShoppingStack.Navigator>
               </View>
             );
           }}
         </Tab.Screen>
         <Tab.Screen
-          name='PerfilTab'
+          name='ProfileTab'
           options={{
             tabBarLabel: 'Perfil',
-            tabBarIcon: ({ focused, color }) => (
-              <Icon
-                name={focused ? 'account' : 'account-outline'}
-                color={color}
-                size={24}
-              />
-            ),
+            tabBarIcon: TabBarIcon('account'),
           }}>
           {() => {
             const routeName = getFocusedRouteNameFromRoute(route);
             return (
-              <View style={{ flex: routeName === 'PerfilTab' ? 1 : 0 }}>
-                <PerfilStack.Navigator
-                  screenOptions={TransitionScreenOptions}
-                  headerMode='screen'>
-                  <PerfilStack.Screen
-                    name='Profile'
-                    component={Perfil.Profile}
-                    options={{ headerShown: false, title: myTitle }}
-                  />
-                  <PerfilStack.Screen
+              <View style={{ flex: routeName === 'ProfileTab' ? 1 : 0 }}>
+                <ProfileStack.Navigator screenOptions={myScreenOptions}>
+                  <ProfileStack.Screen name='Profile' component={Profile} />
+                  <ProfileStack.Screen
                     name='Notifications'
-                    component={Perfil.Notifications}
-                    options={{
-                      header: (props) => (
-                        <Header {...props} title={'Notificações'} />
-                      ),
-                      title: myTitle,
-                    }}
+                    component={Notifications}
                   />
-                  <PerfilStack.Screen
-                    name='Help'
-                    component={Perfil.Help}
-                    options={{
-                      header: (props) => (
-                        <Header {...props} title={'Central de ajuda'} />
-                      ),
-                      title: myTitle,
-                    }}
+                  <ProfileStack.Screen name='Help' component={Help} />
+                  <ProfileStack.Screen name='Config' component={Config} />
+                  <ProfileStack.Screen
+                    name='ConfigNoti'
+                    component={ConfigNoti}
                   />
-                  <PerfilStack.Screen
-                    name='Config'
-                    component={Perfil.Config}
-                    options={{
-                      header: (props) => (
-                        <Header {...props} title={'Configurações'} />
-                      ),
-                      title: myTitle,
-                    }}
-                  />
-                  <PerfilStack.Screen
-                    name='ConfigNotifications'
-                    component={Perfil.ConfigNoti}
-                    options={{
-                      header: (props) => (
-                        <Header {...props} title={'Gerenciar notificações'} />
-                      ),
-                      title: myTitle,
-                    }}
-                  />
-                  <PerfilStack.Screen
-                    name='Questions'
-                    component={Perfil.Questions}
-                    options={{
-                      header: (props) => (
-                        <Header {...props} title={'Perguntas frequentes'} />
-                      ),
-                      title: myTitle,
-                    }}
-                  />
-                </PerfilStack.Navigator>
+                  <ProfileStack.Screen name='Questions' component={Questions} />
+                </ProfileStack.Navigator>
               </View>
             );
           }}
         </Tab.Screen>
       </Tab.Navigator>
-      <CartBarApp navigation={navigation} />
+      <CartBar toped />
     </>
   );
 }
-
-function CartBarApp({
-  navigation,
-  toped = true,
-}: {
-  navigation: any;
-  toped?: boolean;
-}) {
-  const { subtotal } = useMyContext();
-  const [state] = useState({
-    translateY: new Animated.Value(subtotal.value == 0 ? 50 + 24 : 0),
-  });
-
-  useEffect(() => {
-    if (subtotal.value == 0) {
-      Animated.timing(state.translateY, {
-        toValue: 50 + 24,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      Animated.timing(state.translateY, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [subtotal]);
-
-  return (
-    <View
-      style={[
-        styles.cartBar,
-        toped ? { marginBottom: device.iPhoneNotch ? 54 + 34 : 54 } : {},
-      ]}>
-      <Animated.View style={{ transform: [{ translateY: state.translateY }] }}>
-        <MyTouchable
-          solid
-          style={[
-            styles.cartBar2,
-            { height: !toped && device.iPhoneNotch ? 50 + 24 : 50 },
-          ]}
-          onPress={() => navigation.navigate('Cart')}>
-          <View
-            style={[
-              styles.cartBar3,
-              !toped && device.iPhoneNotch ? { marginBottom: 24 } : {},
-            ]}>
-            <Icon
-              style={styles.iconCart}
-              name={'cart'}
-              size={28}
-              color={'#FFF'}
-            />
-            <MyText style={styles.textCart}>Ver carrinho</MyText>
-            <MyText style={styles.priceCart}>R${subtotal?.toString()}</MyText>
-          </View>
-        </MyTouchable>
-      </Animated.View>
-    </View>
-  );
-}
-
-export function CartBar({ navigation }: { navigation: any }) {
-  return <CartBarApp navigation={navigation} toped={false} />;
-}
-
-const styles = StyleSheet.create({
-  cartBar: {
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-  },
-  cartBar2: {
-    flexDirection: 'row',
-    backgroundColor: myColors.primaryColor,
-    width: '100%',
-  },
-  cartBar3: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  iconCart: {
-    position: 'absolute',
-    left: 24,
-  },
-  textCart: {
-    color: '#FFF',
-    fontSize: 14,
-  },
-  priceCart: {
-    position: 'absolute',
-    right: 18,
-    alignContent: 'flex-end',
-    color: '#FFF',
-    fontSize: 16,
-    fontFamily: 'Medium',
-  },
-});
 
 export default BottomTabs;

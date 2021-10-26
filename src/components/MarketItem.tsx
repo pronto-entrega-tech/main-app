@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Image } from 'react-native-elements';
+import { Image } from 'react-native-elements/dist/image/Image';
 import { businessHours, dateHours } from '~/core/models';
 import { myColors, device, globalStyles } from '~/constants';
 import {
@@ -8,12 +8,13 @@ import {
   getImageUrl,
   isMarketOpen,
   Money,
+  moneyToString,
 } from '~/functions/converter';
 import MyText from './MyText';
 import MyTouchable from './MyTouchable';
 import Rating from './Rating';
 
-export interface marketModel {
+export interface Market {
   market_id: string;
   market_name_id: string;
   name: string;
@@ -42,39 +43,31 @@ export interface marketModel {
   payments_accepted: string[];
 }
 
-function MercItem({
-  item,
-  coords,
-  onPress,
-}: {
-  item: marketModel;
-  coords: { lat: number | undefined; lon: number | undefined };
-  onPress: (item: any) => void;
+function MercItem(props: {
+  market: Market;
+  coords: { lat?: number; lon?: number };
 }) {
+  const { market, coords } = props;
   const distance =
-    coords.lat && coords.lon
-      ? computeDistance(
-          [coords.lat, coords.lon],
-          item.address.coords.split(',')
-        )
-      : undefined;
-  const { isOpen, nextHour, tomorrow } = isMarketOpen(item.business_hours);
+    !!(coords.lat && coords.lon) &&
+    computeDistance([coords.lat, coords.lon], market.address.coords.split(','));
+  const { isOpen, nextHour, tomorrow } = isMarketOpen(market.business_hours);
 
   return (
     <MyTouchable
-      style={[styles.card, globalStyles.elevation4, globalStyles.darkBoader]}
-      onPress={onPress}>
+      style={[styles.card, globalStyles.elevation4, globalStyles.darkBorder]}
+      path={`/inicio/mercado/${market.city}/${market.market_id}`}>
       <Image
         source={{
-          uri: getImageUrl('market', item.market_id),
+          uri: getImageUrl('market', market.market_id),
         }}
         containerStyle={styles.image}
       />
       <View style={{ marginLeft: 10, marginTop: -5, justifyContent: 'center' }}>
         <View style={{ flexDirection: 'row' }}>
-          <MyText style={styles.title}>{item.name}</MyText>
-          {item.rating ? (
-            <Rating value={item.rating} style={{ alignSelf: 'center' }} />
+          <MyText style={styles.title}>{market.name}</MyText>
+          {market.rating ? (
+            <Rating value={market.rating} style={{ alignSelf: 'center' }} />
           ) : (
             <MyText style={styles.new}>Novo!</MyText>
           )}
@@ -83,15 +76,15 @@ function MercItem({
           <MyText style={styles.openText}>
             {isOpen ? 'Aberto' : 'Fechado'}
           </MyText>
-          {nextHour
-            ? ` • ${isOpen ? 'Fecha' : 'Abre'} às ${nextHour}${
-                tomorrow ? ' de amanhã' : ''
-              }`
-            : ''}
+          {nextHour &&
+            ` • ${isOpen ? 'Fecha' : 'Abre'} às ${nextHour}${
+              tomorrow && ' de amanhã'
+            }`}
         </MyText>
         <MyText style={styles.text2}>
-          {distance ? `Á ${distance}km • ` : ''}
-          {item.min_time}-{item.max_time}min • R${item.fee.toString()}
+          {distance && `Á ${distance}km • `}
+          {market.min_time}-{market.max_time}min •{' '}
+          {moneyToString(market.fee, 'R$')}
         </MyText>
       </View>
     </MyTouchable>

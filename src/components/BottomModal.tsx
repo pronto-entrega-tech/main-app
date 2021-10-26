@@ -1,72 +1,112 @@
-import React from "react";
-import { View, StyleSheet, Pressable, Animated, ViewStyle, StyleProp, BackHandler } from "react-native";
-import { myColors, device } from "../constants";
+import React from 'react';
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  Animated,
+  ViewStyle,
+  StyleProp,
+  BackHandler,
+} from 'react-native';
+import { myColors, device } from '~/constants';
 
-function BottomModal({isVisible, onDismiss, style, children}:
-{isVisible: boolean, onDismiss: () => void, style?: StyleProp<ViewStyle>, children: any}) {
-  const [show, setShow] = React.useState(false)
+function BottomModal({
+  isVisible,
+  onDismiss,
+  style,
+  children,
+}: {
+  isVisible: boolean;
+  onDismiss(): void;
+  style?: StyleProp<ViewStyle>;
+  children: any;
+}) {
+  const [show, setShow] = React.useState(false);
   const [state] = React.useState({
     opacity: new Animated.Value(0),
     modal: new Animated.Value(device.height),
-  })
+  });
+  const useNativeDriver = !device.web;
 
   const openModal = () => {
-    setShow(true)
+    setShow(true);
     Animated.parallel([
-      Animated.timing(state.opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
-      Animated.timing(state.modal, { toValue: 0, duration: 200, useNativeDriver: true })
-    ]).start()
-  }
+      Animated.timing(state.opacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver,
+      }),
+      Animated.timing(state.modal, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver,
+      }),
+    ]).start();
+  };
 
   const closeModal = () => {
     Animated.parallel([
-      Animated.timing(state.modal, { toValue: device.height, duration: 300, useNativeDriver: true }),
-      Animated.timing(state.opacity, { toValue: 0, duration: 300, useNativeDriver: true }),
-    ]).start()
-    setTimeout(() => setShow(false), 300)
-  }
+      Animated.timing(state.modal, {
+        toValue: device.height,
+        duration: 300,
+        useNativeDriver,
+      }),
+      Animated.timing(state.opacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver,
+      }),
+    ]).start();
+    setTimeout(() => setShow(false), 300);
+  };
 
   React.useEffect(() => {
     if (isVisible) {
-      openModal()
+      openModal();
     } else {
-      closeModal()
+      closeModal();
     }
-  }, [isVisible])
+  }, [isVisible]);
 
   React.useEffect(() => {
     if (!isVisible || !device.android) return;
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
-      onDismiss()
-      return true;
-    });
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        onDismiss();
+        return true;
+      }
+    );
 
-    return () => backHandler.remove();
+    return backHandler.remove;
   }, [isVisible]);
 
-  if (!show) return null
+  if (!show) return null;
 
   return (
-    <View style={StyleSheet.absoluteFill} >
-      <Animated.View style={{opacity: state.opacity}} >
-        <Pressable style={[styles.background]} onPress={onDismiss} />
+    <View style={[StyleSheet.absoluteFill, { zIndex: 999 }]}>
+      <Animated.View style={[styles.background, { opacity: state.opacity }]}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onDismiss} />
       </Animated.View>
-      <Animated.View style={[styles.modal, style, {
-        transform: [
-          { translateY: state.modal }
-        ]
-        }]} >
+      <Animated.View
+        style={[
+          styles.modal,
+          {
+            paddingBottom: device.iPhoneNotch ? 30 : 0,
+            transform: [{ translateY: state.modal }],
+          },
+          style,
+        ]}>
         {children}
-        {device.iPhoneNotch? <View style={{height: 30}} /> : null}
       </Animated.View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   background: {
     backgroundColor: 'rgba(0,0,0,.5)',
-    height: device.web? device.height : '100%',
+    height: '100%',
     width: '100%',
   },
   modal: {
@@ -76,7 +116,7 @@ const styles = StyleSheet.create({
     backgroundColor: myColors.background,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-  }
-})
+  },
+});
 
-export default BottomModal
+export default BottomModal;

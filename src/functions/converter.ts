@@ -1,13 +1,23 @@
-import { STATIC } from '~/services/requests';
-import { marketModel } from '~/components/MarketItem';
-import { prodModel } from '~/components/ProdItem';
+import { STATIC } from '~/constants/url';
+import type { Market } from '~/components/MarketItem';
+import type { Product } from '~/components/ProdItem';
 import { businessHours, weekDayArray } from '~/core/models';
+import type { ImageURISource } from 'react-native';
+import { stringify } from 'qs';
+import { addressModel } from '@pages/endereco';
 
-function money(money?: string) {
-  return new Money(money);
+export interface Money {
+  /**
+   * `$10.00` will be `1000`, so be careful and use the money functions to manage this value.
+   */
+  dangerousInnerValue: number;
 }
+const money = (money: string): Money => {
+  const value = money ? +money.replace(/\D/g, '') : 0;
+  return { dangerousInnerValue: value };
+};
 
-class Money {
+/* class Money {
   value: number = 0;
 
   constructor(money?: string) {
@@ -41,30 +51,78 @@ class Money {
       v.substring(0, v.length - 2) + ',' + v.substring(v.length - 2, v.length)
     );
   }
+} */
+
+export function calcOff(product: Product) {
+  const { price, previous_price } = product;
+
+  if (!previous_price) return;
+
+  const div = price.dangerousInnerValue / previous_price.dangerousInnerValue;
+  return ((1 - div) * 100).toFixed(0);
 }
 
-function moneyToString(money?: Money | { value: number } | number) {
+function getMoneyValue(v: Money | number) {
+  return typeof v === 'number' ? v : v.dangerousInnerValue;
+}
+
+export function add(v1: Money | number, v2: Money | number) {
+  return {
+    dangerousInnerValue: getMoneyValue(v1) + getMoneyValue(v2),
+  } as Money;
+}
+
+export function sub(v1: Money | number, v2: Money | number) {
+  return {
+    dangerousInnerValue: getMoneyValue(v1) - getMoneyValue(v2),
+  } as Money;
+}
+
+export function multiply(v1: Money | number, v2: Money | number) {
+  return {
+    dangerousInnerValue: getMoneyValue(v1) * getMoneyValue(v2),
+  } as Money;
+}
+
+export function divide(v1: Money | number, v2: Money | number) {
+  return {
+    dangerousInnerValue: getMoneyValue(v1) / getMoneyValue(v2),
+  } as Money;
+}
+
+export function isGreater(v1: Money | number, v2: Money | number) {
+  return getMoneyValue(v1) > getMoneyValue(v2);
+}
+
+export function isEqual(v1: Money | number, v2: Money | number) {
+  return getMoneyValue(v1) === getMoneyValue(v2);
+}
+
+function moneyToString(money?: Money | number, currency: string = '') {
   if (!money) return '';
   let v;
-  if (typeof money == 'number') {
+  if (typeof money === 'number') {
     v = money.toString();
   } else {
-    v = money.value.toString().padStart(3, '0');
+    v = money.dangerousInnerValue.toString().padStart(3, '0');
   }
   return (
-    v.substring(0, v.length - 2) + ',' + v.substring(v.length - 2, v.length)
+    currency +
+    v.substring(0, v.length - 2) +
+    ',' +
+    v.substring(v.length - 2, v.length)
   );
 }
 
 function createProdList(json: any[]) {
-  const prodList = [] as prodModel[];
-  for (const i in json) {
-    prodList.push(createProdItem(json[i]));
+  const prodList = [] as Product[];
+  for (const item of json) {
+    prodList.push(createProdItem(item));
   }
   return prodList;
 }
 
-function createProdItem(item: any): prodModel {
+function createProdItem(item: any): Product {
   return {
     prod_id: item.prod_id,
     market_id: item.market_id,
@@ -74,9 +132,7 @@ function createProdItem(item: any): prodModel {
     brand: item.brand,
     quantity: item.quantity,
     price: money(item.price),
-    previous_price: item.previous_price
-      ? money(item.previous_price)
-      : undefined,
+    previous_price: item.previous_price && money(item.previous_price),
     unit_weight: item.unit_weight,
     discount: item.discount,
     images_names: item.images_names,
@@ -84,7 +140,7 @@ function createProdItem(item: any): prodModel {
 }
 
 function createMarketList(json: any[]) {
-  const mercList = [] as marketModel[];
+  const mercList = [] as Market[];
   for (const i in json) {
     const item = json[i];
     mercList.push(createMarketItem(item));
@@ -92,7 +148,7 @@ function createMarketList(json: any[]) {
   return mercList;
 }
 
-function createMarketItem(item: any): marketModel {
+function createMarketItem(item: any): Market {
   item.address.coords = (item.address.coords as string)
     .replace(/\(/, '')
     .replace(/\)/, '');
@@ -105,11 +161,11 @@ function createMarketItem(item: any): marketModel {
     address: item.address,
     business_hours: item.business_hours,
     special_hours: item.special_hours,
-    min_time: parseInt(item.min_time),
-    max_time: parseInt(item.max_time),
+    min_time: +item.min_time,
+    max_time: +item.max_time,
     fee: money(item.fee),
     order_min: money(item.order_min),
-    rating: parseInt(item.rating),
+    rating: +item.rating,
     info: item.info,
     document: item.document,
     payments_accepted: item.payments_accepted,
@@ -151,7 +207,13 @@ function toRad(angle: number) {
   return (angle * Math.PI) / 180;
 }
 
-function isMarketOpen(business_hours: businessHours) {
+function isMarketOpen(business_hours: businessHours): {
+  isOpen: boolean;
+  tomorrow: string | boolean;
+  nextHour: string;
+  open_time: string;
+  close_time: string;
+} {
   const date = new Date();
   const min = date.getMinutes();
   const hour = date.getHours();
@@ -174,13 +236,14 @@ function isMarketOpen(business_hours: businessHours) {
       const isOpen = hour >= openHour;
       const nextHour = removeZero(isOpen ? close_time : open_time);
 
-      return { isOpen, nextHour, open_time, close_time };
+      return { isOpen, tomorrow: '', nextHour, open_time, close_time };
     }
     if (interval1) {
       const { open_time, close_time } = interval1;
 
       return {
         isOpen: false,
+        tomorrow: '',
         nextHour: removeZero(open_time),
         open_time,
         close_time,
@@ -195,21 +258,47 @@ function isMarketOpen(business_hours: businessHours) {
     const { hours } = r2;
     const [{ open_time }] = hours;
 
-    return { isOpen: false, tomorrow: true, nextHour: removeZero(open_time) };
+    return {
+      isOpen: false,
+      tomorrow: true,
+      nextHour: removeZero(open_time),
+      open_time: '',
+      close_time: '',
+    };
   }
 
-  return { isOpen: false };
+  return {
+    isOpen: false,
+    tomorrow: '',
+    nextHour: '',
+    open_time: '',
+    close_time: '',
+  };
+}
+
+export function stringifyParams(params?: any) {
+  return stringify(params, { addQueryPrefix: true, arrayFormat: 'repeat' });
+}
+
+type imageDirs = 'main' | 'market' | 'product' | 'slide';
+function getImageUrl(dir: imageDirs, image: string) {
+  return `${STATIC}/${dir}/${image}.webp`;
 }
 
 function removeZero(text: string) {
   return text.replace(/^.{0}0/, '');
 }
 
-function removeAccents(text: string) {
+export function toCityState(address: addressModel) {
+  return `${removeAccents(address.cidade)}-${address.estado?.toLowerCase()}`;
+}
+
+function removeAccents(text?: string) {
   return text
     ?.toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ /g, '-');
 }
 
 function getStateCode(region: string) {
@@ -226,19 +315,19 @@ function getStateCode(region: string) {
       return 'BA';
     case 'ceara':
       return 'CE';
-    case 'distrito federal':
+    case 'distrito-federal':
       return 'DF';
-    case 'espirito santo':
+    case 'espirito-santo':
       return 'ES';
     case 'goias':
       return 'GO';
     case 'maranhao':
       return 'MA';
-    case 'mato grosso':
+    case 'mato-grosso':
       return 'MT';
-    case 'mato grosso do sul':
+    case 'mato-grosso-do-sul':
       return 'MS';
-    case 'minas gerais':
+    case 'minas-gerais':
       return 'MG';
     case 'para':
       return 'PA';
@@ -250,19 +339,19 @@ function getStateCode(region: string) {
       return 'PE';
     case 'piaui':
       return 'PI';
-    case 'rio de janeiro':
+    case 'rio-de-janeiro':
       return 'RJ';
-    case 'rio grande do norte':
+    case 'rio-grande-do-norte':
       return 'RN';
-    case 'rio grande do sul':
+    case 'rio-grande-do-sul':
       return 'RS';
     case 'rondonia':
       return 'RO';
     case 'roraima':
       return 'RR';
-    case 'santa catarina':
+    case 'santa-catarina':
       return 'SC';
-    case 'sao paulo':
+    case 'sao-paulo':
       return 'SP';
     case 'sergipe':
       return 'SE';
@@ -274,14 +363,8 @@ function getStateCode(region: string) {
   }
 }
 
-type imageDirs = 'main' | 'market' | 'product' | 'slide';
-function getImageUrl(dir: imageDirs, image: string) {
-  return `${STATIC}${dir}/${image}.webp`;
-}
-
 export {
   money,
-  Money,
   moneyToString,
   createProdList,
   createProdItem,
@@ -290,8 +373,8 @@ export {
   documentMask,
   computeDistance,
   isMarketOpen,
+  getImageUrl,
   removeZero,
   removeAccents,
   getStateCode,
-  getImageUrl,
 };

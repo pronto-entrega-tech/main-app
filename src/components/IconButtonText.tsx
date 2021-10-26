@@ -1,37 +1,57 @@
-import React from 'react'
-import { Text, View, StyleSheet, TextStyle, StyleProp } from 'react-native';
-import { myColors } from '../constants'
+import React from 'react';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import { Text, View, StyleSheet } from 'react-native';
+import myFonts from '~/constants/myFonts';
+import { myColors } from '~/constants';
 import IconButton from './IconButton';
+import { ButtonOrLink } from './MyTouchable';
+import { IconNames } from './MyIcon';
 
-interface typeModal {
-  size: number,
-  color: string,
-  style: StyleProp<TextStyle>,
+interface IconButtonTextBase {
+  icon: IconNames;
+  text: string;
+  type?: 'fill' | 'profile2';
 }
 
-function IconButtonText ({ icon, text, onPress, type='fill' }:
-{icon: string, text: string, onPress: (item: any) => void, type?: 'fill'|'profile2'}) {
-  const [state, setState] = React.useState<typeModal>({
-    size: 32,
-    color: myColors.grey2,
-    style: {},
-  });
+type IconButtonTextProps = ButtonOrLink<IconButtonTextBase>;
 
-  React.useEffect(() => {
-    if (type == 'profile2')
-      setState({
-        size: 28,
-        color: '#fff',
-        style: {fontFamily: 'Medium', paddingTop: 4},
-      })
-  }, [])
-  
+function IconButtonText({
+  onPress,
+  path,
+  params,
+  icon,
+  text,
+  type = 'fill',
+}: IconButtonTextProps) {
+  const props =
+    type === 'fill'
+      ? {
+          size: 32,
+          color: myColors.grey2,
+          style: {},
+        }
+      : {
+          size: 28,
+          color: '#fff',
+          style: { fontFamily: myFonts.Medium, paddingTop: 4 },
+        };
+
   return (
     <View>
-      <IconButton icon={icon} size={state.size} color={state.color} type={type} onPress={onPress} />
-      <Text style={[styles.text, state.style]} >{text}</Text>
+      <IconButton
+        icon={icon}
+        size={props.size}
+        color={props.color}
+        type={type}
+        {...({
+          onPress,
+          path,
+          params,
+        } as ButtonOrLink)}
+      />
+      <Text style={[styles.text, props.style]}>{text}</Text>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -40,8 +60,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     color: myColors.text,
     fontSize: 13,
-    textAlign: 'center'
-  }
-})
+    textAlign: 'center',
+  },
+});
 
-export default IconButtonText
+export default IconButtonText;

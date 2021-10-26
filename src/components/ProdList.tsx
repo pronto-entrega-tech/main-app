@@ -1,106 +1,83 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Text,
-  View,
   FlatList,
-  StyleSheet,
   StyleProp,
   ViewStyle,
   RefreshControl,
+  useWindowDimensions,
 } from 'react-native';
-import { Divider } from 'react-native-paper';
-import NetInfo from '@react-native-community/netinfo';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import ProdItem, { prodModel } from './ProdItem';
-import { myColors, device } from '../constants';
-import { StackNavigationProp } from '@react-navigation/stack';
-import validate from '../functions/validate';
-import useMyContext from '../functions/MyContext';
-import { getProdFeed, searchParams } from '../services/requests';
-import Loading, { Errors, myErrors } from './Loading';
-import { createProdList } from '../functions/converter';
-import MyButton from './MyButton';
-import { getCity } from '../functions/dataStorage';
+import { myColors } from '~/constants';
+import useMyContext from '~/core/MyContext';
+import { getProdFeed, SearchParams } from '~/services/requests';
+import { getCity } from '~/core/dataStorage';
+import { hasInternet } from '~/functions/connection';
+import ProdItem, { Product } from './ProdItem';
 import ProdItemHorizontal from './ProdItemHorizontal';
+import Loading, { Errors, myErrors, NothingFeed } from './Loading';
 
-function ListHeader({
-  navigation,
-  title = 'Ofertas',
-  barless = false,
-}: {
-  navigation: StackNavigationProp<any, any>;
-  title?: string;
-  barless?: boolean;
-}) {
-  return (
-    <View style={{ width: '100%', height: 48, elevation: 10, zIndex: 10 }}>
-      {barless ? null : (
-        <Divider style={{ backgroundColor: myColors.divider, height: 2 }} />
-      )}
-      <View style={styles.line2}>
-        <Text style={styles.ofertasText}>{title}</Text>
-        <View style={styles.filerButton}>
-          <MyButton
-            onPress={() => navigation.navigate('Filter')}
-            type='clear'
-            title='Filtros'
-            titleStyle={{ color: myColors.grey2 }}
-            icon={<Icon name='tune' size={24} color={myColors.grey2} />}
-          />
-        </View>
-      </View>
-    </View>
-  );
-}
-
-function ProdList({
-  navigation,
-  header,
-  data,
-  search,
-  searchParams,
-  style = {},
-  marketless = false,
-  horizontalItems = false,
-  horizontal = false,
-  refreshless = false,
-  tryAgain,
-}: {
-  navigation: StackNavigationProp<any, any>;
-  header?: any;
-  data?: prodModel[];
-  search?: boolean;
-  searchParams?: searchParams;
+function ProdList(props: {
+  header?: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
+  data?: Product[];
+  isSearch?: boolean;
+  searchParams?: SearchParams;
   style?: StyleProp<ViewStyle>;
-  marketless?: boolean;
+  hideMarketLogo?: boolean;
   horizontalItems?: boolean;
   horizontal?: boolean;
   refreshless?: boolean;
   tryAgain?: boolean;
 }) {
+  const {
+    header,
+    data,
+    isSearch,
+    searchParams,
+    style = {},
+    hideMarketLogo = false,
+    horizontalItems = false,
+    horizontal = false,
+    refreshless = false,
+    tryAgain,
+  } = props;
   const [isLoading, setIsLoading] = useState(!data);
-  const [tryAgain1, setTryAgain1] = useState(false);
   const [error, setError] = useState<myErrors>(null);
   const [refreshing, setRefreshing] = React.useState(false);
-  const [prodList, setProdList] = useState<prodModel[]>();
+  const [innerData, setInnerData] = useState<Product[]>();
   const [city, setCity] = React.useState('');
-  const { shoppingList, favorites, onPressFav, onPressAdd, onPressRemove } =
-    useMyContext();
+  const { shoppingList, onPressAdd, onPressRemove } = useMyContext();
+
+  const { width } = useWindowDimensions();
+
+  const [columns, setColumns] = React.useState(3);
+
+  React.useEffect(() => {
+    setColumns(
+      (() => {
+        if (width > 768) return 5; // desktop
+        if (width > 425) return 4; // tablet
+        return 3; // mobile
+      })()
+    );
+  }, [width]);
+
+  const numColumns = horizontal ? 1 : columns;
 
   async function tryFeed() {
-    setIsLoading(true);
-    setError(null);
-
-    const { isInternetReachable } = await NetInfo.fetch();
-    if (isInternetReachable === false) return setError('connection');
-
-    const city = await getCity();
-    setCity(city);
+    if (data) return;
     try {
-      const { data: res } = await getProdFeed(city, searchParams);
-      if ((res as any[])?.length === 0)
-        return setError(search ? 'nothing_search' : 'nothing');
-      setProdList(createProdList(res));
+      setIsLoading(true);
+      setError(null);
+
+      if (!(await hasInternet())) return setError('connection');
+
+      const city = await getCity();
+      setCity(city);
+      const prodFeed = await getProdFeed(city, searchParams);
+
+      if (!prodFeed.length)
+        return setError(isSearch ? 'nothing_search' : 'nothing');
+
+      setInnerData(prodFeed);
       setIsLoading(false);
     } catch (err) {
       console.error(err);
@@ -109,26 +86,12 @@ function ProdList({
   }
 
   useEffect(() => {
-    if (data) return;
     tryFeed();
-    return;
-  }, [tryAgain1, tryAgain]);
+  }, [tryAgain]);
 
   useEffect(() => {
-    if (data === null) {
-      if (validate([prodList, shoppingList, favorites])) {
-        setIsLoading(false);
-      } else {
-        setIsLoading(true);
-      }
-    } else {
-      if (validate([favorites, shoppingList])) {
-        setIsLoading(false);
-      } else {
-        setIsLoading(true);
-      }
-    }
-  }, [prodList, shoppingList, favorites]);
+    setIsLoading(!data && !innerData);
+  }, [data, innerData]);
 
   if (error)
     return (
@@ -136,7 +99,7 @@ function ProdList({
         error={error}
         onPress={() => {
           setError(null);
-          setTryAgain1(!tryAgain1);
+          tryFeed();
         }}
       />
     );
@@ -144,28 +107,20 @@ function ProdList({
   if (isLoading) return <Loading />;
 
   if (!horizontalItems) {
-    const myRenderItem = ({
-      item,
-      index,
-    }: {
-      item: prodModel;
-      index: number;
-    }) => (
+    const margin = 1.5;
+    const widthPercentage = (100 - margin * (numColumns + 1)) / numColumns;
+
+    const myRenderItem = ({ item }: { item: Product }) => (
       <ProdItem
-        style={
-          horizontal
-            ? { width: device.width / 3 - 14 }
-            : {
-                /*marginTop: index === 0 || index === 1 ? 3 : 0*/
-              }
-        }
-        navigation={navigation}
+        style={{
+          width: !horizontal ? `${widthPercentage}%` : width / columns - 14,
+          marginLeft: !horizontal ? `${margin}%` : 4,
+          marginBottom: !horizontal ? `${margin}%` : 4,
+        }}
         city={city}
-        merc={marketless}
         item={item}
-        isFavorite={favorites.has(item.prod_id)}
+        showsMarketLogo={!hideMarketLogo}
         quantity={shoppingList.get(item.prod_id)?.quantity}
-        onPressFav={() => onPressFav(item)}
         onPressAdd={() => onPressAdd(item)}
         onPressRemove={() => onPressRemove(item)}
       />
@@ -191,34 +146,28 @@ function ProdList({
             />
           )
         }
-        contentContainerStyle={[horizontal ? {} : { paddingBottom: 50 }, style]}
+        contentContainerStyle={[!horizontal && { paddingBottom: 50 }, style]}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
-        data={data || prodList}
+        data={data ?? innerData}
+        extraData={numColumns}
+        key={numColumns}
+        numColumns={numColumns}
         horizontal={horizontal}
-        numColumns={horizontal ? 1 : 3}
-        keyExtractor={({ prod_id: id, market_id }) => id + market_id}
+        keyExtractor={({ prod_id, market_id }) => prod_id + market_id}
         ListHeaderComponent={header}
         renderItem={myRenderItem}
+        ListEmptyComponent={NothingFeed}
       />
     );
   }
 
-  const myRenderItem = ({
-    item,
-    index,
-  }: {
-    item: prodModel;
-    index: number;
-  }) => (
+  const myRenderItem = ({ item }: { item: Product }) => (
     <ProdItemHorizontal
-      navigation={navigation}
-      city={city}
       item={item}
-      merc={marketless}
-      isFavorite={favorites.has(item.prod_id)}
+      city={city}
+      showsMarketLogo={!hideMarketLogo}
       quantity={shoppingList.get(item.prod_id)?.quantity}
-      onPressFav={() => onPressFav(item)}
       onPressAdd={() => onPressAdd(item)}
       onPressRemove={() => onPressRemove(item)}
     />
@@ -229,34 +178,13 @@ function ProdList({
       getItemLayout={(_item, i) => ({ length: 112, offset: 112 * i, index: i })}
       contentContainerStyle={[{ paddingBottom: 50 }, style]}
       showsVerticalScrollIndicator={false}
-      data={data || prodList}
+      data={data ?? innerData}
       keyExtractor={({ prod_id, market_id }) => prod_id + market_id}
       ListHeaderComponent={header}
       renderItem={myRenderItem}
+      ListEmptyComponent={NothingFeed}
     />
   );
 }
 
-const styles = StyleSheet.create({
-  line2: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: myColors.background,
-    width: '100%',
-    height: 44,
-    paddingLeft: 16,
-    paddingRight: 8,
-  },
-  ofertasText: {
-    color: myColors.primaryColor,
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  filerButton: {
-    alignItems: 'flex-end',
-    flex: 1,
-  },
-});
-
-export { ListHeader };
 export default ProdList;

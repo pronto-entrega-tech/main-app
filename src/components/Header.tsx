@@ -1,35 +1,48 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Divider } from 'react-native-elements';
-import { myColors, globalStyles } from '../constants';
+import useRouting from '~/hooks/useRouting';
+import { myColors, globalStyles } from '~/constants';
 import IconButton from './IconButton';
+import MyDivider from './MyDivider';
 
-function Header({navigation, title, divider = true, goBack = true, notchless = false}:
-  {navigation: StackNavigationProp<any, any>, title: string, divider?: boolean, goBack?: boolean, notchless?: boolean}) {
-  return(
-    <View style={[styles.header, notchless? {} : globalStyles.notch]}>
-      {goBack? <IconButton
-      icon='arrow-left'
-      size={24}
-      color={myColors.primaryColor}
-      type='back'
-      onPress={() => {
-        if (navigation.canGoBack()) return navigation.goBack()
-        navigation.navigate('BottomTabs', {screen: 'Home'})
-        }}
-      />: null}
+function Header({
+  title = '',
+  fallback = '/inicio',
+  divider = true,
+  goBack = true,
+  notchless = false,
+}: {
+  navigation?: StackNavigationProp<any, any>;
+  title?: string;
+  fallback?: string;
+  divider?: boolean;
+  goBack?: boolean;
+  notchless?: boolean;
+}) {
+  const routing = useRouting();
+  return (
+    <View style={[styles.header, !notchless && globalStyles.notch]}>
+      {goBack && (
+        <IconButton
+          icon='arrow-left'
+          type='back'
+          onPress={() => {
+            routing.goBack(fallback);
+          }}
+        />
+      )}
       <Text style={styles.textHeader}>{title}</Text>
-      {divider ? <Divider style={styles.divider} /> : null}
+      {divider && <MyDivider style={styles.divider} />}
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   header: {
     justifyContent: 'center',
     minHeight: 56,
-    backgroundColor: myColors.background
+    backgroundColor: myColors.background,
   },
   textHeader: {
     color: myColors.primaryColor,
@@ -40,11 +53,10 @@ const styles = StyleSheet.create({
   },
   divider: {
     backgroundColor: myColors.divider2,
-    height: 1,
     position: 'absolute',
     bottom: 0,
-    width: '100%'
+    width: '100%',
   },
-})
+});
 
-export default Header
+export default Header;

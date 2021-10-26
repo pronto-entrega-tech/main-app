@@ -1,215 +1,159 @@
 import React from 'react';
-import { View } from 'react-native';
-import {
-  InitialState,
-  NavigationState,
-  NavigationContainer,
-  NavigationContainerRef,
-} from '@react-navigation/native';
+import { View, Image } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import {
   createStackNavigator,
-  TransitionPresets,
+  StackNavigationProp,
 } from '@react-navigation/stack';
-import loadable from '@loadable/component';
-import { myColors, device, myTitle } from '~/constants';
-import Header from '~/components/Header';
-import Others from '~/pages/Others';
-import Home from '~/pages/Home';
-import Perfil from '~/pages/Perfil';
+import {
+  getForegroundPermissionsAsync,
+  hasServicesEnabledAsync,
+} from 'expo-location';
+import { loadAsync } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+import { myColors, images, fonts } from '~/constants';
+import { myScreenOptions } from '~/constants/others';
 import Loading from '~/components/Loading';
 import linking from '~/constants/routes';
-import { MyProvider } from '~/functions/MyContext';
 import MyToast from '~/components/MyToast';
-const BottomTabs = loadable(() => import('./BottomTabs'));
+import { MyProvider } from '~/core/MyContext';
+import BottomTabs from './BottomTabs';
+import {
+  getActiveAddressIndex,
+  getUserStatus,
+  saveActiveAddress,
+} from '~/core/dataStorage';
+import { Cupons } from '@pages/inicio/cupons';
+import SignIn from '@pages/entrar';
+import Address, { getAddress } from '@pages/endereco';
+import ProductTabs from '~/screens/ProductTabs';
+import NewUser from '~/screens/NewUser';
+import Cart from '@pages/carrinho';
+import Schedule from '@pages/agendamento';
+import PaymentTabs from '~/screens/PaymentTabs';
+import PaymentMethods from '@pages/meios-de-pagamento';
+import Filter from '@pages/filtro';
+import Search from '@pages/pesquisa';
+import NewAddress from '@pages/editar-endereco';
+import MyProfile from '@pages/meu-perfil';
+import Suggestion from '@pages/sugestao';
+import UploadQuestion from '@pages/mandar-pergunta';
+import Devices from '@pages/dispositivos';
+
+export async function getLocation() {
+  const { status } = await getForegroundPermissionsAsync();
+  if (status !== 'granted') return false;
+
+  const enabled = await hasServicesEnabledAsync();
+  if (!enabled) return false;
+
+  const address = await getAddress();
+
+  if (address === false) return false;
+
+  saveActiveAddress(address);
+  return true;
+}
 
 const Stack = createStackNavigator();
 
-interface AppProp {
-  navigationRef: React.Ref<NavigationContainerRef>;
-  initialState?: InitialState;
-  onStateChange: (state?: NavigationState) => void;
-}
-export function App({ navigationRef, initialState, onStateChange }: AppProp) {
+export default function App() {
+  const [initialScreen, setInitialScreen] = React.useState('NewUser');
+  const [isReady, setIsReady] = React.useState(false);
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        SplashScreen.preventAutoHideAsync();
+
+        const [status] = await Promise.all([getUserStatus(), loadAsync(fonts)]);
+
+        if (!status) return setInitialScreen('NewUser');
+
+        if (status === 'returning') return setInitialScreen('SignIn');
+
+        const index = await getActiveAddressIndex();
+        if (index !== -1) return setInitialScreen('BottomTabs');
+
+        const got = await getLocation();
+        setInitialScreen(got ? 'BottomTabs' : 'SelectAddress');
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsReady(true);
+      }
+    })();
+  }, []);
+
+  function Splash({
+    navigation,
+  }: {
+    navigation: StackNavigationProp<any, any>;
+  }) {
+    const onLayoutRootView = React.useCallback(async () => {
+      SplashScreen.hideAsync();
+      navigation.replace(initialScreen);
+    }, [navigation]);
+
+    return (
+      <View
+        onLayout={onLayoutRootView}
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          flex: 1,
+          backgroundColor: myColors.primaryColor,
+        }}>
+        <Image
+          {...images.splash}
+          fadeDuration={0}
+          style={{
+            aspectRatio: 0.462,
+            height: '100%',
+          }}
+        />
+      </View>
+    );
+  }
+
+  if (!isReady) return null;
+
   return (
     <MyProvider>
       <NavigationContainer
-        ref={navigationRef}
-        initialState={initialState}
-        onStateChange={onStateChange}
         linking={linking}
-        fallback={device.web ? <Loading /> : <View />}
+        fallback={<Loading />}
         theme={{
+          dark: false,
           colors: {
             primary: myColors.primaryColor,
             background: myColors.background,
+            card: 'white',
+            text: myColors.text,
+            border: myColors.primaryColor,
+            notification: 'gray',
           },
         }}>
-        <Stack.Navigator
-          screenOptions={TransitionPresets.SlideFromRightIOS}
-          headerMode='screen'>
-          <Stack.Screen
-            name='Splash'
-            component={Others.Splash}
-            options={{ headerShown: false, title: myTitle }}
-          />
-          <Stack.Screen
-            name='NewUser'
-            component={Others.NewUser}
-            options={{ headerShown: false, title: myTitle }}
-          />
-          <Stack.Screen
-            name='SignIn'
-            component={Others.SignIn}
-            options={{ headerShown: false, title: myTitle }}
-          />
-          <Stack.Screen
-            name='BottomTabs'
-            component={BottomTabs}
-            options={{ headerShown: false, title: myTitle }}
-          />
-          <Stack.Screen
-            name='SelectAddress'
-            component={Others.Address}
-            initialParams={{ name: 'SelectAddress' }}
-            options={{
-              header: (props) => (
-                <Header
-                  {...props}
-                  title={'Escolha um endereço'}
-                  goBack={false}
-                />
-              ),
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='Address'
-            component={Others.Address}
-            options={{
-              header: (props) => (
-                <Header {...props} title={'Endereços salvos'} />
-              ),
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='Product'
-            component={Others.Product}
-            options={{ headerShown: false, title: myTitle }}
-          />
-          <Stack.Screen
-            name='MercInfo'
-            component={Home.MercInfo}
-            options={{
-              header: (props) => <Header {...props} title={'Informações'} />,
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='MercRating'
-            component={Home.MercRating}
-            options={{
-              header: (props) => <Header {...props} title={'Avaliações'} />,
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='Notifications'
-            component={Perfil.Notifications}
-            options={{
-              header: (props) => <Header {...props} title={'Notificações'} />,
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='Cart'
-            component={Others.Cart}
-            options={{ headerShown: false, title: myTitle }}
-          />
-          <Stack.Screen
-            name='Schedule'
-            component={Others.Schedule}
-            options={{
-              header: (props) => <Header {...props} title={'Agendameto'} />,
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='CartCupons'
-            component={Home.Cupons}
-            options={{
-              header: (props) => (
-                <Home.ListMercadosHeader {...props} title={'Cupons'} />
-              ),
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='Payment'
-            component={Others.Payment}
-            options={{ headerShown: false, title: myTitle }}
-          />
-          <Stack.Screen
-            name='PaymentInApp'
-            component={Others.PaymentInApp}
-            options={{
-              header: (props) => (
-                <Header {...props} title={'Formas de pagamento'} />
-              ),
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='Filter'
-            component={Others.Filter}
-            options={{
-              header: (props) => <Header {...props} title={'Filtro'} />,
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='Search'
-            component={Others.Search}
-            options={{ headerShown: false, title: myTitle }}
-          />
-          <Stack.Screen
-            name='NewAddress'
-            component={Others.NewAddress}
-            options={{ headerShown: false, title: myTitle }}
-          />
-          <Stack.Screen
-            name='MyProfile'
-            component={Others.MyProfile}
-            options={{ headerShown: false, title: myTitle }}
-          />
-          <Stack.Screen
-            name='Sugestao'
-            component={Others.Sugestao}
-            options={{
-              header: (props) => (
-                <Header {...props} title={'Sugerir estabelecimento'} />
-              ),
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='UploadQuestion'
-            component={Others.UploadQuestion}
-            options={{
-              header: (props) => (
-                <Header {...props} title={'Envie sua dúvida'} />
-              ),
-              title: myTitle,
-            }}
-          />
-          <Stack.Screen
-            name='Devices'
-            component={Others.Devices}
-            options={{
-              header: (props) => <Header {...props} title={'Dispositivos'} />,
-              title: myTitle,
-            }}
-          />
+        <Stack.Navigator screenOptions={myScreenOptions}>
+          <Stack.Screen name='Splash' component={Splash} />
+          <Stack.Screen name='NewUser' component={NewUser} />
+          <Stack.Screen name='SignIn' component={SignIn} />
+          <Stack.Screen name='BottomTabs' component={BottomTabs} />
+          <Stack.Screen name='SelectAddress' component={Address} />
+          <Stack.Screen name='Address' component={Address} />
+          <Stack.Screen name='ProductTabs' component={ProductTabs} />
+          <Stack.Screen name='Cart' component={Cart} />
+          <Stack.Screen name='Schedule' component={Schedule} />
+          <Stack.Screen name='Cupons' component={Cupons} />
+          <Stack.Screen name='PaymentTabs' component={PaymentTabs} />
+          <Stack.Screen name='PaymentInApp' component={PaymentMethods} />
+          <Stack.Screen name='Filter' component={Filter} />
+          <Stack.Screen name='Search' component={Search} />
+          <Stack.Screen name='NewAddress' component={NewAddress} />
+          <Stack.Screen name='MyProfile' component={MyProfile} />
+          <Stack.Screen name='Suggestion' component={Suggestion} />
+          <Stack.Screen name='UploadQuestion' component={UploadQuestion} />
+          <Stack.Screen name='Devices' component={Devices} />
         </Stack.Navigator>
         <MyToast />
       </NavigationContainer>

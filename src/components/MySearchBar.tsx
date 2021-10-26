@@ -1,27 +1,28 @@
 import React from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
-import { Searchbar } from 'react-native-paper';
-import { device, myColors } from '~/constants';
+import { View, StyleProp, TextInput, ViewStyle } from 'react-native';
+import { device, myColors, myFonts } from '~/constants';
+import IconButton from './IconButton';
 
 function MySearchbar({
   style,
+  search = '',
   onSubmit,
 }: {
   style?: StyleProp<ViewStyle>;
+  search?: string;
   onSubmit: (search: string) => void;
 }) {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const onChangeSearch = (query: string) => setSearchQuery(query);
+  const [searchQuery, setSearchQuery] = React.useState(search);
+  const _onSubmit = () => {
+    if (searchQuery) onSubmit(searchQuery);
+  };
 
   return (
-    <Searchbar
-      theme={{
-        colors: { primary: myColors.primaryColor },
-        mode: 'exact',
-        dark: false,
-      }}
+    <View
       style={[
         {
+          flexGrow: 1,
+          flexDirection: 'row',
           borderRadius: 50,
           borderWidth: 2,
           borderColor: myColors.primaryColor,
@@ -29,18 +30,52 @@ function MySearchbar({
           elevation: 2,
         },
         style,
-      ]}
-      placeholder='O que você procura?'
-      onChangeText={onChangeSearch}
-      value={searchQuery}
-      onKeyPress={(e) =>
-        e.nativeEvent.key === 'Enter' && device.web
-          ? onSubmit(searchQuery)
-          : null
-      }
-      onSubmitEditing={() => (!device.web ? onSubmit(searchQuery) : null)}
-      focusable={false}
-    />
+      ]}>
+      <IconButton
+        icon='magnify'
+        color='rgba(0, 0, 0, 0.54)'
+        type='clear'
+        style={{
+          alignSelf: 'center',
+          width: 48,
+          padding: 12,
+          aspectRatio: 1,
+        }}
+        disabled={!searchQuery}
+        onPress={_onSubmit}
+      />
+      <TextInput
+        style={{
+          flex: 1,
+          paddingLeft: 8,
+          fontSize: 18,
+          fontFamily: myFonts.Regular,
+        }}
+        placeholder='O que você procura?'
+        accessibilityRole='search'
+        onChangeText={setSearchQuery}
+        value={searchQuery}
+        {...(device.web
+          ? {
+              onKeyPress: (e) => e.nativeEvent.key === 'Enter' && _onSubmit(),
+            }
+          : { onSubmitEditing: _onSubmit })}
+      />
+      {!!searchQuery && (
+        <IconButton
+          icon='close'
+          color='rgba(0, 0, 0, 0.54)'
+          type='clear'
+          style={{
+            alignSelf: 'center',
+            width: 48,
+            aspectRatio: 1,
+            padding: 12,
+          }}
+          onPress={() => setSearchQuery('')}
+        />
+      )}
+    </View>
   );
 }
 

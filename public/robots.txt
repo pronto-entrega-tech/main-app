@@ -1,0 +1,7 @@
+user-agent: *
+
+Sitemap:https://prontoentrega.com.br/sitemap/sitemap.xml
+
+user-agent: AdsBot-Google
+
+host:prontoentrega.com.br

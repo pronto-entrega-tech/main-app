@@ -1,21 +1,21 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Divider } from 'react-native-elements';
+import { globalStyles, myColors } from '~/constants';
 import MySearchbar from './MySearchBar';
-import { globalStyles, myColors } from '../constants';
+import MyDivider from './MyDivider';
 
-export function Header3({title}: {title: string}) {
+function Header3({ title }: { title: string }) {
   return (
     <>
       <View style={[styles.header, globalStyles.notch]}>
         <Text style={styles.textHeader}>{title}</Text>
-        <Divider style={styles.headerDivider}/>
+        <MyDivider style={styles.headerDivider} />
       </View>
-      <View style={{marginTop: 12, marginBottom: 8, paddingHorizontal: 16}} >
-        <MySearchbar/>
+      <View style={{ marginTop: 12, marginBottom: 8, paddingHorizontal: 16 }}>
+        <MySearchbar onSubmit={() => {}} />
       </View>
     </>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -34,9 +34,8 @@ const styles = StyleSheet.create({
   headerDivider: {
     marginTop: 47,
     backgroundColor: myColors.divider2,
-    height: 1,
     marginHorizontal: 16,
   },
-})
+});
 
-export default Header3
+export default Header3;

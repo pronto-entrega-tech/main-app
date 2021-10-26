@@ -1,40 +1,63 @@
 import React from 'react';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { StyleProp, StyleSheet, ViewStyle } from 'react-native';
-import { myColors, globalStyles } from '../constants';
-import colors from '../constants/colors';
-import MyTouchable from './MyTouchable';
+import { Insets, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { myColors, globalStyles } from '~/constants';
+import colors from '~/constants/myColors';
+import MyTouchable, { ButtonOrLink } from './MyTouchable';
+import MyIcon, { IconNames } from './MyIcon';
+
+type ButtonTypes =
+  | 'blank'
+  | 'clear'
+  | 'add'
+  | 'add2'
+  | 'addHorizontal'
+  | 'addLarge'
+  | 'fill'
+  | 'back'
+  | 'profile'
+  | 'address'
+  | 'prodIcons'
+  | 'profile2'
+  | 'cancel';
+
+interface IconButtonBase {
+  icon: IconNames;
+  /**
+   * @default 24
+   */
+  size?: number;
+  /**
+   * @default primaryColor
+   */
+  color?: string;
+  style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
+  type?: ButtonTypes;
+  hitSlop?: Insets;
+}
+
+type IconButtonProps = ButtonOrLink<IconButtonBase>;
 
 function IconButton({
   onPress,
+  path,
+  params,
   icon,
   size = 24,
   color = myColors.primaryColor,
   style,
+  disabled,
   type,
-}: {
-  onPress: (item: any) => void;
-  icon: string;
-  size?: number;
-  color?: string;
-  style?: StyleProp<ViewStyle>;
-  type?:
-    | 'clear'
-    | 'add'
-    | 'add2'
-    | 'addHorizontal'
-    | 'addLarge'
-    | 'fill'
-    | 'back'
-    | 'profile'
-    | 'address'
-    | 'prodIcons'
-    | 'profile2'
-    | 'cancel';
-}) {
-  let hitSlop;
-  let iconStyle = {};
+  hitSlop,
+}: IconButtonProps) {
+  let innerHitSlop;
+  let iconStyle: StyleProp<ViewStyle> = {
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
   switch (type) {
+    case 'blank':
+      break;
     case 'clear':
       iconStyle = styles.buttonClear;
       break;
@@ -42,29 +65,29 @@ function IconButton({
       iconStyle = [
         styles.buttonAdd,
         globalStyles.elevation4,
-        globalStyles.darkBoader,
+        globalStyles.darkBorder,
       ];
-      hitSlop = { top: 9, bottom: 9, left: 12, right: 12 };
+      innerHitSlop = { top: 9, bottom: 9, left: 12, right: 12 };
       break;
     case 'add2':
       iconStyle = styles.buttonAdd2;
-      hitSlop = { top: 9, bottom: 9, left: 9, right: 9 };
+      innerHitSlop = { top: 9, bottom: 9, left: 9, right: 9 };
       break;
     case 'addHorizontal':
       iconStyle = [
         styles.buttonAddHorizontal,
         globalStyles.elevation4,
-        globalStyles.darkBoader,
+        globalStyles.darkBorder,
       ];
-      hitSlop = { top: 10, bottom: 10, left: 10, right: 12 };
+      innerHitSlop = { top: 10, bottom: 10, left: 10, right: 12 };
       break;
     case 'addLarge':
       iconStyle = [
         styles.buttonAddLarge,
         globalStyles.elevation4,
-        globalStyles.darkBoader,
+        globalStyles.darkBorder,
       ];
-      hitSlop = { top: 9, bottom: 9, left: 12, right: 12 };
+      innerHitSlop = { top: 9, bottom: 9, left: 12, right: 12 };
       break;
     case 'back':
       iconStyle = styles.buttonBack;
@@ -79,7 +102,7 @@ function IconButton({
       iconStyle = [
         styles.buttonProfile,
         globalStyles.elevation4,
-        globalStyles.darkBoader,
+        globalStyles.darkBorder,
       ];
       break;
     case 'profile2':
@@ -92,13 +115,21 @@ function IconButton({
       iconStyle = [
         styles.button,
         globalStyles.elevation4,
-        globalStyles.darkBoader,
+        globalStyles.darkBorder,
       ];
   }
 
   return (
-    <MyTouchable hitSlop={hitSlop} onPress={onPress} style={[iconStyle, style]}>
-      <Icon name={icon} size={size} color={color} />
+    <MyTouchable
+      hitSlop={hitSlop ?? innerHitSlop}
+      style={[iconStyle, style]}
+      disabled={disabled}
+      {...({
+        onPress,
+        path,
+        params,
+      } as ButtonOrLink)}>
+      <MyIcon name={icon} size={size} color={color} />
     </MyTouchable>
   );
 }

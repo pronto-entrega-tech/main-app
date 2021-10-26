@@ -1,29 +1,25 @@
 import React from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
-import { prodModel } from './ProdItem';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { Product } from './ProdItem';
 import ProdList from './ProdList';
 
 function ProdListHorizontal({
-  navigation,
   header,
   data,
   style,
-  marketless = false,
+  hideMarketLogo,
 }: {
-  navigation: StackNavigationProp<any, any>;
-  header: any;
-  data?: prodModel[];
+  header?: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
+  data?: Product[];
   style?: StyleProp<ViewStyle>;
-  marketless?: boolean;
+  hideMarketLogo?: boolean;
 }) {
   return (
     <ProdList
-      navigation={navigation}
       header={header}
       data={data}
       style={style}
-      marketless={marketless}
+      hideMarketLogo={hideMarketLogo}
       horizontalItems
     />
   );

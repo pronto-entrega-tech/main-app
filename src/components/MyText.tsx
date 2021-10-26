@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleProp, Text, TextStyle } from 'react-native';
+import myFonts from '~/constants/myFonts';
 
 function MyText({
   children,
@@ -7,14 +8,20 @@ function MyText({
   ellipsizeMode,
   numberOfLines,
 }: {
-  children?: any | any[];
+  children?: React.ReactNode;
   style?: StyleProp<TextStyle>;
   ellipsizeMode?: 'head' | 'middle' | 'tail' | 'clip';
   numberOfLines?: number;
 }) {
   return (
     <Text
-      style={[{ fontFamily: 'Regular' }, style]}
+      {...{ pointerEvents: 'none' }}
+      style={[
+        {
+          fontFamily: myFonts.Regular,
+        },
+        style,
+      ]}
       ellipsizeMode={ellipsizeMode}
       numberOfLines={numberOfLines}>
       {children}

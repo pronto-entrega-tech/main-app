@@ -1,15 +1,23 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { Image } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { myColors, device, globalStyles } from '../constants';
+import { View, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
+import { Image } from 'react-native-elements/dist/image/Image'; // react-native-elements don't tree shake
+import { StackNavigationProp } from '@react-navigation/stack';
+import { myColors, device, globalStyles, myFonts } from '~/constants';
+import {
+  calcOff,
+  getImageUrl,
+  Money,
+  moneyToString,
+} from '~/functions/converter';
 import IconButton from './IconButton';
 import MyTouchable from './MyTouchable';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { getImageUrl, Money } from '../functions/converter';
 import MyText from './MyText';
+import AnimatedText from './AnimatedText';
+import MyIcon from './MyIcon';
+/* import { useRouting } from 'expo-next-react-navigation'; */
+import useRouting from '~/hooks/useRouting';
 
-export interface prodModel {
+export interface Product {
   prod_id: string;
   market_id: string;
   prod_name_id: string;
@@ -29,79 +37,74 @@ export interface prodModel {
   images_names: string[];
 }
 
-function ProdItem({
-  navigation,
-  item,
-  isFavorite,
-  quantity = 0,
-  style = {},
-  merc,
-  city,
-  onPressFav,
-  onPressAdd,
-  onPressRemove,
-}: {
-  navigation: StackNavigationProp<any, any>;
-  item: prodModel;
-  isFavorite: boolean;
+function ProdItem(props: {
+  navigation?: StackNavigationProp<any, any>;
+  item: Product;
+  isFavorite?: boolean;
   quantity?: number;
   style?: StyleProp<ViewStyle>;
-  merc: boolean;
+  showsMarketLogo: boolean;
   city: string;
-  onPressFav: (item: any) => void;
-  onPressAdd: (item: any) => void;
-  onPressRemove: (item: any) => void;
+  onPressFav?: () => void;
+  onPressAdd: () => void;
+  onPressRemove: () => void;
 }) {
-  const off = item.previous_price
-    ? ((1 - item.price.value / item.previous_price.value) * 100).toFixed(0)
-    : undefined;
+  const {
+    item,
+    isFavorite,
+    quantity = 0,
+    style = {},
+    showsMarketLogo,
+    city,
+    onPressFav,
+    onPressAdd,
+    onPressRemove,
+  } = props;
+  const { params } = useRouting();
+  const atualCity = city || params?.city;
+  const off = calcOff(item);
 
   return (
-    <MyTouchable
+    <View
       style={[
         styles.card,
         globalStyles.elevation4,
-        globalStyles.darkBoader,
+        globalStyles.darkBorder,
         style,
-      ]}
-      onPress={() =>
-        navigation.push(
-          'Product',
-          device.web
-            ? { city, marketId: item.market_id, prodId: item.prod_id }
-            : { city, marketId: item.market_id, item: item }
-        )
-      }>
-      <View style={styles.top}>
-        {item.images_names ? (
-          <Image
-            placeholderStyle={{ backgroundColor: '#FFF' }}
-            PlaceholderContent={
-              <Icon name='cart-outline' color={myColors.grey2} size={70} />
-            }
-            source={{
-              uri: getImageUrl('product', item.images_names[0]),
-            }}
-            containerStyle={styles.image}
-          />
-        ) : (
-          <Icon
-            name='cart-outline'
-            color={myColors.grey2}
-            size={70}
-            style={styles.image}
-          />
-        )}
-        {!merc ? (
-          <Image
-            placeholderStyle={{ backgroundColor: '#FFF' }}
-            source={{
-              uri: getImageUrl('market', item.market_id),
-            }}
-            containerStyle={styles.fav}
-          />
-        ) : null}
-        {/* <IconButton
+      ]}>
+      <MyTouchable
+        style={{ flex: 1 }}
+        path={`/produto/${atualCity}/${item.market_id}/${item.prod_id}`}>
+        <View style={styles.top}>
+          {item.images_names ? (
+            <Image
+              placeholderStyle={{ backgroundColor: '#FFF' }}
+              PlaceholderContent={
+                <MyIcon name='cart-outline' color={myColors.grey2} size={70} />
+              }
+              source={{
+                uri: getImageUrl('product', item.images_names[0]),
+              }}
+              containerStyle={styles.image}
+            />
+          ) : (
+            <MyIcon
+              name='cart-outline'
+              color={myColors.grey2}
+              size={70}
+              style={styles.image}
+            />
+          )}
+          {showsMarketLogo && (
+            <Image
+              placeholderStyle={{ backgroundColor: '#FFF' }}
+              source={{
+                uri: getImageUrl('market', item.market_id),
+              }}
+              containerStyle={styles.marketLogo}
+            />
+          )}
+          {/* <IconButton
           style={styles.fav}
           icon={isFavorite ? 'heart' : 'heart-outline'}
           size={24}
@@ -109,59 +112,30 @@ function ProdItem({
           type='clear'
           onPress={onPressFav}
         /> */}
-        <View
-          style={[
-            globalStyles.elevation4,
-            globalStyles.darkBoader,
-            styles.addBar,
-            {
-              height: 32,
-              width: quantity === 0 ? 32 : 32 * 2 + 16,
-            },
-          ]}>
-          <IconButton
-            style={{ left: device.web ? 1 : 0 }}
-            icon={'plus'}
-            size={24}
-            color={myColors.primaryColor}
-            type='add2'
-            onPress={onPressAdd}
-          />
-          {quantity !== 0 ? (
-            <>
-              <MyText style={styles.centerNumText}>
-                {quantity.toString()}
-              </MyText>
-              <IconButton
-                style={styles.remove}
-                icon='minus'
-                size={24}
-                color={myColors.primaryColor}
-                type='add2'
-                onPress={onPressRemove}
-              />
-            </>
-          ) : null}
         </View>
-      </View>
-      <View style={styles.container}>
-        <MyText style={styles.priceText}>R${item.price.toString()}</MyText>
-        {item.previous_price ? (
-          <View style={styles.oldPriceRow}>
-            <View style={styles.offTextBox}>
-              <MyText style={styles.offText}>-{off}%</MyText>
+        <View style={styles.container}>
+          <MyText style={styles.priceText}>
+            {moneyToString(item.price, 'R$')}
+          </MyText>
+          {off && (
+            <View style={styles.oldPriceRow}>
+              <View style={styles.offTextBox}>
+                <MyText style={styles.offText}>-{off}%</MyText>
+              </View>
+              <MyText style={styles.oldPriceText}>
+                {moneyToString(item.previous_price, 'R$')}
+              </MyText>
             </View>
-            <MyText style={styles.oldPriceText}>
-              R${item.previous_price.toString()}
-            </MyText>
-          </View>
-        ) : null}
-        <MyText ellipsizeMode='tail' numberOfLines={2} style={styles.nameText}>
-          {item.name} {item.brand}
-        </MyText>
-        <MyText style={styles.quantityText}>{item.quantity}</MyText>
-      </View>
-      {/* <Divider
+          )}
+          <MyText
+            ellipsizeMode='tail'
+            numberOfLines={2}
+            style={styles.nameText}>
+            {item.name} {item.brand}
+          </MyText>
+          <MyText style={styles.quantityText}>{item.quantity}</MyText>
+        </View>
+        {/* <Divider
         style={{
           backgroundColor: myColors.divider2,
           height: 1,
@@ -185,18 +159,44 @@ function ProdItem({
           onPress={onPressAdd}
         />
       </View> */}
-    </MyTouchable>
+      </MyTouchable>
+      <View
+        style={[
+          globalStyles.elevation4,
+          globalStyles.darkBorder,
+          styles.addBar,
+          {
+            height: 32,
+            width: quantity === 0 ? 32 : 32 * 2 + 16,
+          },
+        ]}>
+        <IconButton
+          style={{ left: device.web ? 1 : 0 }}
+          icon={'plus'}
+          type='add2'
+          onPress={onPressAdd}
+        />
+        {quantity !== 0 && (
+          <>
+            <AnimatedText style={styles.centerNumText} distace={10}>
+              {quantity}
+            </AnimatedText>
+            <IconButton
+              style={styles.remove}
+              icon='minus'
+              type='add2'
+              onPress={onPressRemove}
+            />
+          </>
+        )}
+      </View>
+    </View>
   );
 }
 
-const margin = 5;
-const tileWidth = (device.width - margin * 4) / 3;
 const styles = StyleSheet.create({
   card: {
     height: 185,
-    width: tileWidth,
-    marginLeft: margin,
-    marginBottom: margin,
     borderRadius: 10,
     backgroundColor: '#fff',
   },
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   placeholderColor: {
     backgroundColor: 'transparent',
   },
-  fav: {
+  marketLogo: {
     top: 8,
     left: 6,
     position: 'absolute',
@@ -223,15 +223,17 @@ const styles = StyleSheet.create({
     right: 6,
     alignItems: 'center',
     flexDirection: 'row-reverse',
+    overflow: 'hidden',
+    ...Platform.select({ web: { transitionDuration: '200ms' } }),
   },
   centerNumText: {
     fontSize: 15,
     color: myColors.text3,
-    fontFamily: 'Medium',
+    fontFamily: myFonts.Medium,
     left: 36,
     position: 'absolute',
   },
-  remove: { position: 'absolute', left: 0 },
+  remove: { position: 'absolute', right: 46 },
   mercImage: {
     position: 'absolute',
     right: 0,
@@ -256,7 +258,7 @@ const styles = StyleSheet.create({
     marginTop: -22,
     marginBottom: 1,
     fontSize: 18,
-    fontFamily: 'Medium',
+    fontFamily: myFonts.Medium,
   },
   oldPriceRow: {
     marginTop: -1,
@@ -272,7 +274,7 @@ const styles = StyleSheet.create({
   offText: {
     fontSize: 11,
     color: '#FFF',
-    fontWeight: 'bold',
+    fontFamily: myFonts.Bold,
   },
   oldPriceText: {
     textDecorationLine: 'line-through',
@@ -285,7 +287,7 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
     color: myColors.grey3,
     marginTop: 2,
-    fontFamily: 'Condensed',
+    fontFamily: myFonts.Condensed,
   },
   quantityText: {
     includeFontPadding: false,

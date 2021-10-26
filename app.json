@@ -64,7 +64,7 @@
     "web": {
       "name": "ProntoEntrega",
       "shortName": "Pronto",
-      "favicon": "./src/assets/favicon.png",
+      "favicon": "./public/favicon.ico",
       "themeColor": "#2196F3",
       "lang": "pt-BR"
     },
