@@ -58,6 +58,7 @@ function MyButton({
   const isHovered = hovered && (path || !disabled); // should be a link or a button not disabled
 
   const hoverColor = !isHovered ? myColors.primaryColor : '#48a2eb';
+  const solidTextColor = !disabled ? 'white' : '#99a1a8';
   const textColor = !disabled ? hoverColor : '#9CA3AA';
   const backgroundColor = !disabled ? hoverColor : '#E3E6E8';
 
@@ -86,9 +87,9 @@ function MyButton({
       <MyText
         style={[
           {
-            color: type === 'solid' ? 'white' : textColor,
+            color: type === 'solid' ? solidTextColor : textColor,
             fontFamily: device.android ? myFonts.Medium : myFonts.Regular,
-            fontSize: 12 + PixelRatio.get() * 2,
+            fontSize: 16,
           },
           titleStyle,
         ]}>
