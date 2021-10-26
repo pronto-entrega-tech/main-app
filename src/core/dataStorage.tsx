@@ -39,7 +39,7 @@ export async function getShortAddress() {
   const address = await getActiveAddress();
   if (!address) return 'Escolha um endereço';
   return (
-    (address.rua ?? address.cidade) +
+    (address.rua || address.cidade) + // `||` filter empty strings
     (address.numero ? ', ' + address.numero : '')
   );
 }

@@ -3,9 +3,26 @@ import { View, StyleSheet, Image, useWindowDimensions } from 'react-native';
 import { myColors, globalStyles, images, myFonts } from '~/constants';
 import MyButton from '~/components/MyButton';
 import MyText from '~/components/MyText';
+import useRouting from '~/hooks/useRouting';
+import { addressModel } from './endereco';
+import { saveActiveAddress, saveActiveAddressIndex } from '~/core/dataStorage';
+
+async function saveCity(city: { city: string; state: string }) {
+  const address: addressModel = {
+    apelido: '',
+    rua: '',
+    numero: '',
+    bairro: '',
+    cidade: city.city,
+    estado: city.state,
+  };
+  await Promise.all([saveActiveAddressIndex(-1), saveActiveAddress(address)]);
+}
 
 function Splash() {
-  const cites = [{ city: 'Jataí', state: 'GO', path: 'jatai-go' }];
+  /* const cites = [{ city: 'Jataí', path: 'jatai-go' }]; */
+  const cites = [{ city: 'Jataí', state: 'GO' }];
+  const routing = useRouting();
   const { width } = useWindowDimensions();
 
   const [isTablet, setTablet] = useState(false);
@@ -67,7 +84,11 @@ function Splash() {
           type='clear'
           titleStyle={titleSize}
           buttonStyle={styles.cityButton}
-          path={`/inicio/explore/${item.path}`}
+          /* path={`/inicio/explore/${item.path}`} */
+          onPress={async () => {
+            await saveCity(item);
+            routing.navigate('/inicio');
+          }}
         />
       ))}
     </View>
