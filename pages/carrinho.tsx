@@ -140,7 +140,7 @@ function CartHeader({
             }, 300);
           }}
           titleStyle={{ color: myColors.primaryColor }}
-          title='Limpar carrinho'
+          title='Esvaziar'
           type='clear'
         />
       </View>
