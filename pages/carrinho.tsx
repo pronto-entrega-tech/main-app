@@ -77,17 +77,18 @@ function CartHeader({
   });
 
   useEffect(() => {
+    const useNativeDriver = !device.web;
     if (entregar) {
       Animated.timing(state.indicator, {
         toValue: 0,
         duration: 175,
-        useNativeDriver: true,
+        useNativeDriver,
       }).start();
     } else {
       Animated.timing(state.indicator, {
         toValue: 80 + extraWidth,
         duration: 175,
-        useNativeDriver: true,
+        useNativeDriver,
       }).start();
     }
   }, [entregar, state.indicator]);
@@ -249,6 +250,7 @@ function getUpdatedSchedule({ business_hours, min_time, max_time }: Market) {
       scheduleList = [...scheduleList, schedule];
     }
   }
+
   return { activeSchedule, schedules: { isOpen, scheduleList } };
 }
 
@@ -298,6 +300,7 @@ function Cart() {
   }, [hasInternet]);
 
   useEffect(() => {
+    let updateScheduleTimer: NodeJS.Timer;
     setReadyActiveMarket(false);
 
     getLastPayment().then((lastPayment) => {
@@ -317,9 +320,23 @@ function Cart() {
       }
       setActiveMarket(activeMarket);
 
-      const { activeSchedule, schedules } = getUpdatedSchedule(activeMarket);
-      setActiveSchedule(activeSchedule);
-      setSchedules(schedules);
+      const updateSchedule = () => {
+        const { activeSchedule, schedules } = getUpdatedSchedule(activeMarket);
+        setActiveSchedule(activeSchedule);
+        setSchedules(schedules);
+      };
+      updateSchedule();
+
+      const updateScheduleTask = () => {
+        const time = new Date().getTime();
+        const minutesInMs = 60 * 60 * 1000;
+        const minTimeInMs = activeMarket.min_time * 60 * 1000;
+        updateScheduleTimer = setTimeout(() => {
+          updateSchedule();
+          updateScheduleTask();
+        }, minutesInMs - (time % minutesInMs) - minTimeInMs);
+      };
+      updateScheduleTask();
 
       setReadyActiveMarket(true);
     };
@@ -339,11 +356,9 @@ function Cart() {
         setup(data);
       })
       .catch(() => setError('server'));
-
-    const a = setInterval(() => {
-      console.log('oi');
-    }, 3600000);
-    return () => clearInterval(a);
+    return () => {
+      if (updateScheduleTimer) clearInterval(updateScheduleTimer);
+    };
   }, []);
 
   useEffect(() => {
