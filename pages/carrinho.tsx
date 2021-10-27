@@ -207,15 +207,7 @@ function updateCart(
   setReadySubtotal(true);
 }
 
-function updateSchedule(
-  { business_hours, min_time, max_time }: Market,
-  setSchedules: React.Dispatch<
-    React.SetStateAction<{ isOpen: Boolean; list: scheduleModel[] }>
-  >,
-  setActiveSchedule: React.Dispatch<
-    React.SetStateAction<scheduleModel | undefined>
-  >
-) {
+function getUpdatedSchedule({ business_hours, min_time, max_time }: Market) {
   let scheduleList = [] as scheduleModel[];
   const date = new Date();
   const min = date.getMinutes();
@@ -232,7 +224,9 @@ function updateSchedule(
   const dayText2 = hours < closeHour ? day : day + 1;
 
   const deliveryHour = hours + (min + min_time) / 60;
-  if (isOpen) {
+
+  const activeSchedule = (() => {
+    if (!isOpen) return;
     const schedule: scheduleModel = {
       dia: dayText,
       diaDoMes: dayText2,
@@ -240,10 +234,8 @@ function updateSchedule(
       scheduled: false,
     };
     scheduleList = [schedule];
-    setActiveSchedule(schedule);
-  } else {
-    setActiveSchedule(undefined);
-  }
+    return schedule;
+  })();
 
   for (let i = openHour; i < closeHour; i++) {
     if (deliveryHour < i || hours >= closeHour) {
@@ -257,7 +249,7 @@ function updateSchedule(
       scheduleList = [...scheduleList, schedule];
     }
   }
-  setSchedules({ isOpen, list: scheduleList });
+  return { activeSchedule, schedules: { isOpen, scheduleList } };
 }
 
 function marketAddress(address: Market['address']) {
@@ -281,8 +273,8 @@ function Cart() {
   const [activeSchedule, setActiveSchedule] = useState<scheduleModel>();
   const [schedules, setSchedules] = useState<{
     isOpen: Boolean;
-    list: scheduleModel[];
-  }>({ isOpen: false, list: [] });
+    scheduleList: scheduleModel[];
+  }>({ isOpen: false, scheduleList: [] });
   const [cartSubtotal, setCartSubtotal] = useState<Money>(money('0'));
   const [off, setOff] = useState<Money>();
   const [total, setTotal] = useState<Money>();
@@ -323,9 +315,12 @@ function Cart() {
       } catch {
         setError('server');
       }
-
       setActiveMarket(activeMarket);
-      updateSchedule(activeMarket, setSchedules, setActiveSchedule);
+
+      const { activeSchedule, schedules } = getUpdatedSchedule(activeMarket);
+      setActiveSchedule(activeSchedule);
+      setSchedules(schedules);
+
       setReadyActiveMarket(true);
     };
 
@@ -344,6 +339,11 @@ function Cart() {
         setup(data);
       })
       .catch(() => setError('server'));
+
+    const a = setInterval(() => {
+      console.log('oi');
+    }, 3600000);
+    return () => clearInterval(a);
   }, []);
 
   useEffect(() => {
@@ -669,7 +669,7 @@ function Cart() {
             ? 'Escolha um horário'
             : `${activeSchedule.dia}, ${activeSchedule.horarios}`}
         </MyText>
-        {schedules.list.length !== 0 && (
+        {schedules.scheduleList.length !== 0 && (
           <MyButton
             title='Ver horários'
             type='clear'
@@ -683,7 +683,7 @@ function Cart() {
             onPress={() =>
               routing.navigate('/agendamento', {
                 active: JSON.stringify(activeSchedule),
-                list: JSON.stringify(schedules.list),
+                list: JSON.stringify(schedules.scheduleList),
               })
             }
           />
@@ -694,7 +694,7 @@ function Cart() {
         contentContainerStyle={styles.scheduleConteiner}
         showsHorizontalScrollIndicator={false}
         horizontal>
-        {schedules.list.map((item, index) => {
+        {schedules.scheduleList.map((item, index) => {
           const active = isScheduleEqual(item, activeSchedule);
           return (
             <View key={index} style={{ borderRadius: 10 }}>
