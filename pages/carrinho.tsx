@@ -47,6 +47,7 @@ import { useConnection } from '~/functions/connection';
 import MyIcon from '~/components/MyIcon';
 import { isScheduleEqual } from './agendamento';
 import AnimatedText from '~/components/AnimatedText';
+import makeOrder from '~/core/makeOrder';
 /* import {
   ApplePay,
   confirmApplePayPayment,
@@ -428,120 +429,6 @@ function Cart() {
     setIsLoading(!readySubtotal || !readyActiveMarket);
   }, [readySubtotal, readyActiveMarket]);
 
-  const makePayment = async () => {
-    if (!(activeMarket && activeSchedule && off && total && longAddress))
-      return;
-
-    setIsLoading(true);
-    /* const cart = [
-      {
-        label: 'Total',
-        amount: (total.value / 100).toString(),
-        type: 'final',
-      },
-    ] as ApplePay.CartSummaryItem[];
-    if (payment.title === 'ApplePay') {
-      const { error, paymentMethod } = await presentApplePay({
-        country: 'BR',
-        currency: 'BRL',
-        cartItems: cart,
-      });
-
-      if (error) {
-        console.error(error.code, error.message);
-      } else {
-        console.log(JSON.stringify(paymentMethod, null, 2));
-        const clientSecret = await fetchPaymentIntentClientSecret(
-          payment.title,
-          cart
-        );
-
-        const { error: confirmApplePayError } = await confirmApplePayPayment(
-          clientSecret
-        );
-
-        if (confirmApplePayError) {
-          console.error(
-            confirmApplePayError.code,
-            confirmApplePayError.message
-          );
-        } else {
-          console.log('Success', 'The payment was confirmed successfully!');
-        }
-      }
-    } else if (payment.title === 'GooglePay') {
-      const {
-        initGooglePay,
-        presentGooglePay,
-        loading,
-        createGooglePayPaymentMethod,
-      } = useGooglePay();
-
-      const { error, paymentMethod } = await createGooglePayPaymentMethod({
-        amount: (total.value / 100).toString(),
-        currencyCode: 'BRL',
-      });
-    } */
-    const scheduled = activeSchedule.scheduled;
-    const d = new Date();
-    const orderDate = `${d.getHours()}:${d
-      .getMinutes()
-      .toString()
-      .padStart(2, '0')} - ${d.getDay().toString().padStart(2, '0')}/${d
-      .getMonth()
-      .toString()
-      .padStart(2, '0')}/${d.getFullYear()}`;
-    let previsao: string;
-    if (!scheduled) {
-      const date1 = new Date(d.getTime() + activeMarket.min_time * 60000);
-      const date2 = new Date(d.getTime() + activeMarket.max_time * 60000);
-      previsao = `${date1.getHours()}:${date1
-        .getMinutes()
-        .toString()
-        .padStart(2, '0')} - ${date2.getHours()}:${date2
-        .getMinutes()
-        .toString()
-        .padStart(2, '0')}`;
-    } else {
-      previsao = activeSchedule.horarios;
-    }
-    getOrdersList().then((list) => {
-      saveOrdersList([
-        {
-          marketName: activeMarket.name,
-          marketId: activeMarket.market_id,
-          orderMarketId: list.length + 1,
-          prodList: prodOrder,
-          scheduled: scheduled,
-          deliveryTime: previsao,
-          date: orderDate,
-          subtotal: moneyToString(cartSubtotal),
-          discount: moneyToString(off),
-          deliveryFee: moneyToString(activeMarket.fee),
-          total: moneyToString(add(cartSubtotal, activeMarket.fee)),
-          address:
-            longAddress.rua +
-            (longAddress.bairro ? ' - ' + longAddress.bairro : ''),
-          payment: payment?.title ?? '',
-        },
-        ...list,
-      ]).then(() => {
-        saveShoppingList(new Map());
-        setShoppingList(new Map());
-        setSubtotal(money('0'));
-        setCartSubtotal(money('0'));
-        setActiveMarketId('');
-        saveActiveMarketId('');
-
-        if (payment?.title === 'Dinheiro')
-          saveLastPayment({ title: 'Dinheiro', sub: 'Sem troco' });
-
-        routing.pop(1);
-        routing.navigate('/compras');
-      });
-    });
-  };
-
   if (!prodList?.length)
     return (
       <>
@@ -848,7 +735,45 @@ function Cart() {
         title={buttonText}
         disabled={!ready}
         buttonStyle={styles.buttonConteiner}
-        onPress={() => makePayment().catch(() => setIsLoading(false))}
+        onPress={() => {
+          if (
+            !(
+              activeMarket &&
+              activeSchedule &&
+              off &&
+              total &&
+              longAddress &&
+              payment &&
+              prodOrder.length
+            )
+          )
+            return;
+          setIsLoading(true);
+          makeOrder(
+            activeMarket,
+            activeSchedule,
+            off,
+            cartSubtotal,
+            longAddress,
+            payment,
+            prodOrder
+          )
+            .then(() => {
+              saveShoppingList(new Map());
+              setShoppingList(new Map());
+              setSubtotal(money('0'));
+              setCartSubtotal(money('0'));
+              setActiveMarketId('');
+              saveActiveMarketId('');
+
+              if (payment?.title === 'Dinheiro')
+                saveLastPayment({ title: 'Dinheiro', sub: 'Sem troco' });
+
+              routing.pop(1);
+              routing.navigate('/compras');
+            })
+            .catch(() => setIsLoading(false));
+        }}
       />
     </View>
   );
