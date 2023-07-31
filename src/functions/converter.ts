@@ -1,380 +1,298 @@
-import { STATIC } from '~/constants/url';
-import type { Market } from '~/components/MarketItem';
-import type { Product } from '~/components/ProdItem';
-import { businessHours, weekDayArray } from '~/core/models';
-import type { ImageURISource } from 'react-native';
-import { stringify } from 'qs';
-import { addressModel } from '@pages/endereco';
+import { UrlObject } from 'url';
+import { Urls } from '~/constants/urls';
+import {
+  Market,
+  Product,
+  OrderSchedule,
+  Order,
+  Address,
+  Coords,
+  PaymentCard,
+} from '~/core/models';
+import { useContextSelector, Context } from 'use-context-selector';
+import { screensPaths } from '~/constants/routes';
+import { objectConditional } from './conditionals';
+import { money } from './money';
+import { Buffer } from 'buffer';
+import { lightFormat } from 'date-fns';
 
-export interface Money {
-  /**
-   * `$10.00` will be `1000`, so be careful and use the money functions to manage this value.
-   */
-  dangerousInnerValue: number;
-}
-const money = (money: string): Money => {
-  const value = money ? +money.replace(/\D/g, '') : 0;
-  return { dangerousInnerValue: value };
+export const validateProduct = (v: any): Product => ({
+  ...v,
+  price: money(v.price),
+  ...objectConditional(v.discount_type)({
+    discount: {
+      type: v.discount_type,
+      value_1:
+        v.discount_type === 'DISCOUNT_VALUE'
+          ? money(v.discount_value_1)
+          : +v.discount_value_1,
+      value_2: v.discount_value_2,
+      max_per_client: v.discount_max_per_client,
+    },
+  }),
+});
+
+export const validateMarket = (v: any): Market => ({
+  ...v,
+  min_time: +v.min_time,
+  max_time: +v.max_time,
+  accept_scheduling: !!v.schedule_mins_interval,
+  delivery_fee: money(v.delivery_fee),
+  order_min: money(v.order_min),
+  rating: +v.rating,
+  address: {
+    street: v.address_street,
+    number: v.address_number,
+    district: v.address_district,
+    city: v.address_city,
+    state: v.address_state,
+    complement: v.address_complement,
+    coords: { lat: v.address_latitude, lng: v.address_longitude },
+  },
+});
+
+export const validateOrder = (v: any): Order => ({
+  ...v,
+  created_at: new Date(v.created_at),
+  finished_at: v.finished_at && new Date(v.finished_at),
+  delivery_min_time: new Date(v.delivery_min_time),
+  delivery_max_time: new Date(v.delivery_max_time),
+  delivery_fee: money(v.delivery_fee),
+  total: money(v.total),
+  payment: {
+    in_app: v.paid_in_app,
+    method: v.payment_method,
+    description: v.payment_description,
+    change: money(v.payment_change),
+    pix_code: v.pix_code,
+    pix_qr_code: v.pix_qr_code,
+    pix_expires_at: v.pix_expires_at && new Date(v.pix_expires_at),
+  },
+  address: {
+    street: v.address_street,
+    number: v.address_number,
+    district: v.address_district,
+    city: v.address_city,
+    state: v.address_state,
+    complement: v.address_complement,
+    coords: { lat: v.address_latitude, lgn: v.address_longitude },
+  },
+});
+
+export const createUseContext = <T>(context: Context<T>) => {
+  return () =>
+    new Proxy(
+      {},
+      {
+        get: (_, name) => {
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          return useContextSelector(context, (c: any) => c[name]);
+        },
+      }
+    ) as T;
 };
 
-/* class Money {
-  value: number = 0;
+export const pick = <T, K extends keyof T>(obj: T, ...keys: K[]): Pick<T, K> =>
+  keys.reduce((result, key) => {
+    if (key in obj) result[key] = obj[key];
+    return result;
+  }, {} as any);
 
-  constructor(money?: string) {
-    if (!money) return;
-    this.value = parseInt(money.replace(/\D/g, ''));
-  }
-
-  add(money: number | Money) {
-    this.value = this.value + (typeof money === 'number' ? money : money.value);
-    return this;
-  }
-
-  sub(money: number | Money) {
-    this.value = this.value - (typeof money === 'number' ? money : money.value);
-    return this;
-  }
-
-  multiply(money: number | Money) {
-    this.value = this.value * (typeof money === 'number' ? money : money.value);
-    return this;
-  }
-
-  divide(money: number | Money) {
-    this.value = this.value / (typeof money === 'number' ? money : money.value);
-    return this;
-  }
-
-  toString() {
-    const v = this.value.toString().padStart(3, '0');
-    return (
-      v.substring(0, v.length - 2) + ',' + v.substring(v.length - 2, v.length)
-    );
-  }
-} */
-
-export function calcOff(product: Product) {
-  const { price, previous_price } = product;
-
-  if (!previous_price) return;
-
-  const div = price.dangerousInnerValue / previous_price.dangerousInnerValue;
-  return ((1 - div) * 100).toFixed(0);
-}
-
-function getMoneyValue(v: Money | number) {
-  return typeof v === 'number' ? v : v.dangerousInnerValue;
-}
-
-export function add(v1: Money | number, v2: Money | number) {
-  return {
-    dangerousInnerValue: getMoneyValue(v1) + getMoneyValue(v2),
-  } as Money;
-}
-
-export function sub(v1: Money | number, v2: Money | number) {
-  return {
-    dangerousInnerValue: getMoneyValue(v1) - getMoneyValue(v2),
-  } as Money;
-}
-
-export function multiply(v1: Money | number, v2: Money | number) {
-  return {
-    dangerousInnerValue: getMoneyValue(v1) * getMoneyValue(v2),
-  } as Money;
-}
-
-export function divide(v1: Money | number, v2: Money | number) {
-  return {
-    dangerousInnerValue: getMoneyValue(v1) / getMoneyValue(v2),
-  } as Money;
-}
-
-export function isGreater(v1: Money | number, v2: Money | number) {
-  return getMoneyValue(v1) > getMoneyValue(v2);
-}
-
-export function isEqual(v1: Money | number, v2: Money | number) {
-  return getMoneyValue(v1) === getMoneyValue(v2);
-}
-
-function moneyToString(money?: Money | number, currency: string = '') {
-  if (!money) return '';
-  let v;
-  if (typeof money === 'number') {
-    v = money.toString();
-  } else {
-    v = money.dangerousInnerValue.toString().padStart(3, '0');
-  }
-  return (
-    currency +
-    v.substring(0, v.length - 2) +
-    ',' +
-    v.substring(v.length - 2, v.length)
+export const omit = <T, K extends keyof T>(obj: T, ...keys: K[]): Omit<T, K> =>
+  keys.reduce(
+    (result, key) => {
+      delete result[key];
+      return result;
+    },
+    { ...obj }
   );
-}
 
-function createProdList(json: any[]) {
-  const prodList = [] as Product[];
-  for (const item of json) {
-    prodList.push(createProdItem(item));
-  }
-  return prodList;
-}
+type FalsyValue = undefined | null | false | 0 | '';
+type Truly<T> = T extends FalsyValue ? never : T;
+type Falsy<T> = T extends FalsyValue ? T : never;
 
-function createProdItem(item: any): Product {
-  return {
-    prod_id: item.prod_id,
-    market_id: item.market_id,
-    prod_name_id: item.prod_name_id,
-    market_name_id: item.market_name_id,
-    name: item.name,
-    brand: item.brand,
-    quantity: item.quantity,
-    price: money(item.price),
-    previous_price: item.previous_price && money(item.previous_price),
-    unit_weight: item.unit_weight,
-    discount: item.discount,
-    images_names: item.images_names,
+
+export const filterFalsy = <T>(arr: T[]) => arr.filter(Boolean) as Truly<T>[];
+
+export const toArray = <T>(v: T) =>
+  (!v || Array.isArray(v) ? v : [v]) as Falsy<T> | Truly<T>[];
+
+/**
+ * @example [...addToArray(v)]
+ */
+export const addToArray = <T>(v: T) => (toArray(v) || []) as Truly<T>[];
+
+export const capitalize = (v: string) =>
+  `${v[0]?.toUpperCase()}${v.slice(1).toLowerCase()}`;
+
+export const formatCardBrand = (card: PaymentCard) =>
+  capitalize(card.brand.replace('UNKNOWN', 'Desconhecido'));
+
+export const digitsMask = (raw: string, data: [number, string][]) =>
+  data.reduce(
+    (v, [n, s]) => (v.length > n ? v.slice(0, n) + s + v.slice(n) : v),
+    raw.replace(/\D/g, '')
+  );
+
+export const documentMask = (doc: string) => {
+  let lastQuantity = 0;
+
+  const get = (quantity: number) => {
+    lastQuantity += quantity;
+    return doc.slice(lastQuantity - quantity, lastQuantity);
   };
-}
 
-function createMarketList(json: any[]) {
-  const mercList = [] as Market[];
-  for (const i in json) {
-    const item = json[i];
-    mercList.push(createMarketItem(item));
-  }
-  return mercList;
-}
+  return `${get(2)}.${get(3)}.${get(3)}/${get(4)}-${get(2)}`;
+};
 
-function createMarketItem(item: any): Market {
-  item.address.coords = (item.address.coords as string)
-    .replace(/\(/, '')
-    .replace(/\)/, '');
-  return {
-    market_id: item.market_id,
-    market_name_id: item.market_name_id,
-    name: item.name,
-    city: item.city,
-    type: item.type,
-    address: item.address,
-    business_hours: item.business_hours,
-    special_hours: item.special_hours,
-    min_time: +item.min_time,
-    max_time: +item.max_time,
-    fee: money(item.fee),
-    order_min: money(item.order_min),
-    rating: +item.rating,
-    info: item.info,
-    document: item.document,
-    payments_accepted: item.payments_accepted,
-  };
-}
+export const computeDistance = (coords1: Coords, coords2: Coords) => {
+  const toRad = (angle: number) => (angle * Math.PI) / 180;
+  const kilometerConst = 6377.830272;
 
-function documentMask(doc: string) {
-  let last = 0;
-  function a(quant: number) {
-    last += quant;
-    return doc.slice(last - quant, last);
-  }
-  return `${a(2)}.${a(3)}.${a(3)}/${a(4)}-${a(2)}`;
-}
-
-function computeDistance(
-  [prevLat, prevLong]: [prevLat: number, prevLong: number],
-  [lat, long]: string[]
-) {
-  const prevLatInRad = toRad(prevLat);
-  const prevLongInRad = toRad(prevLong);
-  const latInRad = toRad(+lat);
-  const longInRad = toRad(+long);
+  const radLat1 = toRad(coords1.lat);
+  const radLng1 = toRad(coords1.lng);
+  const radLat2 = toRad(coords2.lat);
+  const radLng2 = toRad(coords2.lng);
 
   return (
-    6377.830272 *
+    kilometerConst *
     Math.acos(
-      Math.sin(prevLatInRad) * Math.sin(latInRad) +
-        Math.cos(prevLatInRad) *
-          Math.cos(latInRad) *
-          Math.cos(longInRad - prevLongInRad)
+      Math.sin(radLat1) * Math.sin(radLat2) +
+        Math.cos(radLat1) * Math.cos(radLat2) * Math.cos(radLng2 - radLng1)
     )
   )
     .toFixed(1)
     .replace('.', ',');
-}
+};
 
-function toRad(angle: number) {
-  return (angle * Math.PI) / 180;
-}
+export const getJwtExpiration = (jwt: string) => {
+  const [, rawPayload] = jwt.split('.');
+  const payload = JSON.parse(Buffer.from(rawPayload, 'base64').toString());
 
-function isMarketOpen(business_hours: businessHours): {
-  isOpen: boolean;
-  tomorrow: string | boolean;
-  nextHour: string;
-  open_time: string;
-  close_time: string;
-} {
-  const date = new Date();
-  const min = date.getMinutes();
-  const hour = date.getHours();
-  const weekday = date.getDay();
-  const [r1] = business_hours.filter(({ days }) =>
-    days.includes(weekDayArray[weekday])
+  return payload.exp * 1000;
+};
+
+export const getLatLong = ({ coords }: Address) =>
+  coords && `${coords.lat},${coords.lng}`;
+
+export const canReview = (o: Order) => {
+  if (!o.finished_at) return;
+
+  const orderAge = Date.now() - +o.finished_at;
+  const day = 24 * 60 * 60 * 1000;
+
+  return orderAge < 15 * day;
+};
+
+export const formatDeliveryTime = (order: Order) => {
+  const toString = (d: Date) => lightFormat(d, 'HH:mm');
+
+  const min = toString(order.delivery_min_time);
+  const max = toString(order.delivery_max_time);
+
+  return `${min} - ${max}`;
+};
+
+export const isScheduleEqual = (
+  schedule1?: OrderSchedule,
+  schedule2?: OrderSchedule
+) =>
+  schedule1?.dayNumber === schedule2?.dayNumber &&
+  schedule1?.hours === schedule2?.hours;
+
+export const fail = (message?: string) => {
+  const error = new Error(message);
+  Error.captureStackTrace(error, fail);
+  throw error;
+};
+
+// JavaScriptCore don't support lookbehind regex
+const pathRegex = /(?:\/)\[.*?](?=\/|$)/g;
+
+type Params = Record<string, any>;
+
+const queryFrom = (params: Params, path: string) => {
+  const paramsNames = path.match(pathRegex)?.map((v) => v.slice(2, -1));
+
+  return Object.fromEntries(
+    Object.entries(params).filter(
+      ([name, value]) => value && !paramsNames?.includes(name)
+    )
   );
-  if (r1) {
-    const { hours } = r1;
-    const [interval0, interval1] = hours.filter(({ close_time }) => {
-      const [c_h, c_m] = close_time.split(':');
-      const close = +c_h * 60 + +c_m;
-      const time = hour * 60 + min;
-      return time < close;
-    });
-    if (interval0) {
-      const { open_time, close_time } = interval0;
-      const openHour = +open_time.split(':')[0];
+};
 
-      const isOpen = hour >= openHour;
-      const nextHour = removeZero(isOpen ? close_time : open_time);
+export const urlFrom = (screen: string, params?: Params) => {
+  const path =
+    screensPaths.get(screen) ?? fail(`Path for '${screen}' not found`);
 
-      return { isOpen, tomorrow: '', nextHour, open_time, close_time };
-    }
-    if (interval1) {
-      const { open_time, close_time } = interval1;
-
-      return {
-        isOpen: false,
-        tomorrow: '',
-        nextHour: removeZero(open_time),
-        open_time,
-        close_time,
-      };
-    }
-  }
-
-  const [r2] = business_hours.filter(({ days }) =>
-    days.includes(weekDayArray[weekday === 6 ? 0 : weekday + 1])
+  const pathWithParams = path.replace(
+    pathRegex,
+    (param) => `/${params?.[param.slice(2, -1)]}`
   );
-  if (r2) {
-    const { hours } = r2;
-    const [{ open_time }] = hours;
-
-    return {
-      isOpen: false,
-      tomorrow: true,
-      nextHour: removeZero(open_time),
-      open_time: '',
-      close_time: '',
-    };
-  }
 
   return {
-    isOpen: false,
-    tomorrow: '',
-    nextHour: '',
-    open_time: '',
-    close_time: '',
-  };
-}
+    pathname: pathWithParams,
+    query: params && queryFrom(params, path),
+  } as UrlObject;
+};
 
-export function stringifyParams(params?: any) {
-  return stringify(params, { addQueryPrefix: true, arrayFormat: 'repeat' });
-}
+export const screenFrom = (path: string) =>
+  [...screensPaths.entries()].find(([, p]) => p === path)?.[0];
 
-type imageDirs = 'main' | 'market' | 'product' | 'slide';
-function getImageUrl(dir: imageDirs, image: string) {
-  return `${STATIC}/${dir}/${image}.webp`;
-}
+type ImageDir = 'main' | 'market' | 'product' | 'slide';
+export const getImageUrl = (dir: ImageDir, image: string) =>
+  `${Urls.STATIC}/${dir}/${image}.webp`;
 
-function removeZero(text: string) {
-  return text.replace(/^.{0}0/, '');
-}
+export const stringifyShortAddress = (a: Address) => {
+  if (!a.street || !a.number) return a.city;
 
-export function toCityState(address: addressModel) {
-  return `${removeAccents(address.cidade)}-${address.estado?.toLowerCase()}`;
-}
+  return `${a.street}, ${a.number}`;
+};
 
-function removeAccents(text?: string) {
-  return text
+export const stringifyAddress = (a: Omit<Address, 'id'>) => {
+  const district = a.district ? ` - ${a.district}` : '';
+  const number = a.number ? `, ${a.number}` : '';
+
+  return `${a.street}${number}${district}, ${a.city} - ${a.state}`;
+};
+
+export const toCityState = (address: Pick<Address, 'city' | 'state'>) =>
+  `${removeAccents(address.city)}-${address.state?.toLowerCase()}`;
+
+export const removeAccents = (text?: string) =>
+  text
     ?.toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/ /g, '-');
-}
+    .replace(/ /g, '-') ?? '';
 
-function getStateCode(region: string) {
-  switch (removeAccents(region)) {
-    case 'acre':
-      return 'AC';
-    case 'alagoas':
-      return 'AL';
-    case 'amapa':
-      return 'AP';
-    case 'amazonas':
-      return 'AM';
-    case 'bahia':
-      return 'BA';
-    case 'ceara':
-      return 'CE';
-    case 'distrito-federal':
-      return 'DF';
-    case 'espirito-santo':
-      return 'ES';
-    case 'goias':
-      return 'GO';
-    case 'maranhao':
-      return 'MA';
-    case 'mato-grosso':
-      return 'MT';
-    case 'mato-grosso-do-sul':
-      return 'MS';
-    case 'minas-gerais':
-      return 'MG';
-    case 'para':
-      return 'PA';
-    case 'paraiba':
-      return 'PB';
-    case 'parana':
-      return 'PR';
-    case 'pernambuco':
-      return 'PE';
-    case 'piaui':
-      return 'PI';
-    case 'rio-de-janeiro':
-      return 'RJ';
-    case 'rio-grande-do-norte':
-      return 'RN';
-    case 'rio-grande-do-sul':
-      return 'RS';
-    case 'rondonia':
-      return 'RO';
-    case 'roraima':
-      return 'RR';
-    case 'santa-catarina':
-      return 'SC';
-    case 'sao-paulo':
-      return 'SP';
-    case 'sergipe':
-      return 'SE';
-    case 'tocantins':
-      return 'TO';
-
-    default:
-      return region;
-  }
-}
-
-export {
-  money,
-  moneyToString,
-  createProdList,
-  createProdItem,
-  createMarketList as createMercList,
-  createMarketItem as createMercItem,
-  documentMask,
-  computeDistance,
-  isMarketOpen,
-  getImageUrl,
-  removeZero,
-  removeAccents,
-  getStateCode,
-};
+export const getStateCode = (region: string) =>
+  ({
+    acre: 'AC',
+    alagoas: 'AL',
+    amapa: 'AP',
+    amazonas: 'AM',
+    bahia: 'BA',
+    ceara: 'CE',
+    'distrito-federal': 'DF',
+    'espirito-santo': 'ES',
+    goias: 'GO',
+    maranhao: 'MA',
+    'mato-grosso': 'MT',
+    'mato-grosso-do-sul': 'MS',
+    'minas-gerais': 'MG',
+    para: 'PA',
+    paraiba: 'PB',
+    parana: 'PR',
+    pernambuco: 'PE',
+    piaui: 'PI',
+    'rio-de-janeiro': 'RJ',
+    'rio-grande-do-norte': 'RN',
+    'rio-grande-do-sul': 'RS',
+    rondonia: 'RO',
+    roraima: 'RR',
+    'santa-catarina': 'SC',
+    'sao-paulo': 'SP',
+    sergipe: 'SE',
+    tocantins: 'TO',
+  }[removeAccents(region)] ?? region);

@@ -1,30 +1,26 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import React from 'react';
-import { KeyboardAvoidingView, StatusBar, View } from 'react-native';
-import Header from '~/components/Header';
-import MyDivider from '~/components/MyDivider';
+import { KeyboardAvoidingView, View } from 'react-native';
+import MyHeader from '~/components/MyHeader';
 import { device, myColors, myTitle } from '~/constants';
-import PaymentInApp from '@pages/pagamento';
-import PaymentOnDelivery from '@pages/pagamento-entrega';
+import { PaymentOnApp } from '@pages/pagamento';
 import Portal from '~/core/Portal';
 import { RouteProp } from '@react-navigation/core';
+import PaymentOnDelivery from './PaymentOnDelivery';
+import { appOrSite, notchHeight } from '~/constants/device';
 
 const Tab = createMaterialTopTabNavigator();
 
-function PaymentTabs({ route }: { route: RouteProp<any> }) {
+const PaymentTabs = ({ route }: { route: RouteProp<any> }) => {
   const paymentTabs = (
     <Portal.Host>
       <View
         style={{
-          height: device.android
-            ? StatusBar.currentHeight
-            : device.iPhoneNotch
-            ? 34
-            : 0,
+          height: notchHeight,
           backgroundColor: myColors.background,
         }}
       />
-      <Header title='Pagamento' divider={false} notchless />
+      <MyHeader title='Pagamento' dividerLess notchLess />
       <View style={{ flex: 1 }}>
         <Tab.Navigator
           screenOptions={{
@@ -34,23 +30,17 @@ function PaymentTabs({ route }: { route: RouteProp<any> }) {
           }}>
           <Tab.Screen
             name='PaymentInApp'
-            component={PaymentInApp}
-            options={{ tabBarLabel: 'Pagar pelo app' }}
+            options={{ tabBarLabel: `Pagar pelo ${appOrSite}` }}
+            component={PaymentOnApp}
+            initialParams={route.params?.params}
           />
           <Tab.Screen
             name='PaymentOnDelivery'
+            options={{ tabBarLabel: 'Pagar na entrega' }}
             component={PaymentOnDelivery}
-            options={{ tabBarLabel: 'Pagar na entreaga' }}
             initialParams={route.params?.params}
           />
         </Tab.Navigator>
-        {/* <MyDivider
-          style={{
-            position: 'absolute',
-            width: '100%',
-            bottom: 0,
-          }}
-        /> */}
       </View>
     </Portal.Host>
   );
@@ -63,6 +53,6 @@ function PaymentTabs({ route }: { route: RouteProp<any> }) {
     );
 
   return paymentTabs;
-}
+};
 
 export default PaymentTabs;

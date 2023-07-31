@@ -2,7 +2,6 @@ import React from 'react';
 import { Picker } from '@react-native-picker/picker';
 import {
   View,
-  Text,
   Modal,
   StyleSheet,
   StyleProp,
@@ -10,11 +9,12 @@ import {
   Pressable,
   TouchableOpacity,
 } from 'react-native';
-import { device, myColors } from '~/constants';
+import { device, myColors, myFonts } from '~/constants';
 import MyIcon from './MyIcon';
 import MyDivider from './MyDivider';
+import MyText from './MyText';
 
-function MyPicker({
+const MyPicker = ({
   items,
   label,
   errorMessage = '',
@@ -28,29 +28,24 @@ function MyPicker({
   style: StyleProp<ViewStyle>;
   selectedValue?: string;
   onValueChange: (v: string) => void;
-}) {
+}) => {
   const [visible, setVisible] = React.useState(false);
   const [value, setValue] = React.useState(selectedValue);
-  items = ['-', ...items];
 
-  const PickerItems = () => {
-    return items.map((item, i) => {
-      return (
-        <Picker.Item
-          key={item}
-          label={item}
-          value={item}
-          color={i === 0 ? '#9EA0A4' : myColors.text4_5}
-          style={{ fontSize: 18 }}
-        />
-      );
-    });
-  };
+  const pickerItems = ['-', ...items].map((item, i) => (
+    <Picker.Item
+      key={item}
+      label={item}
+      value={item}
+      color={i === 0 ? '#9EA0A4' : myColors.text4_5}
+      style={{ fontSize: 18 }}
+    />
+  ));
 
   if (device.iOS)
     return (
-      <View style={[styles.conteiner, style]}>
-        <Text style={styles.label}>{label}</Text>
+      <View style={[styles.container, style]}>
+        <MyText style={styles.label}>{label}</MyText>
         <TouchableOpacity
           style={{
             flexDirection: 'row',
@@ -58,11 +53,11 @@ function MyPicker({
             alignItems: 'center',
           }}
           onPress={() => setVisible(true)}>
-          <Text style={styles.input}>{value}</Text>
+          <MyText style={styles.input}>{value}</MyText>
           <MyIcon name='menu-down' color='#777' style={{ marginRight: 12 }} />
         </TouchableOpacity>
         <MyDivider style={styles.divider} />
-        <Text style={styles.error}>{errorMessage}</Text>
+        <MyText style={styles.error}>{errorMessage}</MyText>
         <Modal transparent visible={visible} animationType='slide'>
           <Pressable
             style={StyleSheet.absoluteFill}
@@ -71,7 +66,7 @@ function MyPicker({
           <View style={{ position: 'absolute', bottom: 0, width: '100%' }}>
             <View style={styles.toolbar}>
               <Pressable onPress={() => setVisible(false)}>
-                <Text style={styles.done}>Done</Text>
+                <MyText style={styles.done}>Done</MyText>
               </Pressable>
             </View>
             <Picker
@@ -81,7 +76,7 @@ function MyPicker({
                 onValueChange(v);
                 setValue(v);
               }}>
-              {PickerItems()}
+              {pickerItems}
             </Picker>
           </View>
         </Modal>
@@ -90,8 +85,8 @@ function MyPicker({
 
   if (device.web)
     return (
-      <View style={[styles.conteiner, style]}>
-        <Text style={styles.label}>{label}</Text>
+      <View style={[styles.container, style]}>
+        <MyText style={styles.label}>{label}</MyText>
         <Picker
           style={{ height: 52, paddingVertical: 8, zIndex: 2, opacity: 0 }}
           selectedValue={value}
@@ -99,7 +94,7 @@ function MyPicker({
             onValueChange(v);
             setValue(v);
           }}>
-          {PickerItems()}
+          {pickerItems}
         </Picker>
         <View
           style={{
@@ -110,17 +105,17 @@ function MyPicker({
             width: '100%',
             height: 46,
           }}>
-          <Text style={styles.input}>{value}</Text>
+          <MyText style={styles.input}>{value}</MyText>
           <MyIcon name='menu-down' color='#777' style={{ marginRight: 12 }} />
         </View>
         <MyDivider style={styles.divider} />
-        <Text style={styles.error}>{errorMessage}</Text>
+        <MyText style={styles.error}>{errorMessage}</MyText>
       </View>
     );
 
   return (
-    <View style={[styles.conteiner, style]}>
-      <Text style={[styles.label, { marginBottom: 10 }]}>{label}</Text>
+    <View style={[styles.container, style]}>
+      <MyText style={[styles.label, { marginBottom: 10 }]}>{label}</MyText>
       <Picker
         mode='dropdown'
         selectedValue={value}
@@ -128,29 +123,30 @@ function MyPicker({
           onValueChange(v);
           setValue(v);
         }}>
-        {PickerItems()}
+        {pickerItems}
       </Picker>
       <MyDivider style={[styles.divider, { top: 8 }]} />
-      <Text style={styles.error}>{errorMessage}</Text>
+      <MyText style={styles.error}>{errorMessage}</MyText>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  conteiner: {
+  container: {
     marginLeft: 3,
+    paddingBottom: 4,
   },
   label: {
     color: myColors.primaryColor,
     marginLeft: 7,
     alignSelf: 'flex-start',
     fontSize: 16,
-    fontFamily: 'Bold',
+    fontFamily: myFonts.Bold,
   },
   input: {
     paddingHorizontal: 8,
     paddingVertical: 16,
-    fontSize: 17,
+    fontSize: 18,
   },
   error: {
     fontSize: 12,

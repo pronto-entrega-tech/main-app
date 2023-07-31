@@ -1,28 +1,55 @@
 {
   "Create component": {
-    "scope": "javascriptreact,typescriptreact",
+    "scope": "typescriptreact",
     "prefix": ["react-component", "rc"],
     "body": [
       "import React from \"react\";",
       "",
-      "function $TM_FILENAME_BASE() {",
+      "const $TM_FILENAME_BASE = () => {",
       "  return (",
       "    ",
       "  )",
       "}",
       "",
       "export default $TM_FILENAME_BASE;"
-    ],
-    "description": "Create a React component."
+    ]
+  },
+  "Create useState": {
+    "scope": "typescriptreact",
+    "prefix": ["use-state", "us"],
+    "body": ["const [state, setState] = useState();"]
   },
   "Create useEffect": {
-    "scope": "javascriptreact,typescriptreact",
-    "prefix": ["use-effect", "us"],
+    "scope": "typescriptreact",
+    "prefix": ["use-effect", "ue"],
     "body": ["useEffect(() => {", "", "}, [])"]
   },
   "Create StyleSheet": {
-    "scope": "javascriptreact,typescriptreact",
-    "prefix": ["create-stylesheet", "cs"],
+    "scope": "typescriptreact",
+    "prefix": ["create-stylesheet", "css"],
     "body": ["const styles = StyleSheet.create({", "", "})"]
+  },
+  "Create context": {
+    "scope": "typescriptreact",
+    "prefix": ["context"],
+    "body": [
+      "import { ReactNode, useState, useCallback } from 'react';",
+      "import { createContext } from 'use-context-selector';",
+      "import { createUseContext } from '~/functions/createUseContext';",
+      "",
+      "const useProviderValues = () => {",
+      "  return {};",
+      "};",
+      "",
+      "type ${TM_FILENAME_BASE}Values = ReturnType<typeof useProviderValues>;",
+      "",
+      "const ${TM_FILENAME_BASE} = createContext({} as ${TM_FILENAME_BASE}Values);",
+      "",
+      "export const use${TM_FILENAME_BASE} = createUseContext(${TM_FILENAME_BASE});",
+      "",
+      "export const ${TM_FILENAME_BASE/Context/$1/}Provider = (props: { children: ReactNode }) => (",
+      "  <${TM_FILENAME_BASE}.Provider value={useProviderValues()} {...props} />",
+      ");"
+    ]
   }
 }

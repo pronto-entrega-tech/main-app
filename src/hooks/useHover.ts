@@ -9,7 +9,7 @@ export type UseHover = [
   }
 ];
 
-export default function useHover(): UseHover {
+const useHover = (): UseHover => {
   const [hovered, setHovered] = React.useState(false);
 
   const hoverBind = {
@@ -19,4 +19,6 @@ export default function useHover(): UseHover {
   };
 
   return [hovered, hoverBind];
-}
+};
+
+export default useHover;

@@ -1,64 +1,94 @@
-import React from 'react';
-import { Text, ScrollView, StyleSheet, View, TextInput } from 'react-native';
-import { Input } from 'react-native-elements/dist/input/Input';
+import React, { useEffect, createRef, useState } from 'react';
+import { StyleSheet, View, TextInput } from 'react-native';
 import { getDocumentAsync, DocumentResult } from 'expo-document-picker';
 import Loading from '~/components/Loading';
-import { device, myColors } from '~/constants';
-import { getProfile } from '~/core/dataStorage';
+import { device, globalStyles, myColors, myFonts } from '~/constants';
 import useMyContext from '~/core/MyContext';
 import IconButton from '~/components/IconButton';
 import MyButton from '~/components/MyButton';
-import myAlert from '~/functions/myAlert';
 import MyDivider from '~/components/MyDivider';
 import MyIcon from '~/components/MyIcon';
-import Header from '~/components/Header';
+import MyHeader from '~/components/MyHeader';
 import useRouting from '~/hooks/useRouting';
+import { reduceErrors } from '~/functions/reduceErrors';
+import MyText from '~/components/MyText';
+import { useAuthContext } from '~/contexts/AuthContext';
+import FormContainer from '~/components/FormContainer';
+import MyInput from '~/components/MyInput';
+import { api } from '~/services/api';
 
-const emailCorrectRega =
+const emailRegex =
   /[a-zA-Z0-9.!#$%&'*+/=?`{|}~^-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-const emailCompleteReg = /^(.+)@(.+)\.(.{2,})$/;
+/* const emailCompleteReg = /^(.+)@(.+)\.(.{2,})$/; */
 
-function UploadQuestion() {
+const UploadQuestion = () => (
+  <>
+    <MyHeader title='Envie sua dúvida' />
+    <UploadQuestionBody />
+  </>
+);
+
+const UploadQuestionBody = () => {
   const routing = useRouting();
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [email, setEmail] = React.useState<string>('');
-  const [emailError, setEmailError] = React.useState<boolean>(false);
-  const [title, setTitle] = React.useState<string>('');
-  const [titleError, setTitleError] = React.useState<boolean>(false);
-  const [message, setMessage] = React.useState<string>('');
-  const [messageError, setMessageError] = React.useState<boolean>(false);
-  const [documents, setDocuments] = React.useState<DocumentResult[]>([]);
-  const { toast } = useMyContext();
+  const { toast, alert } = useMyContext();
+  const { isAuth, accessToken } = useAuthContext();
+  const [email, setEmail] = useState<string>();
+  const [emailError, setEmailError] = useState(false);
+  const [title, setTitle] = useState('');
+  const [titleError, setTitleError] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageError, setMessageError] = useState(false);
+  const [documents, setDocuments] = useState<DocumentResult[]>([]);
 
-  React.useEffect(() => {
-    getProfile().then((profile) => {
-      if (profile) setEmail(profile.email);
-      setIsLoading(false);
-    });
-  }, []);
+  const inputTitle = createRef<TextInput>();
+  const inputMessage = createRef<TextInput>();
 
-  const inputTitle = React.useRef<TextInput | null>();
-  const inputMessage = React.useRef<TextInput | null>();
+  useEffect(() => {
+    if (isAuth === false) return setEmail('');
 
-  if (isLoading) return <Loading />;
+    if (accessToken)
+      api.customers.find(accessToken).then(({ email }) => {
+        setEmail(email ?? '');
+      });
+  }, [isAuth, accessToken]);
+
+  if (email === undefined) return <Loading />;
+
+  const send = () => {
+    const hasError = reduceErrors([
+      [!emailRegex.test(email), setEmailError],
+      [!title, setTitleError],
+      [!message, setMessageError],
+    ]);
+    if (hasError) return;
+
+    toast('Dúvida enviada');
+    routing.navigate('Profile');
+  };
+
+  const addFile = async () => {
+    if (documents.length > 4) return alert('Máximo de 5 anexos');
+
+    const document = await getDocumentAsync({ copyToCacheDirectory: false });
+
+    if (document.type === 'cancel') return;
+
+    setDocuments([...documents, document]);
+  };
 
   return (
     <>
-      <Header title={'Envie sua dúvida'} />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.conteiner}>
-        <Input
+      <FormContainer>
+        <MyInput
           label='Email'
           labelStyle={styles.label}
           errorMessage={emailError ? 'Email inválido' : ''}
           defaultValue={email}
           placeholder='nome@email.com'
           keyboardType='email-address'
-          autoCompleteType='email'
+          autoComplete='email'
           autoCapitalize='none'
           autoCorrect={false}
-          selectionColor={myColors.colorAccent}
           inputStyle={styles.border}
           inputContainerStyle={{ borderColor: 'transparent' }}
           onChangeText={(v) => {
@@ -68,11 +98,11 @@ function UploadQuestion() {
           returnKeyType='next'
           onSubmitEditing={() => inputTitle.current?.focus()}
         />
-        <Input
+        <MyInput
+          _ref={inputTitle}
           label='Assunto'
           labelStyle={styles.label}
           errorMessage={titleError ? 'Insira assunto' : ''}
-          selectionColor={myColors.colorAccent}
           inputStyle={styles.border}
           inputContainerStyle={{ borderColor: 'transparent' }}
           onChangeText={(v) => {
@@ -81,13 +111,12 @@ function UploadQuestion() {
           }}
           returnKeyType='next'
           onSubmitEditing={() => inputMessage.current?.focus()}
-          ref={(ref: any) => (inputTitle.current = ref)}
         />
-        <Input
+        <MyInput
+          _ref={inputMessage}
           label='Descrição'
           labelStyle={styles.label}
           errorMessage={messageError ? 'Insira descrição' : ''}
-          selectionColor={myColors.colorAccent}
           inputStyle={styles.border}
           inputContainerStyle={{ borderColor: 'transparent' }}
           style={{ textAlignVertical: 'top' }}
@@ -97,39 +126,29 @@ function UploadQuestion() {
             setMessageError(false);
             setMessage(v);
           }}
-          ref={(ref: any) => (inputMessage.current = ref)}
         />
 
-        <Text
+        <MyText
           style={[
             styles.label,
             {
               alignSelf: 'flex-start',
-              fontFamily: 'Bold',
+              fontFamily: myFonts.Bold,
               marginLeft: 19,
               fontSize: 16,
             },
           ]}>
           Anexos
-        </Text>
+        </MyText>
         <View style={styles.attachment}>
           <MyButton
             title='Adicionar arquivo'
             type='clear'
-            buttonStyle={{ borderRadius: 12, width: device.width - 20 }}
-            onPress={() => {
-              (async () => {
-                const document = await getDocumentAsync({
-                  copyToCacheDirectory: false,
-                });
-                if (document.type == 'cancel') return;
-                if (documents.length > 4) return myAlert('Máximo de 5 anexos');
-                setDocuments([...documents, document]);
-              })();
-            }}
+            buttonStyle={{ borderRadius: 12, width: '100%' }}
+            onPress={addFile}
           />
-          {documents.map((item, i) => {
-            if (item.type == 'cancel') return;
+          {documents.map((doc, i) => {
+            if (doc.type === 'cancel') return;
             return (
               <View key={i}>
                 <MyDivider
@@ -152,13 +171,13 @@ function UploadQuestion() {
                       color={myColors.primaryColor}
                       style={{ padding: 12 }}
                     />
-                    <Text
+                    <MyText
                       style={{
                         color: myColors.text4,
                         maxWidth: device.width - 120,
                       }}>
-                      {item.name}
-                    </Text>
+                      {doc.name}
+                    </MyText>
                   </View>
                   <View
                     style={{
@@ -170,7 +189,7 @@ function UploadQuestion() {
                       icon='close-circle'
                       type='cancel'
                       onPress={() =>
-                        setDocuments(documents.filter((v) => v != item))
+                        setDocuments(documents.filter((v) => v !== doc))
                       }
                     />
                   </View>
@@ -179,41 +198,18 @@ function UploadQuestion() {
             );
           })}
         </View>
-      </ScrollView>
+      </FormContainer>
       <MyButton
         title='Enviar'
         type='outline'
-        buttonStyle={styles.button}
-        onPress={() => {
-          let error = false;
-          if (!emailCorrectRega.test(email)) {
-            error = true;
-            setEmailError(true);
-          }
-          if (title == '') {
-            error = true;
-            setTitleError(true);
-          }
-          if (message == '') {
-            error = true;
-            setMessageError(true);
-          }
-          if (error) return;
-          toast('Dúvida enviada');
-          routing.navigate('/perfil', 'redirect');
-        }}
+        buttonStyle={globalStyles.bottomButton}
+        onPress={send}
       />
     </>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  conteiner: {
-    alignItems: 'center',
-    backgroundColor: myColors.background,
-    paddingTop: 24,
-    paddingBottom: 8 + 46 + (device.iPhoneNotch ? 38 : 12),
-  },
   label: {
     color: myColors.primaryColor,
     marginBottom: 6,
@@ -229,17 +225,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: myColors.primaryColor,
     borderRadius: 12,
-    width: device.width - 20,
+    marginHorizontal: 10,
     borderStyle: 'dashed',
-  },
-  button: {
-    position: 'absolute',
-    alignSelf: 'center',
-    bottom: device.iPhoneNotch ? 38 : 12,
-    borderWidth: 2,
-    width: 120,
-    height: 46,
-    backgroundColor: '#fff',
   },
 });
 

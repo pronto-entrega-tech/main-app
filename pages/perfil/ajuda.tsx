@@ -1,17 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import Header from '~/components/Header';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import MyHeader from '~/components/MyHeader';
 import { WithBottomNav } from '~/components/Layout';
 import MyButton from '~/components/MyButton';
 import MyDivider from '~/components/MyDivider';
-import { myColors } from '~/constants';
+import { myColors, myFonts } from '~/constants';
+import MyText from '~/components/MyText';
 
-interface HelpOption {
+type HelpOption = {
   route: string;
   title: string;
   body: string;
   navigate?: string;
-}
+};
 
 export const helpList1: HelpOption[] = [
   {
@@ -46,7 +47,7 @@ const helpList2: HelpOption[] = [
     route: '',
     title: 'Envie sua dúvida',
     body: '',
-    navigate: '/mandar-pergunta',
+    navigate: 'UploadQuestion',
   },
   {
     route: 'parceiro',
@@ -57,46 +58,44 @@ const helpList2: HelpOption[] = [
 
 export const helpList = [...helpList1, ...helpList2];
 
-function HelpList({ title, list }: { title: string; list: HelpOption[] }) {
-  return (
-    <>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>{title}</Text>
+const HelpList = ({ title, list }: { title: string; list: HelpOption[] }) => (
+  <>
+    <View style={styles.header}>
+      <MyText style={styles.headerText}>{title}</MyText>
+    </View>
+    {list.map((item, index) => (
+      <View key={index}>
+        <MyButton
+          screen={item.navigate ?? 'Questions'}
+          params={{ question: item.route }}
+          type='clear'
+          title={item.title}
+          titleStyle={styles.buttonText}
+          buttonStyle={styles.button}
+        />
+        <MyDivider style={styles.divider} />
       </View>
-      {list.map((item, index) => (
-        <View key={index}>
-          <MyButton
-            path={item.navigate ?? `/perfil/perguntas/${item.route}`}
-            type='clear'
-            title={item.title}
-            titleStyle={styles.buttonText}
-            buttonStyle={styles.button}
-          />
-          <MyDivider style={styles.divider} />
-        </View>
-      ))}
-    </>
-  );
-}
+    ))}
+  </>
+);
 
-function Help() {
-  return (
-    <>
-      <Header title={'Central de ajuda'} />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          backgroundColor: myColors.background,
-          flex: 1,
-        }}>
-        <HelpList title='Perguntas Frenquentes' list={helpList1} />
-        <HelpList title='Atendimento' list={helpList2} />
-      </ScrollView>
-    </>
-  );
-}
+const Help = () => (
+  <>
+    <MyHeader title='Central de ajuda' />
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.container}>
+      <HelpList title='Perguntas Frequentes' list={helpList1} />
+      <HelpList title='Atendimento' list={helpList2} />
+    </ScrollView>
+  </>
+);
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: myColors.background,
+    paddingBottom: 56,
+  },
   header: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -108,11 +107,11 @@ const styles = StyleSheet.create({
   },
   headerText: {
     color: '#FFF',
-    fontWeight: 'bold',
+    fontFamily: myFonts.Bold,
     fontSize: 16,
   },
   button: {
-    height: 48,
+    minHeight: 48,
   },
   buttonText: {
     color: myColors.text,

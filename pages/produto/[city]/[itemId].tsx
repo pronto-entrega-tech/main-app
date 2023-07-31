@@ -1,0 +1,298 @@
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Image } from 'react-native-elements/dist/image/Image';
+import IconButton from '~/components/IconButton';
+import ProdListHorizontal from '~/components/ProdListHorizontal';
+import { myColors, device, myFonts } from '~/constants';
+import { getImageUrl } from '~/functions/converter';
+import { calcPrices, money } from '~/functions/money';
+import MyIcon from '~/components/MyIcon';
+import MyDivider from '~/components/MyDivider';
+import useRouting from '~/hooks/useRouting';
+import Loading from '~/components/Loading';
+import Errors, { MyErrors } from '~/components/Errors';
+import { GetStaticPaths, GetStaticProps } from 'next';
+import AnimatedText from '~/components/AnimatedText';
+import { MarketFeed } from '@pages/inicio/mercado/[city]/[marketId]';
+import ProductHeader from '~/components/ProductHeader';
+import { SinglePageTabs } from '~/components/SinglePageTabs';
+import CartBar from '~/components/CartBar';
+import { Product, SetState } from '~/core/models';
+import MyText from '~/components/MyText';
+import { api } from '~/services/api';
+import { useCartContext } from '~/contexts/CartContext';
+
+const ProductDetailsHeader = ({
+  setMarketId,
+}: {
+  setMarketId?: SetState<string | undefined>;
+}) => {
+  const { params } = useRouting();
+  const { shoppingList, addProduct, removeProduct } = useCartContext();
+  const [error, setError] = useState<MyErrors>(null);
+  const [tryAgain, setTryAgain] = useState(false);
+  const [product, setProduct] = useState<Product>();
+
+  useEffect(() => {
+    if (product?.item_id === params.itemId) return;
+
+    const { city, itemId } = params;
+    if (!city || !itemId) return setError('nothing_product');
+
+    (async () => {
+      try {
+        setError(null);
+
+        const prod = await api.products.findOne(city, itemId);
+        if (!prod) return setError('nothing_product');
+
+        setProduct(prod);
+        setMarketId?.(prod.market_id);
+      } catch {
+        setError('server');
+      }
+    })();
+  }, [tryAgain, product, params, setMarketId]);
+
+  if (error)
+    return <Errors error={error} onPress={() => setTryAgain(!tryAgain)} />;
+
+  if (!product || product.item_id !== params.itemId) return <Loading />;
+
+  const quantity = shoppingList?.get(product.item_id)?.quantity;
+  const { price, previous_price, discountText } = calcPrices(product);
+
+  return (
+    <>
+      <View
+        style={{
+          flexDirection: 'row',
+          paddingHorizontal: 13,
+          paddingTop: 6,
+          paddingBottom: 10,
+        }}>
+        <View style={{ flex: 1, flexDirection: 'column' }}>
+          <MyText numberOfLines={3} style={styles.prodText}>
+            {product.name} {product.brand}
+          </MyText>
+          {discountText && (
+            <View style={styles.oldPriceContainer}>
+              <View style={styles.offTextBox}>
+                <MyText style={styles.offText}>{discountText}</MyText>
+              </View>
+              <MyText style={styles.oldPriceText}>
+                {money.toString(previous_price, 'R$')}
+              </MyText>
+            </View>
+          )}
+          <MyText style={styles.priceText}>
+            {money.toString(price, 'R$')}
+          </MyText>
+          <MyText style={styles.quantityText}>{product.quantity}</MyText>
+        </View>
+
+        <View style={{ flexDirection: 'column' }}>
+          {product.images_names ? (
+            <Image
+              placeholderStyle={{ backgroundColor: 'white' }}
+              PlaceholderContent={
+                <MyIcon name='cart-outline' color={myColors.grey2} size={140} />
+              }
+              source={{ uri: getImageUrl('product', product.images_names[0]) }}
+              resizeMode='contain'
+              style={styles.image}
+            />
+          ) : (
+            <MyIcon
+              name='cart-outline'
+              color={myColors.rating}
+              size={140}
+              style={styles.image}
+            />
+          )}
+
+          <View style={styles.containerAdd}>
+            <IconButton
+              icon='minus'
+              size={24}
+              color={myColors.primaryColor}
+              type='addLarge'
+              onPress={() => removeProduct(product)}
+            />
+            <AnimatedText style={styles.centerNumText} animateZero>
+              {quantity ?? 0}
+            </AnimatedText>
+            <IconButton
+              icon='plus'
+              type='addLarge'
+              onPress={() => addProduct(product)}
+            />
+          </View>
+        </View>
+      </View>
+      <KitItems product={product} />
+
+      <MyDivider style={{ height: 2 }} />
+      <MyText style={styles.ofertasText}>Compare ofertas</MyText>
+    </>
+  );
+};
+
+export const ProductDetails = (
+  ...[props]: Parameters<typeof ProductDetailsHeader>
+) => (
+  <View style={{ backgroundColor: myColors.background, flex: 1 }}>
+    <ProdListHorizontal header={<ProductDetailsHeader {...props} />} />
+  </View>
+);
+
+const KitItems = ({ product }: { product: Product }) => {
+  const items = product.details.reverse().map(({ name, quantity }, i) => (
+    <MyText
+      key={i}
+      style={{
+        paddingVertical: 10,
+        paddingHorizontal: 14,
+        color: myColors.text4,
+      }}>
+      {quantity}x {name}
+    </MyText>
+  ));
+
+  return (
+    <>
+      <MyDivider style={{ height: 1 }} />
+      {items}
+    </>
+  );
+};
+
+const ProductTabs = () => {
+  const [marketId, setMarketId] = useState<string>();
+
+  return (
+    <>
+      <SinglePageTabs
+        header={<ProductHeader />}
+        tabs={[
+          {
+            title: 'Produto',
+            element: <ProductDetails {...{ setMarketId }} />,
+          },
+          {
+            title: 'Mercado',
+            element: <MarketFeed {...{ marketId }} />,
+          },
+        ]}
+      />
+      <CartBar />
+    </>
+  );
+};
+
+const textLinePad = device.android ? -2 : 1;
+const styles = StyleSheet.create({
+  placeholderColor: {
+    backgroundColor: 'transparent',
+  },
+  image: {
+    marginTop: 10,
+    height: 140,
+    width: 140,
+    marginHorizontal: 4,
+  },
+  prodText: {
+    color: myColors.grey3,
+    fontSize: 20,
+    marginTop: 8,
+    marginBottom: 8,
+    fontFamily: myFonts.Condensed,
+    position: 'absolute',
+  },
+  oldPriceContainer: {
+    flexDirection: 'row',
+    position: 'absolute',
+    alignItems: 'center',
+    marginTop: 80,
+  },
+  oldPriceText: {
+    textDecorationLine: 'line-through',
+    color: myColors.grey2,
+    fontSize: 18,
+    fontFamily: myFonts.Regular,
+    marginLeft: 8,
+  },
+  offTextBox: {
+    paddingVertical: 5,
+    paddingHorizontal: 4,
+    backgroundColor: myColors.primaryColor,
+    borderRadius: 8,
+  },
+  offText: {
+    color: '#FFF',
+    fontFamily: myFonts.Bold,
+    fontSize: 15,
+  },
+  priceText: {
+    color: myColors.text3,
+    marginTop: 112 + textLinePad,
+    fontSize: 27,
+    fontFamily: myFonts.Medium,
+  },
+  brandText: {
+    color: myColors.grey2,
+    fontFamily: myFonts.Regular,
+    fontSize: 19,
+  },
+  quantityText: {
+    marginTop: 4 + textLinePad,
+    color: myColors.grey2,
+    fontFamily: myFonts.Regular,
+    fontSize: 19,
+  },
+  containerAdd: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+  },
+  centerNumText: {
+    fontSize: 17,
+    color: myColors.text3,
+    fontFamily: myFonts.Medium,
+  },
+  ofertasText: {
+    marginLeft: 16,
+    marginVertical: 12,
+    color: myColors.text3,
+    fontSize: 16,
+    fontFamily: myFonts.Regular,
+  },
+});
+
+export default ProductTabs;
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [{ params: { city: 'jatai-go', itemId: '1' } }],
+    fallback: 'blocking',
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const getProps = async () => {
+    if (!params) return;
+
+    const city = params.city;
+    const itemId = params.itemId;
+    if (typeof city !== 'string' || typeof itemId !== 'string') return;
+
+    return { product: await api.products.findOne(city, itemId) };
+  };
+
+  return {
+    revalidate: 60,
+    props: (await getProps()) ?? {},
+  };
+};

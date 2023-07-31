@@ -12,35 +12,35 @@ import {
 } from 'react-native';
 import device from '~/constants/device';
 import innerUseHover, { UseHover } from '~/hooks/useHover';
-/* import { useRouting } from 'expo-next-react-navigation'; */
 import useRouting from '~/hooks/useRouting';
+import { urlFrom } from '~/functions/converter';
 
-interface OnlyButton {
+type OnlyButton = {
   /**
-   * To navegate use the `path` instead, so this button become a link.
+   * To navigate use the `screen` instead, so this button become a link.
    */
   onPress?: (event: GestureResponderEvent) => void;
 
-  path?: undefined;
+  screen?: undefined;
   params?: undefined;
-}
+};
 
-interface OnlyLink {
+type OnlyLink = {
   /**
    * When defined, this button become a link.
    */
-  path: string;
+  screen: string;
   /**
-   * Params to pass to the route, use with `path`.
+   * Params to pass to the route, use with `screen`.
    */
   params?: any;
 
   onPress?: undefined;
-}
+};
 
-export type ButtonOrLink<T = null> = (OnlyButton | OnlyLink) & T;
+export type ButtonOrLink<T = any> = (OnlyButton | OnlyLink) & T;
 
-interface MyTouchableBase {
+type MyTouchableBase = {
   children?: React.ReactNode;
   disabled?: boolean;
   hitSlop?: Insets;
@@ -51,60 +51,63 @@ interface MyTouchableBase {
   hoverStyle?: ViewStyle;
   useHover?: UseHover;
   solid?: boolean;
-}
+};
 
 type MyTouchableProps = ButtonOrLink<MyTouchableBase>;
 
-function MyTouchable({
+const useTryRouting = () => {
+  try {
+    return useRouting().navigate;
+  } catch {
+    return () => undefined;
+  }
+};
+
+const MyTouchable = ({
   onPress,
-  path,
+  screen,
   params,
   children,
-  disabled,
+  disabled = !onPress && !screen,
   hitSlop,
   style,
   hoverStyle,
   useHover,
   solid,
-}: MyTouchableProps) {
-  const { navigate } = useRouting();
+}: MyTouchableProps) => {
+  const navigate = useTryRouting();
 
   if (device.web) {
     const [isHovered, hoverBind] = useHover ?? innerUseHover();
 
-    const baseStyle = {
-      transitionDuration: '200ms',
-    } as ViewStyle;
-    const baseHoverStyle = {
-      opacity: 0.5,
-    };
-    const hovered = !!(isHovered && (path || !disabled)); // should be a link or a button not disabled
+    const baseStyle = { transitionDuration: '200ms' } as ViewStyle;
+    const baseHoverStyle = { opacity: 0.5 };
+    const hovered = !!(isHovered && (screen || !disabled)); // should be a link or a button not disabled
 
     const Touchable = (
       <View
-        accessibilityRole={path ? 'link' : 'button'}
+        accessibilityRole={screen ? 'link' : 'button'}
         {...hoverBind}
-        {...{ onClick: !path && !disabled ? onPress : undefined }}
+        {...{ onClick: !screen && !disabled ? onPress : undefined }}
         style={[style, baseStyle, hovered && (hoverStyle ?? baseHoverStyle)]}>
         <>{children}</>
       </View>
     );
 
-    if (path) {
+    if (screen)
       return (
-        <Link href={{ pathname: path, query: params }} passHref>
+        <Link href={urlFrom(screen, params)} passHref>
           {Touchable}
         </Link>
       );
-    }
 
     return Touchable;
   }
 
-  const onPressOrNav = !path ? onPress : () => navigate(path, params);
+  const onPressOrNav = !screen ? onPress : () => navigate(screen, params);
 
   if (device.iOS) {
-    const TouchableHybrid = solid ? TouchableHighlight : TouchableOpacity;
+    const TouchableHybrid: any = solid ? TouchableHighlight : TouchableOpacity;
     return (
       <TouchableHybrid
         underlayColor='#68b5f2'
@@ -131,18 +134,6 @@ function MyTouchable({
       <View style={[{ overflow: 'hidden' }, style]}>{children}</View>
     </TouchableNativeFeedback>
   );
-
-  /* return (
-    <TouchableRipple
-      rippleColor={solid ? 'rgba(255, 255, 255, .32)' : undefined}
-      underlayColor={solid ? '#68b5f2' : undefined}
-      hitSlop={hitSlop}
-      disabled={disabled}
-      onPress={onPress}
-      style={style}>
-      <>{children}</>
-    </TouchableRipple>
-  ); */
-}
+};
 
 export default MyTouchable;

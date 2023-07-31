@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react';
+import { SetState } from './models';
 
-interface PortalValues {
-  setGates: React.Dispatch<React.SetStateAction<React.ReactNode>>;
-}
+type PortalValues = {
+  setGates: SetState<React.ReactNode>;
+};
 const PortalContext = React.createContext({} as PortalValues);
 
-function Portal(props: { children: React.ReactNode }) {
-  const { children } = props;
+const Portal = ({ children }: { children: React.ReactNode }) => {
   const { setGates } = React.useContext(PortalContext);
 
   useEffect(() => {
     if (setGates) setGates(children);
   }, [children, setGates]);
 
-  // `void` is not a valid JSX element
   return null;
-}
+};
 
-Portal.Host = function PortalHost(props: { children: React.ReactNode }) {
+const Host = (props: { children: React.ReactNode }) => {
   const [gates, setGates] = useState<React.ReactNode>();
 
   return (
@@ -27,5 +26,6 @@ Portal.Host = function PortalHost(props: { children: React.ReactNode }) {
     </PortalContext.Provider>
   );
 };
+Portal.Host = Host;
 
 export default Portal;

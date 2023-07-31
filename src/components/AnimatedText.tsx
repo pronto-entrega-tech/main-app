@@ -1,42 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { Animated } from 'react-native';
 import { device, myFonts } from '~/constants';
-import {
-  isEqual,
-  isGreater,
-  Money,
-  moneyToString,
-} from '~/functions/converter';
+import { Money, money } from '~/functions/money';
 
-export default function AnimatedText({
+const AnimatedText = ({
   children: value,
   style,
-  distace = 20,
+  distance = 20,
   duration = 100,
   animateZero = false,
 }: {
   children: number | Money;
   style?: any;
-  distace?: number;
+  distance?: number;
   duration?: number;
   animateZero?: boolean;
-}) {
+}) => {
+  const [showValue, setShowValue] = useState(value);
   const [valueState] = useState({
     translateY: new Animated.Value(0),
     opacity: new Animated.Value(1),
   });
-  const [showValue, setShowValue] = useState(value);
 
   useEffect(() => {
-    if (isEqual(showValue, value)) return;
-    if (value === 0 && !animateZero) return setShowValue(0); // the conteiner will hide, so skip the value animation
+    if (money.isEqual(showValue, value)) return;
+    if (value === 0 && !animateZero) return setShowValue(0); // the container will hide, so skip the value animation
 
     const useNativeDriver = !device.web;
-    const isGoingUp = isGreater(value, showValue);
+    const isGoingUp = money.isGreater(value, showValue);
 
     Animated.parallel([
       Animated.timing(valueState.translateY, {
-        toValue: isGoingUp ? -distace : distace,
+        toValue: isGoingUp ? -distance : distance,
         duration,
         useNativeDriver,
       }),
@@ -46,8 +41,8 @@ export default function AnimatedText({
         useNativeDriver,
       }),
     ]).start(() => {
-      valueState.translateY.setValue(isGoingUp ? distace : -distace);
       setShowValue(value);
+      valueState.translateY.setValue(isGoingUp ? distance : -distance);
 
       Animated.parallel([
         Animated.timing(valueState.translateY, {
@@ -62,6 +57,7 @@ export default function AnimatedText({
         }),
       ]).start();
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
   const isNumber = typeof showValue === 'number';
@@ -75,7 +71,9 @@ export default function AnimatedText({
         },
         style,
       ]}>
-      {isNumber ? showValue.toString() : moneyToString(showValue, 'R$')}
+      {isNumber ? `${showValue}` : money.toString(showValue, 'R$')}
     </Animated.Text>
   );
-}
+};
+
+export default AnimatedText;

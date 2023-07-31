@@ -1,13 +1,18 @@
 import { createURL } from 'expo-linking';
 import { LinkingOptions } from '@react-navigation/native';
-const prefix = createURL('/');
 
-const linking: LinkingOptions<{}> = {
-  prefixes: [prefix],
+const linking: LinkingOptions<ReactNavigation.RootParamList> = {
+  prefixes: [createURL('/')],
   config: {
     screens: {
       Splash: '',
-      SignIn: 'entrar',
+      SignIn: {
+        path: 'entrar',
+        screens: {
+          SignIn: '',
+          EmailSignIn: 'email',
+        },
+      },
       SelectAddress: 'selecione-endereco',
       BottomTabs: {
         initialRouteName: 'HomeTab',
@@ -19,18 +24,19 @@ const linking: LinkingOptions<{}> = {
               Explore: 'explore/:city',
               Cupons: 'cupons',
               Favorites: 'favoritos',
-              MarketList: 'lista-mercados',
+              MarketList: 'mercados',
               Market: 'mercado/:city/:marketId',
               MarketDetails: 'mercado/:city/:marketId/detalhes',
               MarketRating: 'mercado/:city/:marketId/avaliacao',
             },
           },
           Categories: 'categorias',
-          ShoppingTab: {
+          OrdersTab: {
             path: 'compras',
             screens: {
-              Shopping: '',
-              Order: 'pedido',
+              Orders: '',
+              OrderDetails: ':marketId/:orderId',
+              Chat: ':marketId/:orderId/chat',
             },
           },
           ProfileTab: {
@@ -39,32 +45,32 @@ const linking: LinkingOptions<{}> = {
               Profile: '',
               Notifications: 'notificacoes',
               Help: 'ajuda',
-              Config: 'config',
-              ConfigNoti: 'config-notificoes',
               Questions: 'perguntas/:question',
+              Config: {
+                path: 'configuracoes',
+                screens: {
+                  Config: '',
+                  NotifConfig: 'notificacoes',
+                },
+              },
             },
           },
         },
       },
-      ProductTabs: {
-        path: 'produto/:city/:marketId/:prodId',
+      Product: 'produto/:city/:itemId',
+      PaymentMethods: {
+        path: 'meios-de-pagamento',
         screens: {
-          ProductDetails: '',
-          ProductMarket: '/mercado',
+          PaymentMethods: '',
+          PaymentCard: 'cartao',
         },
       },
-      PaymentInApp: 'meios-de-pagamento',
-      PaymentTabs: {
-        screens: {
-          PaymentInApp: 'pagamento',
-          PaymentOnDelivery: 'pagamento-entrega',
-        },
-      },
+      Payment: 'pagamento',
       Cart: 'carrinho',
       Cupons: 'cupons',
       Schedule: 'agendamento',
-      Address: 'endereco',
-      NewAddress: 'editar-endereco',
+      Addresses: 'endereco',
+      EditAddress: 'editar-endereco',
       Filter: 'filtro',
       Search: 'pesquisa',
       MyProfile: 'meu-perfil',
@@ -75,5 +81,27 @@ const linking: LinkingOptions<{}> = {
     },
   },
 };
+
+export const screensPaths = (() => {
+  const screensPaths = new Map<string, string>([['BottomTabs', '/inicio']]);
+
+  const joinPaths = (paths: string[]) =>
+    paths
+      .filter(Boolean)
+      .join('/')
+      .replace(/(?:\/):.*?(?=\/|$)/g, (param) => `/[${param.slice(2)}]`);
+
+  const iterate = (screens: any, path = '') => {
+    Object.entries(screens).forEach(([screen, route]: any) => {
+      typeof route === 'string'
+        ? screensPaths.set(screen, `/${joinPaths([path, route])}`)
+        : iterate(route.screens, joinPaths([path, route.path]));
+    });
+  };
+
+  iterate(linking.config?.screens ?? {});
+
+  return screensPaths;
+})();
 
 export default linking;

@@ -25,3 +25,11 @@
 body::-webkit-scrollbar {
   width: 0;
 }
+
+input {
+  outline-style: none;
+}
+
+textarea {
+  outline-style: none;
+}

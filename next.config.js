@@ -10,21 +10,17 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV !== 'production';
 
 /**
  * @type {import('next').NextConfig}
  **/
 const nextConfig = {
-  /* reactStrictMode: true, */
-  /* 
-  webpack: (config) => {
-
-    config
-  
-    return config;
+  images: {
+    domains: ['static.prontoentrega.com.br'],
   },
- */
+  experimental: { forceSwcTransforms: true },
+  /* reactStrictMode: true, */
 };
 
 module.exports = withPlugins(

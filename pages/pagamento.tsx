@@ -1,25 +1,57 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { WithPaymentTabBar } from '~/components/Layout';
-import { globalStyles, myColors } from '~/constants';
+import MyHeader from '~/components/MyHeader';
+import Portal from '~/core/Portal';
+import { SinglePageTabs } from '~/components/SinglePageTabs';
+import PaymentOnDelivery from '~/screens/PaymentOnDelivery';
+import { PaymentMethodsBody } from './meios-de-pagamento';
+import { appOrSite } from '~/constants/device';
+import { useCartContext } from '~/contexts/CartContext';
+import { PaymentCard } from '~/core/models';
+import useRouting from '~/hooks/useRouting';
+import { formatCardBrand } from '~/functions/converter';
 
-function PaymentInApp() {
+const PaymentTabs = () => (
+  <Portal.Host>
+    <SinglePageTabs
+      header={<MyHeader title='Pagamento' dividerLess notchLess />}
+      tabs={[
+        {
+          title: `Pagar pelo ${appOrSite}`,
+          element: <PaymentOnApp />,
+        },
+        { title: 'Pagar na entrega', element: <PaymentOnDelivery /> },
+      ]}
+    />
+  </Portal.Host>
+);
+
+export const PaymentOnApp = () => {
+  const { goBack } = useRouting();
+  const { setPayment } = useCartContext();
+
+  const selectPayment = (card?: PaymentCard) => {
+    setPayment({
+      inApp: true,
+      ...(card
+        ? {
+            description: `Crédito ${formatCardBrand(card)} •••• ${card.last4}`,
+            method: 'CARD',
+            cardId: card.id,
+          }
+        : {
+            description: 'PIX',
+            method: 'PIX',
+          }),
+    });
+    goBack();
+  };
+
   return (
-    <>
-      <View
-        style={[
-          globalStyles.centralizer,
-          {
-            backgroundColor: myColors.background,
-          },
-        ]}>
-        <Text style={{ fontSize: 15, color: myColors.text2 }}>
-          Nenhum meio de pagamento ainda
-        </Text>
-      </View>
-    </>
+    <PaymentMethodsBody
+      onPixPress={selectPayment}
+      onCardPress={selectPayment}
+    />
   );
-}
+};
 
-export { PaymentInApp };
-export default WithPaymentTabBar(PaymentInApp);
+export default PaymentTabs;

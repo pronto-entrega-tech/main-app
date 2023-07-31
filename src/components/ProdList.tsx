@@ -7,16 +7,20 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { myColors } from '~/constants';
-import useMyContext from '~/core/MyContext';
-import { getProdFeed, SearchParams } from '~/services/requests';
-import { getCity } from '~/core/dataStorage';
-import { hasInternet } from '~/functions/connection';
-import ProdItem, { Product } from './ProdItem';
+import { SearchParams } from '~/services/api/products';
+import { useConnection } from '~/functions/connection';
+import ProdItem from './ProdItem';
 import ProdItemHorizontal from './ProdItemHorizontal';
-import Loading, { Errors, myErrors, NothingFeed } from './Loading';
+import Loading from './Loading';
+import Errors, { NothingFeed } from './Errors';
+import { Product } from '~/core/models';
+import { getLatLong, toCityState } from '~/functions/converter';
+import { useAddressContext } from '~/contexts/AddressContext';
+import { api } from '~/services/api';
+import { useCartContext } from '~/contexts/CartContext';
 
-function ProdList(props: {
-  header?: React.ReactElement<any, string | React.JSXElementConstructor<any>>;
+const ProdList = (props: {
+  header?: JSX.Element;
   data?: Product[];
   isSearch?: boolean;
   searchParams?: SearchParams;
@@ -24,9 +28,9 @@ function ProdList(props: {
   hideMarketLogo?: boolean;
   horizontalItems?: boolean;
   horizontal?: boolean;
-  refreshless?: boolean;
+  refreshLess?: boolean;
   tryAgain?: boolean;
-}) {
+}) => {
   const {
     header,
     data,
@@ -36,97 +40,103 @@ function ProdList(props: {
     hideMarketLogo = false,
     horizontalItems = false,
     horizontal = false,
-    refreshless = false,
+    refreshLess = false,
     tryAgain,
   } = props;
-  const [isLoading, setIsLoading] = useState(!data);
-  const [error, setError] = useState<myErrors>(null);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const { shoppingList, addProduct, removeProduct } = useCartContext();
+  const { address } = useAddressContext();
   const [innerData, setInnerData] = useState<Product[]>();
-  const [city, setCity] = React.useState('');
-  const { shoppingList, onPressAdd, onPressRemove } = useMyContext();
+  const [serverErr, setServerErr] = useState<'server'>();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const listData = data ?? innerData;
+
+  const hasInternet = useConnection();
+  const connectErr = hasInternet === false ? 'connection' : undefined;
+
+  const city = address && toCityState(address);
+
+  const missingAddress = city === null ? 'missing_address' : undefined;
+
+  const nothingErr =
+    listData && !listData.length
+      ? isSearch
+        ? 'nothing_search'
+        : 'nothing_feed'
+      : undefined;
 
   const { width } = useWindowDimensions();
-
-  const [columns, setColumns] = React.useState(3);
-
-  React.useEffect(() => {
-    setColumns(
-      (() => {
-        if (width > 768) return 5; // desktop
-        if (width > 425) return 4; // tablet
-        return 3; // mobile
-      })()
-    );
-  }, [width]);
+  const columns = (() => {
+    if (width > 768) return 5; // desktop
+    if (width > 430) return 4; // tablet
+    return 3; // mobile
+  })();
 
   const numColumns = horizontal ? 1 : columns;
 
-  async function tryFeed() {
-    const city = await getCity();
-    setCity(city);
+  const tryFeed = useCallback(
+    async (refresh = false) => {
+      if ((listData && !refresh) || connectErr || !city) return;
 
-    if (data) return;
-    try {
-      setIsLoading(true);
-      setError(null);
+      try {
+        const prodFeed = await api.products.findMany(city, {
+          ...searchParams,
+          latLong: getLatLong(address),
+        });
 
-      if (!(await hasInternet())) return setError('connection');
+        setInnerData(prodFeed);
+        setServerErr(undefined);
+      } catch {
+        setServerErr('server');
+      }
+    },
+    [listData, connectErr, city, searchParams, address]
+  );
 
-      const prodFeed = await getProdFeed(city, searchParams);
-
-      if (!prodFeed.length)
-        return setError(isSearch ? 'nothing_search' : 'nothing');
-
-      setInnerData(prodFeed);
-      setIsLoading(false);
-    } catch (err) {
-      console.error(err);
-      setError('server');
-    }
-  }
+  const searchParamsString = JSON.stringify(searchParams);
+  useEffect(() => {
+    setInnerData(undefined);
+  }, [city, searchParamsString]);
 
   useEffect(() => {
     tryFeed();
-  }, [tryAgain]);
+  }, [tryAgain, tryFeed, city]);
 
-  useEffect(() => {
-    setIsLoading(!data && !innerData);
-  }, [data, innerData]);
-
+  const error = connectErr ?? missingAddress ?? nothingErr ?? serverErr;
   if (error)
     return (
-      <Errors
-        error={error}
-        onPress={() => {
-          setError(null);
-          tryFeed();
-        }}
-      />
+      <>
+        {header}
+        <Errors error={error} onPress={() => tryFeed()} />
+      </>
     );
 
-  if (isLoading) return <Loading />;
+  if (!listData || !shoppingList) return <Loading />;
 
   if (!horizontalItems) {
     const margin = 1.5;
     const widthPercentage = (100 - margin * (numColumns + 1)) / numColumns;
 
-    const myRenderItem = ({ item }: { item: Product }) => (
+    const _ProdItem = ({ item }: { item: Product }) => (
       <ProdItem
         style={{
           width: !horizontal ? `${widthPercentage}%` : width / columns - 14,
           marginLeft: !horizontal ? `${margin}%` : 4,
           marginBottom: !horizontal ? `${margin}%` : 4,
         }}
-        city={city}
         item={item}
         showsMarketLogo={!hideMarketLogo}
-        quantity={shoppingList.get(item.prod_id)?.quantity}
-        onPressAdd={() => onPressAdd(item)}
-        onPressRemove={() => onPressRemove(item)}
+        quantity={shoppingList.get(item.item_id)?.quantity}
+        onPressAdd={() => addProduct(item)}
+        onPressRemove={() => removeProduct(item)}
       />
     );
 
+    const refresh = async () => {
+      setRefreshing(true);
+      await tryFeed(true);
+      setRefreshing(false);
+    };
     return (
       <FlatList
         getItemLayout={(_item, i) => ({
@@ -135,42 +145,37 @@ function ProdList(props: {
           index: i,
         })}
         refreshControl={
-          refreshless ? undefined : (
+          refreshLess ? undefined : (
             <RefreshControl
               colors={[myColors.primaryColor]}
               refreshing={refreshing}
-              onRefresh={async () => {
-                setRefreshing(true);
-                await tryFeed();
-                setRefreshing(false);
-              }}
+              onRefresh={refresh}
             />
           )
         }
         contentContainerStyle={[!horizontal && { paddingBottom: 50 }, style]}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
-        data={data ?? innerData}
+        data={listData}
         extraData={numColumns}
         key={numColumns}
         numColumns={numColumns}
         horizontal={horizontal}
-        keyExtractor={({ prod_id, market_id }) => prod_id + market_id}
+        keyExtractor={(v) => v.item_id}
         ListHeaderComponent={header}
-        renderItem={myRenderItem}
+        renderItem={_ProdItem}
         ListEmptyComponent={NothingFeed}
       />
     );
   }
 
-  const myRenderItem = ({ item }: { item: Product }) => (
+  const _ProdItemHorizontal = ({ item }: { item: Product }) => (
     <ProdItemHorizontal
       item={item}
-      city={city}
       showsMarketLogo={!hideMarketLogo}
-      quantity={shoppingList.get(item.prod_id)?.quantity}
-      onPressAdd={() => onPressAdd(item)}
-      onPressRemove={() => onPressRemove(item)}
+      quantity={shoppingList.get(item.item_id)?.quantity}
+      onPressAdd={() => addProduct(item)}
+      onPressRemove={() => removeProduct(item)}
     />
   );
 
@@ -179,13 +184,13 @@ function ProdList(props: {
       getItemLayout={(_item, i) => ({ length: 112, offset: 112 * i, index: i })}
       contentContainerStyle={[{ paddingBottom: 50 }, style]}
       showsVerticalScrollIndicator={false}
-      data={data ?? innerData}
+      data={listData}
       keyExtractor={({ prod_id, market_id }) => prod_id + market_id}
       ListHeaderComponent={header}
-      renderItem={myRenderItem}
+      renderItem={_ProdItemHorizontal}
       ListEmptyComponent={NothingFeed}
     />
   );
-}
+};
 
 export default ProdList;

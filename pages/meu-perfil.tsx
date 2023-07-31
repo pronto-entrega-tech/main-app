@@ -1,107 +1,75 @@
-import React, { useState } from 'react';
-import Header from '~/components/Header';
-import {
-  KeyboardAvoidingView,
-  ScrollView,
-  TextInput,
-  StyleSheet,
-} from 'react-native';
-import { Input } from 'react-native-elements/dist/input/Input';
-import { myColors, device } from '~/constants';
-import { getProfile, saveProfile } from '~/core/dataStorage';
+import React, { createRef, useEffect, useState } from 'react';
+import MyHeader from '~/components/MyHeader';
+import { KeyboardAvoidingView, TextInput } from 'react-native';
+import { myColors, device, globalStyles } from '~/constants';
 import useMyContext from '~/core/MyContext';
 import Loading from '~/components/Loading';
 /* import BottomModal from '~/components/BottomModal';
 import IconButtonText from '~/components/IconButtonText'; */
 import MyButton from '~/components/MyButton';
 import useRouting from '~/hooks/useRouting';
+import { range } from '~/functions/range';
+import { digitsMask } from '~/functions/converter';
+import { useAuthContext } from '~/contexts/AuthContext';
+import FormContainer from '~/components/FormContainer';
+import MyInput from '~/components/MyInput';
+import { api } from '~/services/api';
 
-export interface Profile {
-  name?: string;
-  email: string;
-  CPF: string;
-  phone: string;
-}
+const onlyDigits = (s: string) => s.replace(/\D/g, '');
 
-const emailCorrectRega =
-  /[a-zA-Z0-9.!#$%&'*+/=?`{|}~^-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-const emailCompleteReg = /^(.+)@(.+)\.(.{2,})$/;
+const cpfValidation = (raw: string) => {
+  const v = onlyDigits(raw);
 
-function cpfMask(v: string) {
-  v = v.replace(/\D/g, '');
-  if (v.length > 3) v = v.substring(0, 3) + '.' + v.substring(3);
-  if (v.length > 7) v = v.substring(0, 7) + '.' + v.substring(7);
-  if (v.length > 11) v = v.substring(0, 11) + '-' + v.substring(11);
-  return v;
-}
+  // all same or sequential digits
+  const knowInvalid = /^(\d)\1+$|01234567890/g;
 
-function cpfValidation(value: string) {
-  const noWay = [
-    '00000000000',
-    '11111111111',
-    '22222222222',
-    '33333333333',
-    '44444444444',
-    '55555555555',
-    '66666666666',
-    '77777777777',
-    '88888888888',
-    '99999999999',
-    '01234567890',
-  ];
-  const v = value.replace(/\D/g, '');
+  if (v.length !== 11 || knowInvalid.test(v)) return false;
 
-  if (noWay.includes(v)) {
-    return false;
-  }
+  const verify = (pos: number) => {
+    const sum = range(0, 8 + pos).reduce(
+      (sum, i) => sum + +v[i] * (10 + pos - i),
+      0
+    );
+    const remainder = 11 - (sum % 11);
+    const checkDigit = remainder > 9 ? 0 : remainder;
 
-  let soma = 0;
-  for (let i = 0; i < 9; i++) {
-    soma += +v.charAt(i) * (10 - i);
-  }
-  let resto = 11 - (soma % 11);
-  if (resto === 10 || resto === 11) {
-    resto = 0;
-  }
-  if (resto !== +v.charAt(9)) {
-    return false;
-  }
+    return checkDigit === +v[9 + pos];
+  };
 
-  soma = 0;
-  for (let i = 0; i < 10; i++) {
-    soma += +v.charAt(i) * (11 - i);
-  }
-  resto = 11 - (soma % 11);
-  if (resto === 10 || resto === 11) {
-    resto = 0;
-  }
-  return resto === +v.charAt(10);
-}
+  return verify(0) && verify(1);
+};
 
-function phoneMask(v: string) {
-  v = v.replace(/\D/g, '');
-  if (v.length > 0) v = v.substring(0, 0) + '(' + v.substring(0);
-  if (v.length > 3) v = v.substring(0, 3) + ') ' + v.substring(3);
-  if (v.length > 6) v = v.substring(0, 6) + ' ' + v.substring(6);
-  if (v.length > 11) v = v.substring(0, 11) + '-' + v.substring(11);
-  return v;
-}
+const cpfMask = (raw: string) =>
+  digitsMask(raw, [
+    [3, '.'],
+    [7, '.'],
+    [11, '-'],
+  ]);
 
-function MyProfile() {
-  const routing = useRouting();
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [ready, setReady] = React.useState<boolean>(true);
-  const [profile, setProfile] = React.useState<Profile>();
-  //const [isModalVisible, setIsModalVisible] = useState(false);
-  const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [emailError, setEmailError] = useState<string>('');
-  const [CPF, setCPF] = useState<string>('');
-  const [isCpfValid, setCpfValid] = useState<boolean>(false);
-  const [phone, setPhone] = useState<string>('');
+const phoneMask = (raw: string) =>
+  digitsMask(raw, [
+    [0, '('],
+    [3, ') '],
+    [6, ' '],
+    [11, '-'],
+  ]);
+
+const MyProfile = () => {
+  const { navigate, goBack } = useRouting();
   const { toast } = useMyContext();
+  const { isAuth, accessToken } = useAuthContext();
+  const [isLoading, setIsLoading] = useState(false);
+  /* const [ready, setReady] = useState(true); */
+  //const [isModalVisible, setIsModalVisible] = useState(false);
+  const [name, setName] = useState<string>();
+  const [document, setDocument] = useState('');
+  const [phone, setPhone] = useState('');
+  const [nameError, setNameError] = useState(false);
+  const [isCpfValid, setCpfValid] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (isAuth === false) return navigate('Profile');
+
     /* ImagePicker.getPendingResultAsync().then(result => {
       if (result.length == 0) return;
       const image = result[result.length-1]
@@ -113,11 +81,15 @@ function MyProfile() {
         })
         .catch(() => alert('Erro ao salvar foto de perfil'))
     }) */
-    getProfile().then((profile) => {
-      setProfile(profile);
-      setIsLoading(false);
-    });
-  }, []);
+    if (accessToken)
+      api.customers.find(accessToken).then((profile) => {
+        setName(profile.name);
+        setDocument(profile.document ?? '');
+        setPhone(profile.phone ?? '');
+
+        setIsLoading(false);
+      });
+  }, [isAuth, accessToken, navigate]);
 
   /* const openCamera = () => {
     setIsModalVisible(false);
@@ -166,29 +138,16 @@ function MyProfile() {
       .catch(() => alert('Erro ao remover foto de perfil'))
   } */
 
-  const inputEmail = React.useRef<TextInput | null>();
-  const inputCPF = React.useRef<TextInput | null>();
-  const inputPhone = React.useRef<TextInput | null>();
+  const inputEmail = createRef<TextInput>();
+  const inputCPF = createRef<TextInput>();
+  const inputPhone = createRef<TextInput>();
 
-  if (isLoading) return <Loading />;
+  if (isLoading || !accessToken || !name) return <Loading />;
 
-  return (
-    <KeyboardAvoidingView
-      behavior='height'
-      style={[
-        { marginBottom: device.iPhoneNotch ? 28 : 0 },
-        device.web ? { height: device.height } : { flex: 1 },
-      ]}>
-      <Header title={'Meu Perfil'} />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          backgroundColor: myColors.background,
-          alignItems: 'center',
-          paddingTop: 24,
-          paddingHorizontal: 4,
-          paddingBottom: 66,
-        }}>
+  const page = (
+    <>
+      <MyHeader title='Meu Perfil' />
+      <FormContainer>
         {/* <Image
           placeholderStyle={{backgroundColor: '#FFF'}}
           containerStyle={{height: 120, width: 120, borderRadius: 120}}
@@ -199,93 +158,71 @@ function MyProfile() {
           size={32}
           color={myColors.grey2}
           type='profile'/> */}
-        <Input
+        <MyInput
           label='Nome Completo'
           placeholder='Seu nome'
-          defaultValue={profile?.name}
-          labelStyle={{ color: myColors.primaryColor }}
-          selectionColor={myColors.colorAccent}
-          autoCompleteType='name'
+          defaultValue={name}
+          errorMessage={nameError ? 'Insira seu nome' : ''}
+          autoComplete='name'
           textContentType='name'
-          onChangeText={setName}
+          onChangeText={(t) => {
+            setName(t);
+            setNameError(!t);
+          }}
           returnKeyType='next'
           onSubmitEditing={() => inputEmail.current?.focus()}
         />
-        <Input
-          label='Email'
-          errorMessage={emailError}
-          defaultValue={profile?.email}
-          placeholder='nome@email.com'
-          keyboardType='email-address'
-          autoCapitalize='none'
-          autoCorrect={false}
-          labelStyle={{ color: myColors.primaryColor }}
-          selectionColor={myColors.colorAccent}
-          autoCompleteType='email'
-          textContentType='emailAddress'
-          onChangeText={(v) => {
-            setEmail(v);
-            setEmailError(
-              !emailCorrectRega.test(v.toLowerCase()) ? 'Email inválido' : ''
-            );
-          }}
-          returnKeyType='next'
-          ref={(ref: any) => (inputEmail.current = ref)}
-          onSubmitEditing={() => inputCPF.current?.focus()}
-        />
-        <Input
+        <MyInput
+          _ref={inputCPF}
           label='CPF'
-          errorMessage={CPF.length === 14 && !isCpfValid ? 'CPF inválido' : ''}
-          defaultValue={profile?.CPF}
           placeholder='000.000.000-00'
+          errorMessage={
+            document.length === 14 && !isCpfValid ? 'CPF inválido' : ''
+          }
           keyboardType='numeric'
-          labelStyle={{ color: '#86939E' }}
-          selectionColor={myColors.colorAccent}
+          labelStyle={{ color: myColors.optionalInput }}
           maxLength={14}
-          value={CPF}
+          value={cpfMask(document)}
           onChangeText={(v) => {
-            if (v !== CPF) {
-              setCPF(cpfMask(v));
-              if (v.length === 14) setCpfValid(cpfValidation(v));
-            }
+            setDocument(v);
+            setCpfValid(cpfValidation(v));
           }}
           returnKeyType='next'
-          ref={(ref: any) => (inputCPF.current = ref)}
           onSubmitEditing={() => inputPhone.current?.focus()}
         />
-        <Input
+        <MyInput
+          _ref={inputPhone}
           label='Número de celular'
-          defaultValue={profile?.phone}
           placeholder='(00) 0 0000-0000'
           keyboardType='phone-pad'
-          labelStyle={{ color: '#86939E' }}
-          selectionColor={myColors.colorAccent}
-          autoCompleteType='tel'
+          labelStyle={{ color: myColors.optionalInput }}
+          autoComplete='tel'
           textContentType='telephoneNumber'
           maxLength={16}
-          value={phone}
+          value={phoneMask(phone)}
           onChangeText={(v) => {
-            if (v !== phone) setPhone(phoneMask(v));
+            setPhone(v);
           }}
-          ref={(ref: any) => (inputPhone.current = ref)}
         />
-      </ScrollView>
+      </FormContainer>
       <MyButton
         title='Atualizar perfil'
         type='outline'
-        buttonStyle={styles.button}
-        disabled={!ready}
+        buttonStyle={globalStyles.bottomButton}
+        disabled={nameError}
         onPress={() => {
           setIsLoading(true);
-          saveProfile({
-            name: name || undefined, // `||` don't catch empty strings
-            email: email,
-            CPF: CPF,
-            phone: phone,
-          }).then(() => {
-            toast('Perfil atualizado');
-            routing.navigate('/perfil', 'redirect');
-          });
+
+          api.customers
+            .update(accessToken, {
+              name,
+              document: document || undefined,
+              phone: phone || undefined,
+            })
+            .then(() => {
+              toast('Perfil atualizado');
+              goBack('Profile');
+            });
         }}
       />
       {/* <BottomModal
@@ -296,11 +233,21 @@ function MyProfile() {
           <IconButtonText icon='image' text={`Adicionar\nfoto`} onPress={openPhotos} type='profile2' />
           <IconButtonText icon='delete' text={`Remover\nfoto`} onPress={removePhoto} type='profile2' />
       </BottomModal> */}
+    </>
+  );
+
+  if (device.web) return page;
+
+  return (
+    <KeyboardAvoidingView
+      behavior='height'
+      style={{ marginBottom: device.iPhoneNotch ? 28 : 0, flex: 1 }}>
+      {page}
     </KeyboardAvoidingView>
   );
-}
+};
 
-const styles = StyleSheet.create({
+/* const styles = StyleSheet.create({
   modal: {
     paddingRight: '20%',
     flexDirection: 'row',
@@ -308,14 +255,6 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 26,
   },
-  button: {
-    position: 'absolute',
-    alignSelf: 'center',
-    bottom: 12,
-    width: 210,
-    height: 46,
-    backgroundColor: '#fff',
-  },
-});
+}); */
 
 export default MyProfile;

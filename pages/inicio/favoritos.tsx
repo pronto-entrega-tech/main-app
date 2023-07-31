@@ -1,45 +1,36 @@
-import { StackNavigationProp } from '@react-navigation/stack';
 import React from 'react';
 import { View } from 'react-native';
-import MySearchbar from '~/components/MySearchBar';
+import MySearchBar from '~/components/MySearchBar';
 import ProdListHorizontal from '~/components/ProdListHorizontal';
 import { globalStyles, myColors } from '~/constants';
 import useMyContext from '~/core/MyContext';
-import { ListMercadosHeader } from './lista-mercados';
 import MyText from '~/components/MyText';
 import { WithBottomNav } from '~/components/Layout';
+import MyHeader from '~/components/MyHeader';
 
-function Favoritos({
-  navigation,
-}: {
-  navigation: StackNavigationProp<any, any>;
-}) {
+const Favorites = () => {
   const { favorites } = useMyContext();
 
   return (
     <>
-      <ListMercadosHeader title={'Favoritos'} />
+      <MyHeader title='Favoritos' smallDivider />
       <View style={{ marginTop: 12, marginBottom: 8, paddingHorizontal: 16 }}>
-        <MySearchbar onSubmit={() => {}} />
+        <MySearchBar onSubmit={() => 0} />
       </View>
-      {favorites.size === 0 ? (
+      {!favorites.size ? (
         <View style={globalStyles.centralizer}>
-          <MyText
-            style={{
-              fontSize: 15,
-              color: myColors.text2,
-            }}>
+          <MyText style={{ fontSize: 15, color: myColors.text2 }}>
             Nenhum produto salvo
           </MyText>
         </View>
       ) : (
         <ProdListHorizontal
           style={{ paddingTop: 12 }}
-          data={Array.from(favorites.values()).reverse()}
+          data={[...favorites.values()].reverse()}
         />
       )}
     </>
   );
-}
+};
 
-export default WithBottomNav(Favoritos);
+export default WithBottomNav(Favorites);

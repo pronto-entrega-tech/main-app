@@ -2,14 +2,20 @@ import React from 'react';
 import { View, Share, StatusBar } from 'react-native';
 import IconButton from '~/components/IconButton';
 import { myColors, device } from '~/constants';
-import useMyContext from '~/core/MyContext';
 import useRouting from '~/hooks/useRouting';
-import { WWW } from '~/constants/url';
+import { Urls } from '~/constants/urls';
 
-export default function ProductHeader(props: { pathname?: string }) {
+const ProductHeader = () => {
   const routing = useRouting();
-  const pathname = props.pathname || routing.pathname; // `||` to filter empty string
-  const { notify, onPressNot } = useMyContext();
+  /* const { notify, onPressNot } = useMyContext(); */
+
+  const share = () => {
+    const { city, itemId } = routing.params;
+    const url = `${Urls.WWW}/produto/${city}/${itemId}`;
+
+    if (!device.web) Share.share({ message: url });
+    else navigator.share({ url });
+  };
 
   return (
     <>
@@ -33,7 +39,7 @@ export default function ProductHeader(props: { pathname?: string }) {
         <IconButton
           icon='arrow-left'
           type='back'
-          onPress={() => routing.goBack('/inicio')}
+          onPress={() => routing.goBack('Home')}
         />
         <View style={{ flexDirection: 'row' }}>
           {/* <IconButton
@@ -41,23 +47,11 @@ export default function ProductHeader(props: { pathname?: string }) {
             type='back'
             onPress={() => onPressNot(item)}
           /> */}
-          <IconButton
-            icon='share-variant'
-            type='prodIcons'
-            onPress={() => {
-              if (!device.web) {
-                Share.share({
-                  message: WWW + pathname,
-                });
-              } else {
-                navigator.share({
-                  url: WWW + pathname,
-                });
-              }
-            }}
-          />
+          <IconButton icon='share-variant' type='prodIcons' onPress={share} />
         </View>
       </View>
     </>
   );
-}
+};
+
+export default ProductHeader;

@@ -3,66 +3,35 @@ import { View, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
 import { Image } from 'react-native-elements/dist/image/Image'; // react-native-elements don't tree shake
 import { StackNavigationProp } from '@react-navigation/stack';
 import { myColors, device, globalStyles, myFonts } from '~/constants';
-import {
-  calcOff,
-  getImageUrl,
-  Money,
-  moneyToString,
-} from '~/functions/converter';
+import { getImageUrl } from '~/functions/converter';
+import { calcPrices, money } from '~/functions/money';
 import IconButton from './IconButton';
 import MyTouchable from './MyTouchable';
 import MyText from './MyText';
 import AnimatedText from './AnimatedText';
 import MyIcon from './MyIcon';
-/* import { useRouting } from 'expo-next-react-navigation'; */
-import useRouting from '~/hooks/useRouting';
+import { Product } from '~/core/models';
 
-export interface Product {
-  prod_id: string;
-  market_id: string;
-  prod_name_id: string;
-  market_name_id: string;
-  name: string;
-  brand: string;
-  quantity: string;
-  price: Money;
-  previous_price?: Money;
-  unit_weight?: number;
-  discount?: {
-    type: 'OFF' | 'ONE_FREE';
-    value_1: number;
-    value_2?: number;
-    max_per_client: number;
-  };
-  images_names: string[];
-}
-
-function ProdItem(props: {
+const ProdItem = (props: {
   navigation?: StackNavigationProp<any, any>;
   item: Product;
   isFavorite?: boolean;
   quantity?: number;
   style?: StyleProp<ViewStyle>;
   showsMarketLogo: boolean;
-  city: string;
   onPressFav?: () => void;
   onPressAdd: () => void;
   onPressRemove: () => void;
-}) {
+}) => {
   const {
     item,
-    isFavorite,
     quantity = 0,
     style = {},
     showsMarketLogo,
-    city,
-    onPressFav,
     onPressAdd,
     onPressRemove,
   } = props;
-  const { params } = useRouting();
-  const atualCity = city || params?.city;
-  const off = calcOff(item);
+  const { price, previous_price, discountText } = calcPrices(item);
 
   return (
     <View
@@ -74,11 +43,12 @@ function ProdItem(props: {
       ]}>
       <MyTouchable
         style={{ flex: 1 }}
-        path={`/produto/${atualCity}/${item.market_id}/${item.prod_id}`}>
+        screen='Product'
+        params={{ city: item.city_slug, itemId: item.item_id }}>
         <View style={styles.top}>
           {item.images_names ? (
             <Image
-              placeholderStyle={{ backgroundColor: '#FFF' }}
+              placeholderStyle={{ backgroundColor: 'white' }}
               PlaceholderContent={
                 <MyIcon name='cart-outline' color={myColors.grey2} size={70} />
               }
@@ -97,10 +67,9 @@ function ProdItem(props: {
           )}
           {showsMarketLogo && (
             <Image
-              placeholderStyle={{ backgroundColor: '#FFF' }}
-              source={{
-                uri: getImageUrl('market', item.market_id),
-              }}
+              placeholderStyle={{ backgroundColor: 'white' }}
+              source={{ uri: getImageUrl('market', item.market_id) }}
+              resizeMode='contain'
               containerStyle={styles.marketLogo}
             />
           )}
@@ -115,25 +84,24 @@ function ProdItem(props: {
         </View>
         <View style={styles.container}>
           <MyText style={styles.priceText}>
-            {moneyToString(item.price, 'R$')}
+            {money.toString(price, 'R$')}
           </MyText>
-          {off && (
+          {discountText && (
             <View style={styles.oldPriceRow}>
               <View style={styles.offTextBox}>
-                <MyText style={styles.offText}>-{off}%</MyText>
+                <MyText style={styles.offText}>{discountText}</MyText>
               </View>
               <MyText style={styles.oldPriceText}>
-                {moneyToString(item.previous_price, 'R$')}
+                {money.toString(previous_price, 'R$')}
               </MyText>
             </View>
           )}
-          <MyText
-            ellipsizeMode='tail'
-            numberOfLines={2}
-            style={styles.nameText}>
+          <MyText numberOfLines={2} style={styles.nameText}>
             {item.name} {item.brand}
           </MyText>
-          <MyText style={styles.quantityText}>{item.quantity}</MyText>
+          <MyText numberOfLines={1} style={styles.quantityText}>
+            {item.quantity}
+          </MyText>
         </View>
         {/* <Divider
         style={{
@@ -178,7 +146,7 @@ function ProdItem(props: {
         />
         {quantity !== 0 && (
           <>
-            <AnimatedText style={styles.centerNumText} distace={10}>
+            <AnimatedText style={styles.centerNumText} distance={10}>
               {quantity}
             </AnimatedText>
             <IconButton
@@ -192,13 +160,13 @@ function ProdItem(props: {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   card: {
     height: 185,
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
   },
   top: {
     alignItems: 'center',
@@ -216,15 +184,19 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   addBar: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 30,
     position: 'absolute',
     top: 6,
     right: 6,
     alignItems: 'center',
     flexDirection: 'row-reverse',
-    overflow: 'hidden',
-    ...Platform.select({ web: { transitionDuration: '200ms' } }),
+    ...Platform.select({
+      web: {
+        overflow: 'hidden',
+        transitionDuration: '200ms',
+      },
+    }),
   },
   centerNumText: {
     fontSize: 15,
@@ -233,8 +205,8 @@ const styles = StyleSheet.create({
     left: 36,
     position: 'absolute',
   },
-  remove: { position: 'absolute', right: 46 },
-  mercImage: {
+  remove: { position: 'absolute', [device.web ? 'right' : 'left']: 46 },
+  marketImage: {
     position: 'absolute',
     right: 0,
     top: 80,
@@ -273,7 +245,7 @@ const styles = StyleSheet.create({
   },
   offText: {
     fontSize: 11,
-    color: '#FFF',
+    color: 'white',
     fontFamily: myFonts.Bold,
   },
   oldPriceText: {

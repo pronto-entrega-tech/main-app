@@ -1,7 +1,3 @@
-export async function hasInternet() {
-  return true;
-}
+export const hasInternet = async () => true;
 
-export async function useConnection() {
-  return true;
-}
+export const useConnection = async () => true;

@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleProp, TextInput, ViewStyle } from 'react-native';
-import { device, myColors, myFonts } from '~/constants';
+import { globalStyles, myColors, myFonts } from '~/constants';
 import IconButton from './IconButton';
 
-function MySearchbar({
+const MySearchBar = ({
   style,
-  search = '',
+  defaultValue = '',
   onSubmit,
 }: {
   style?: StyleProp<ViewStyle>;
-  search?: string;
-  onSubmit: (search: string) => void;
-}) {
-  const [searchQuery, setSearchQuery] = React.useState(search);
-  const _onSubmit = () => {
-    if (searchQuery) onSubmit(searchQuery);
+  defaultValue?: string;
+  onSubmit: (query: string) => void;
+}) => {
+  const [query, setSearchQuery] = useState(defaultValue);
+
+  const submit = () => {
+    if (query) onSubmit(query);
   };
 
   return (
@@ -27,8 +28,9 @@ function MySearchbar({
           borderWidth: 2,
           borderColor: myColors.primaryColor,
           height: 38,
-          elevation: 2,
+          backgroundColor: 'white',
         },
+        globalStyles.elevation3,
         style,
       ]}>
       <IconButton
@@ -41,8 +43,8 @@ function MySearchbar({
           padding: 12,
           aspectRatio: 1,
         }}
-        disabled={!searchQuery}
-        onPress={_onSubmit}
+        disabled={!query}
+        onPress={submit}
       />
       <TextInput
         style={{
@@ -53,15 +55,11 @@ function MySearchbar({
         }}
         placeholder='O que você procura?'
         accessibilityRole='search'
+        value={query}
         onChangeText={setSearchQuery}
-        value={searchQuery}
-        {...(device.web
-          ? {
-              onKeyPress: (e) => e.nativeEvent.key === 'Enter' && _onSubmit(),
-            }
-          : { onSubmitEditing: _onSubmit })}
+        onSubmitEditing={submit}
       />
-      {!!searchQuery && (
+      {!!query && (
         <IconButton
           icon='close'
           color='rgba(0, 0, 0, 0.54)'
@@ -77,6 +75,6 @@ function MySearchbar({
       )}
     </View>
   );
-}
+};
 
-export default MySearchbar;
+export default MySearchBar;

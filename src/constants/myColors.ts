@@ -1,11 +1,11 @@
-import device from './device';
-
 const myColors = {
   colorAccent: '#21ADF8',
   primaryColor: '#2196F3',
   primaryColorDark: '#1E80F0',
   background: '#FEFEFE',
   rating: '#FDCC0D',
+  pending: '#FDEC00',
+  green: '#10b500',
   divider: '#F4F4F4',
   divider2: '#F0F0F0',
   divider3: '#E2E2E2',
@@ -22,7 +22,9 @@ const myColors = {
   text4_5: '#404040',
   text5: '#363636',
   text6: '#2F2F2F',
+  text7: '#222222',
   loading: /* device.iOS ? '#999' : */ '#21ADF8',
+  optionalInput: '#86939E',
 } as const;
 
 export default myColors;

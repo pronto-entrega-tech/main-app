@@ -19,5 +19,8 @@
     "isolatedModules": true
   },
   "extends": "expo/tsconfig.base",
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "ts-node": {
+    "swc": true
+  }
 }

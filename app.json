@@ -2,6 +2,7 @@
   "expo": {
     "name": "Pronto Entrega",
     "slug": "prontoentrega",
+    "owner": "prontoentrega",
     "version": "1.0.0",
     "description": "Faça suas compras sem sair de casa.",
     "orientation": "portrait",
@@ -9,6 +10,7 @@
     "backgroundColor": "#FEFEFE",
     "scheme": "prontoentrega",
     "icon": "./src/assets/icon.png",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "contain",
@@ -67,15 +69,6 @@
       "favicon": "./public/favicon.ico",
       "themeColor": "#2196F3",
       "lang": "pt-BR"
-    },
-    "plugins": [
-      [
-        "@stripe/stripe-react-native",
-        {
-          "merchantIdentifier": "",
-          "enableGooglePay": true
-        }
-      ]
-    ]
+    }
   }
 }

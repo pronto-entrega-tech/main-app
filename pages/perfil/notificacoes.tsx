@@ -1,26 +1,23 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import Header from '~/components/Header';
+import { View } from 'react-native';
+import MyHeader from '~/components/MyHeader';
 import { WithBottomNav } from '~/components/Layout';
 import { globalStyles, myColors } from '~/constants';
+import MyText from '~/components/MyText';
 
-function Notifications() {
-  return (
-    <>
-      <Header title={'Notificações'} />
-      <View
-        style={[
-          globalStyles.centralizer,
-          {
-            backgroundColor: myColors.background,
-          },
-        ]}>
-        <Text style={{ fontSize: 15, color: myColors.text2 }}>
-          Nenhuma notificação ainda
-        </Text>
-      </View>
-    </>
-  );
-}
+const Notifications = () => (
+  <>
+    <MyHeader title='Notificações' />
+    <View
+      style={[
+        globalStyles.centralizer,
+        { backgroundColor: myColors.background },
+      ]}>
+      <MyText style={{ fontSize: 15, color: myColors.text2 }}>
+        Nenhuma notificação ainda
+      </MyText>
+    </View>
+  </>
+);
 
 export default WithBottomNav(Notifications);

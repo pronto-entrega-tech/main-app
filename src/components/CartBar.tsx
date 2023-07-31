@@ -1,45 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
-import useMyContext from '~/core/MyContext';
 import { device, myColors, myFonts } from '~/constants';
 import MyTouchable from '~/components/MyTouchable';
 import MyText from '~/components/MyText';
 import AnimatedText from '~/components/AnimatedText';
 import MyIcon from './MyIcon';
 import useRouting from '~/hooks/useRouting';
+import { Money, money } from '~/functions/money';
+import { useCartContext } from '~/contexts/CartContext';
 
-function CartBar({ toped = false }: { toped?: boolean }) {
-  const { subtotal } = useMyContext();
-  const routing = useRouting();
+const screensWOCartBar = ['OrderDetails', 'Chat'];
+
+const hiddenY = 50 + 24;
+
+const getTranslateValue = (subtotal: Money, screen: string) =>
+  screensWOCartBar.includes(screen) || money.isEqual(subtotal, 0) ? hiddenY : 0;
+
+const CartBar = ({ toped = false }: { toped?: boolean }) => {
+  const { subtotal } = useCartContext();
+  const { screen, navigate } = useRouting();
+
+  const translateValue = getTranslateValue(subtotal, screen);
   const [barState] = useState({
-    translateY: new Animated.Value(
-      subtotal.dangerousInnerValue === 0 ? 50 + 24 : 0
-    ),
+    translateY: new Animated.Value(translateValue),
   });
 
   useEffect(() => {
-    const useNativeDriver = !device.web;
-
-    if (subtotal.dangerousInnerValue === 0) {
-      Animated.timing(barState.translateY, {
-        toValue: 50 + 24,
-        duration: 200,
-        useNativeDriver,
-      }).start();
-    } else {
-      Animated.timing(barState.translateY, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver,
-      }).start();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subtotal]);
+    Animated.timing(barState.translateY, {
+      toValue: translateValue,
+      duration: 200,
+      useNativeDriver: !device.web,
+    }).start();
+  }, [translateValue, barState.translateY]);
 
   return (
     <View
       style={[
-        styles.cartBarConteiner,
+        styles.cartBarContainer,
         toped ? { marginBottom: device.iPhoneNotch ? 54 + 34 : 54 } : {},
       ]}>
       <Animated.View
@@ -48,27 +45,34 @@ function CartBar({ toped = false }: { toped?: boolean }) {
           solid
           style={[
             styles.cartBarTouchable,
-            !toped && device.iPhoneNotch
-              ? { height: 50 + 24, marginBottom: 24 }
-              : { height: 50 },
+            !toped && device.iPhoneNotch ? { height: 50 + 24 } : { height: 50 },
           ]}
-          onPress={() => routing.navigate('/carrinho')}>
-          <MyIcon
-            name={'cart'}
-            size={28}
-            color={'#FFF'}
-            style={styles.iconCart}
-          />
-          <MyText style={styles.textCart}>Ver carrinho</MyText>
-          <AnimatedText style={styles.priceCart}>{subtotal}</AnimatedText>
+          onPress={() => navigate('Cart')}>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: !toped && device.iPhoneNotch ? 24 : 0,
+            }}>
+            <MyIcon
+              name={'cart'}
+              size={28}
+              color={'#FFF'}
+              style={styles.iconCart}
+            />
+            <MyText style={styles.textCart}>Ver carrinho</MyText>
+            <AnimatedText style={styles.priceCart}>{subtotal}</AnimatedText>
+          </View>
         </MyTouchable>
       </Animated.View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  cartBarConteiner: {
+  cartBarContainer: {
     position: !device.web ? 'absolute' : ('fixed' as any),
     overflow: 'hidden',
     bottom: 0,
@@ -76,10 +80,7 @@ const styles = StyleSheet.create({
   },
   cartBarTouchable: {
     width: '100%',
-    flexDirection: 'row',
     backgroundColor: myColors.primaryColor,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   iconCart: {
     position: 'absolute',

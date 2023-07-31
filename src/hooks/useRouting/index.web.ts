@@ -1,29 +1,38 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { MyRouting } from '.';
-import { stringifyParams } from '~/functions/converter';
+import { screenFrom, urlFrom } from '~/functions/converter';
 import useMyContext from '~/core/MyContext';
 
-function useRouting(): MyRouting {
+const useRouting = (): MyRouting => {
   const { hasNavigated } = useMyContext();
-  const { push, replace, back: goBack, pathname, query, asPath } = useRouter();
-  // implement a pseudo `canGoBack` by tracking if we've navigated
+  const { push, replace, back, pathname, query, isReady } = useRouter();
+  // pseudo `canGoBack` implemented by tracking if we've navigated
   const canGoBack = useRef(() => hasNavigated.current).current;
 
+  const navigate = useCallback(
+    (screen, params) => push(urlFrom(screen, params)),
+    [push]
+  );
+
   return {
-    navigate: (path, params) => push(path + stringifyParams(params)),
-    push: ({ path }, params) => push(path + stringifyParams(params)),
-    replace: ({ path }, params) => replace(path + stringifyParams(params)),
+    navigate,
+    push: navigate,
+    replace: useCallback(
+      (screen, params) => replace(urlFrom(screen, params)),
+      [replace]
+    ),
     canGoBack,
-    goBack: (fallback) => {
-      if (canGoBack() || !fallback) return goBack();
-      push(fallback);
+    goBack: (fallback = 'Home') => {
+      if (canGoBack()) return back();
+      push(urlFrom(fallback));
     },
     pop: () => {},
     params: query,
     pathname,
-    asPath,
+    screen: screenFrom(pathname) ?? '',
+    isReady,
   };
-}
+};
 
 export default useRouting;

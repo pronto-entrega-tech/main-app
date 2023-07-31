@@ -1,7 +1,6 @@
 import React from 'react';
 import { Insets, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 import { myColors, globalStyles } from '~/constants';
-import colors from '~/constants/myColors';
 import MyTouchable, { ButtonOrLink } from './MyTouchable';
 import MyIcon, { IconNames } from './MyIcon';
 
@@ -15,12 +14,11 @@ type ButtonTypes =
   | 'fill'
   | 'back'
   | 'profile'
-  | 'address'
   | 'prodIcons'
   | 'profile2'
   | 'cancel';
 
-interface IconButtonBase {
+type IconButtonBase = {
   icon: IconNames;
   /**
    * @default 24
@@ -34,13 +32,13 @@ interface IconButtonBase {
   disabled?: boolean;
   type?: ButtonTypes;
   hitSlop?: Insets;
-}
+};
 
 type IconButtonProps = ButtonOrLink<IconButtonBase>;
 
-function IconButton({
+const IconButton = ({
   onPress,
-  path,
+  screen,
   params,
   icon,
   size = 24,
@@ -49,12 +47,9 @@ function IconButton({
   disabled,
   type,
   hitSlop,
-}: IconButtonProps) {
+}: IconButtonProps) => {
   let innerHitSlop;
-  let iconStyle: StyleProp<ViewStyle> = {
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
+  let iconStyle: StyleProp<ViewStyle> = {};
   switch (type) {
     case 'blank':
       break;
@@ -108,12 +103,9 @@ function IconButton({
     case 'profile2':
       iconStyle = [styles.buttonProfile2, globalStyles.elevation4];
       break;
-    case 'address':
-      iconStyle = styles.buttonAddress;
-      break;
     default:
       iconStyle = [
-        styles.button,
+        styles.buttonDefault,
         globalStyles.elevation4,
         globalStyles.darkBorder,
       ];
@@ -122,33 +114,33 @@ function IconButton({
   return (
     <MyTouchable
       hitSlop={hitSlop ?? innerHitSlop}
-      style={[iconStyle, style]}
+      style={[styles.base, iconStyle, style]}
       disabled={disabled}
       {...({
         onPress,
-        path,
+        screen,
         params,
       } as ButtonOrLink)}>
       <MyIcon name={icon} size={size} color={color} />
     </MyTouchable>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  button: {
-    width: 54,
-    height: 54,
-    backgroundColor: '#fff',
+  base: {
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 60,
+  },
+  buttonDefault: {
+    width: 54,
+    height: 54,
+    backgroundColor: '#fff',
     margin: 5,
   },
   buttonClear: {
     width: 44,
     height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 48,
     padding: 10,
   },
@@ -156,49 +148,33 @@ const styles = StyleSheet.create({
     width: 32,
     height: 28,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 60,
     margin: 2,
   },
   buttonAdd2: {
     width: 32,
     height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 60,
   },
   buttonAddHorizontal: {
     width: 26,
     height: 26,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 60,
     margin: 2,
   },
   buttonAddLarge: {
     width: 34,
     height: 30,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 60,
     margin: 2,
   },
   buttonBack: {
     width: 56,
     height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 56,
   },
   buttonProdIcons: {
     marginLeft: -8,
     width: 56,
     height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 56,
   },
   buttonProfile: {
@@ -208,33 +184,17 @@ const styles = StyleSheet.create({
     right: -40,
     marginBottom: 8,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 60,
     margin: 5,
   },
   buttonProfile2: {
     width: 50,
     height: 50,
-    backgroundColor: colors.primaryColor,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 60,
+    backgroundColor: myColors.primaryColor,
     margin: 5,
-  },
-  buttonAddress: {
-    width: 48,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 60,
-    marginTop: -2,
   },
   cancel: {
     width: 48,
     height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 48,
   },
 });

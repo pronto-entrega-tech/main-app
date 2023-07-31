@@ -1,63 +1,50 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Image } from 'react-native-elements/dist/image/Image';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { myColors, device, globalStyles } from '~/constants';
-import { calcOff, getImageUrl, moneyToString } from '~/functions/converter';
+import { myColors, device, globalStyles, myFonts } from '~/constants';
+import { getImageUrl } from '~/functions/converter';
+import { calcPrices, money } from '~/functions/money';
 import IconButton from './IconButton';
-import { Product } from './ProdItem';
 import MyIcon from './MyIcon';
-import useRouting from '~/hooks/useRouting';
 import MyTouchable from './MyTouchable';
 import AnimatedText from './AnimatedText';
+import { objectConditional } from '~/functions/conditionals';
+import { Product } from '~/core/models';
+import MyText from './MyText';
 
-function ProdItemHorizontal(props: {
-  navigation?: StackNavigationProp<any, any>;
+const ProdItemHorizontal = (props: {
   item: Product;
-  city: string;
   showsMarketLogo: boolean;
   isFavorite?: boolean;
   quantity?: number;
   onPressFav?: () => void;
   onPressAdd: () => void;
   onPressRemove: () => void;
-}) {
+}) => {
   const {
     item,
-    city,
     showsMarketLogo,
     quantity = 0,
     onPressAdd,
     onPressRemove,
   } = props;
-  const { params, push } = useRouting();
-  const atualCity = city || params.city;
-  const off = calcOff(item);
+  const { price, previous_price, discountText } = calcPrices(item);
 
-  const nav = device.web
-    ? { path: `/produto/${atualCity}/${item.market_id}/${item.prod_id}` }
-    : {
-        onPress: () =>
-          push(
-            { screen: 'ProductTabs', path: '' },
-            {
-              city: atualCity,
-              marketId: item.market_id,
-              prodId: item.prod_id,
-              path: `/produto/${atualCity}/${item.market_id}/${item.prod_id}`, // pathname inside tabs are undefined
-            }
-          ),
-      };
+  const path = `/produto/${item.city_slug}/${item.item_id}`;
+  const pathParam = objectConditional(!device.web)({ path }); // pathname inside tabs are undefined
 
   return (
     <View
       style={[globalStyles.elevation4, globalStyles.darkBorder, styles.card]}>
-      <MyTouchable style={{ flex: 1 }} {...nav}>
+      <MyTouchable
+        style={{ flex: 1 }}
+        screen='Product'
+        params={{ city: item.city_slug, itemId: item.item_id, ...pathParam }}>
         <View style={styles.container}>
           <View style={styles.containerImage}>
             {item.images_names ? (
               <Image
-                placeholderStyle={{ backgroundColor: '#FFF' }}
+                placeholderStyle={{ backgroundColor: 'white' }}
                 PlaceholderContent={
                   <MyIcon
                     name='cart-outline'
@@ -66,6 +53,7 @@ function ProdItemHorizontal(props: {
                   />
                 }
                 source={{ uri: getImageUrl('product', item.images_names[0]) }}
+                resizeMode='contain'
                 containerStyle={styles.image}
               />
             ) : (
@@ -86,35 +74,30 @@ function ProdItemHorizontal(props: {
           /> */}
           </View>
           <View style={styles.containerText}>
-            <Text
-              ellipsizeMode='tail'
-              numberOfLines={1}
-              style={styles.prodText}>
+            <MyText numberOfLines={1} style={styles.prodText}>
               {item.name} {item.brand}
-            </Text>
-            {off && (
+            </MyText>
+            {discountText && (
               <View style={styles.oldPriceRow}>
                 <View style={styles.offTextBox}>
-                  <Text style={styles.offText}>-{off}%</Text>
+                  <MyText style={styles.offText}>{discountText}</MyText>
                 </View>
-                <Text style={styles.oldPriceText}>
-                  {moneyToString(item.previous_price, 'R$')}
-                </Text>
+                <MyText style={styles.oldPriceText}>
+                  {money.toString(previous_price, 'R$')}
+                </MyText>
               </View>
             )}
-            <Text style={styles.priceText}>
-              {moneyToString(item.price, 'R$')}
-            </Text>
-            <Text style={styles.quantityText}>{item.quantity}</Text>
+            <MyText style={styles.priceText}>
+              {money.toString(price, 'R$')}
+            </MyText>
+            <MyText style={styles.quantityText}>{item.quantity}</MyText>
           </View>
-          <View style={styles.mercContainer}>
+          <View style={styles.marketContainer}>
             {showsMarketLogo && (
               <Image
-                placeholderStyle={{ backgroundColor: '#FFF' }}
-                source={{
-                  uri: getImageUrl('market', item.market_id),
-                }}
-                containerStyle={styles.mercImage}
+                placeholderStyle={{ backgroundColor: 'white' }}
+                source={{ uri: getImageUrl('market', item.market_id) }}
+                containerStyle={styles.marketImage}
               />
             )}
           </View>
@@ -122,14 +105,14 @@ function ProdItemHorizontal(props: {
       </MyTouchable>
       <View style={styles.containerAdd}>
         <IconButton icon='plus' type='addHorizontal' onPress={onPressAdd} />
-        <AnimatedText style={styles.centerNumText} distace={10} animateZero>
+        <AnimatedText style={styles.centerNumText} distance={10} animateZero>
           {quantity}
         </AnimatedText>
         <IconButton icon='minus' type='addHorizontal' onPress={onPressRemove} />
       </View>
     </View>
   );
-}
+};
 
 const textLinePad = device.android ? -2 : 1;
 const styles = StyleSheet.create({
@@ -138,7 +121,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     marginBottom: 8,
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
   },
   container: {
     flexDirection: 'row',
@@ -156,7 +139,7 @@ const styles = StyleSheet.create({
   centerNumText: {
     fontSize: 17,
     color: myColors.text3,
-    fontFamily: 'Medium',
+    fontFamily: myFonts.Medium,
   },
   containerImage: {
     marginLeft: -6,
@@ -182,7 +165,7 @@ const styles = StyleSheet.create({
     color: myColors.grey3,
     marginTop: 12,
     width: device.width - 160,
-    fontFamily: 'Condensed',
+    fontFamily: myFonts.Condensed,
   },
   oldPriceRow: {
     flexDirection: 'row',
@@ -197,34 +180,34 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   offText: {
-    color: '#FFF',
-    fontWeight: 'bold',
+    color: 'white',
+    fontFamily: myFonts.Bold,
     fontSize: 12,
   },
   oldPriceText: {
     textDecorationLine: 'line-through',
     color: myColors.grey2,
     fontSize: 13,
-    fontFamily: 'Regular',
+    fontFamily: myFonts.Regular,
     marginLeft: 4,
   },
   priceText: {
     color: myColors.text3,
     marginTop: 18 + textLinePad,
     fontSize: 20,
-    fontFamily: 'Medium',
+    fontFamily: myFonts.Medium,
   },
   quantityText: {
     marginTop: textLinePad,
     color: myColors.grey2,
-    fontFamily: 'Regular',
+    fontFamily: myFonts.Regular,
   },
-  mercContainer: {
+  marketContainer: {
     position: 'absolute',
     right: 12,
     top: 48,
   },
-  mercImage: {
+  marketImage: {
     marginRight: 0,
     height: 34,
     width: 34,

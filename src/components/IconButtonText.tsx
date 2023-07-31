@@ -1,28 +1,28 @@
 import React from 'react';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import { Text, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import myFonts from '~/constants/myFonts';
 import { myColors } from '~/constants';
 import IconButton from './IconButton';
 import { ButtonOrLink } from './MyTouchable';
 import { IconNames } from './MyIcon';
+import MyText from './MyText';
 
-interface IconButtonTextBase {
+type IconButtonTextBase = {
   icon: IconNames;
   text: string;
   type?: 'fill' | 'profile2';
-}
+};
 
 type IconButtonTextProps = ButtonOrLink<IconButtonTextBase>;
 
-function IconButtonText({
+const IconButtonText = ({
   onPress,
-  path,
+  screen,
   params,
   icon,
   text,
   type = 'fill',
-}: IconButtonTextProps) {
+}: IconButtonTextProps) => {
   const props =
     type === 'fill'
       ? {
@@ -45,14 +45,14 @@ function IconButtonText({
         type={type}
         {...({
           onPress,
-          path,
+          screen,
           params,
         } as ButtonOrLink)}
       />
-      <Text style={[styles.text, props.style]}>{text}</Text>
+      <MyText style={[styles.text, props.style]}>{text}</MyText>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   text: {

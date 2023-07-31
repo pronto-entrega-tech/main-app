@@ -1,90 +1,120 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import Slider from '@react-native-community/slider';
 import MyTouchable from '~/components/MyTouchable';
 import MyButton from '~/components/MyButton';
-import { myColors, device, globalStyles } from '~/constants';
+import { myColors, device, globalStyles, myFonts } from '~/constants';
 import { categoriesArray } from './categorias';
-import Header from '~/components/Header';
+import MyHeader from '~/components/MyHeader';
 import useRouting from '~/hooks/useRouting';
 import MyIcon, { IconNames } from '~/components/MyIcon';
 import Chip from '~/components/Chip';
 import AnimatedText from '~/components/AnimatedText';
 import MyText from '~/components/MyText';
+import { toArray } from '~/functions/converter';
+import { ItemOrderBy } from '~/core/models';
+import { objectConditional } from '~/functions/conditionals';
 
-function FilterButton(props: {
+const FilterButton = (props: {
   icon: IconNames;
   text: string;
   onPress: () => void;
   selected: boolean;
-}) {
+}) => {
   const { icon, text, onPress, selected } = props;
   return (
     <MyTouchable onPress={onPress} style={styles.filterButton}>
       <View
         style={[
-          styles.iconConteiner,
-          { backgroundColor: selected ? myColors.primaryColor : '#FFF' },
+          styles.iconContainer,
+          { backgroundColor: selected ? myColors.primaryColor : 'white' },
           selected ? globalStyles.elevation5 : globalStyles.elevation3,
         ]}>
-        <MyIcon name={icon} color={selected ? '#FFF' : myColors.grey2} />
+        <MyIcon name={icon} color={selected ? 'white' : myColors.grey2} />
       </View>
-      <Text
+      <MyText
         style={[
           styles.buttonText,
           { color: selected ? myColors.primaryColor : myColors.text2 },
         ]}>
         {text}
-      </Text>
+      </MyText>
     </MyTouchable>
   );
-}
+};
+const defaultDistance = 15;
 
-function Filter() {
+const Filter = () => {
   const routing = useRouting();
-  const [filter, setFilter] = useState<number>(0);
-  const [distance, setDistance] = useState<number>(14);
-  const [categoriasList, setCategoriasList] = useState<string[]>( // primitive values in params are converted to string
-    routing.params.categories ?? []
+  const [orderBy, setOrderBy] = useState(ItemOrderBy.Default);
+  const [distance, setDistance] = useState(defaultDistance);
+  const [categories, setCategories] = useState<string[]>(
+    toArray(routing.params.category) ?? []
   );
+
+  const chipsBar = categoriesArray.map((category, index) => {
+    const categoryId = index + 1;
+    const isSelected = categories.includes(`${categoryId}`);
+
+    return (
+      <Chip
+        key={categoryId}
+        title={category}
+        titleStyle={{ color: isSelected ? 'white' : '#191919' }}
+        style={{
+          margin: 4,
+          backgroundColor: isSelected ? myColors.colorAccent : '#ECECEC',
+        }}
+        onPress={() => {
+          if (isSelected) {
+            setCategories((c) => c.filter((i) => i !== `${categoryId}`));
+          } else {
+            setCategories((c) => [...c, `${categoryId}`]);
+          }
+        }}
+      />
+    );
+  });
+
+  const filterButtonState = (type: ItemOrderBy) => ({
+    onPress: () => setOrderBy(type),
+    selected: orderBy === type,
+  });
+
   return (
     <>
-      <Header title={'Filtro'} />
+      <MyHeader title='Filtro' />
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{ height: device.height - (device.web ? 56 : 0) }}
-        contentContainerStyle={styles.conteiner}>
-        <Text style={styles.title}>Ordernar por</Text>
+        contentContainerStyle={styles.container}>
+        <MyText style={styles.title}>Ordenar por</MyText>
         <FilterButton
           icon='sort-variant'
           text='Padrão'
-          onPress={() => setFilter(0)}
-          selected={filter === 0}
+          {...filterButtonState(ItemOrderBy.Default)}
         />
         <FilterButton
           icon='star'
           text='Avaliação'
-          onPress={() => setFilter(1)}
-          selected={filter === 1}
+          {...filterButtonState(ItemOrderBy.Rating)}
         />
         <FilterButton
           icon='clock'
           text='Tempo de entrega'
-          onPress={() => setFilter(2)}
-          selected={filter === 2}
+          {...filterButtonState(ItemOrderBy.DeliveryTime)}
         />
         <FilterButton
           icon='map-marker'
           text='Distância'
-          onPress={() => setFilter(3)}
-          selected={filter === 3}
+          {...filterButtonState(ItemOrderBy.Distance)}
         />
-        <View style={styles.distanceConteiner}>
-          <Text style={styles.distance}>Distância</Text>
+        <View style={styles.distanceContainer}>
+          <MyText style={styles.distance}>Distância</MyText>
           <View style={{ flexDirection: 'row' }}>
             <MyText style={styles.distance2}>Menos de </MyText>
-            <AnimatedText style={styles.distance2} distace={10}>
-              {distance + 1}
+            <AnimatedText style={styles.distance2} distance={10}>
+              {distance}
             </AnimatedText>
             <MyText style={styles.distance2}>km</MyText>
           </View>
@@ -92,62 +122,40 @@ function Filter() {
         <View style={device.web ? { height: 28 } : {}}>
           <Slider
             value={distance}
-            onValueChange={(v) => setDistance(v)}
-            maximumValue={14}
+            onValueChange={setDistance} // called on drag
+            onSlidingComplete={setDistance} // called on touch
+            minimumValue={1}
+            maximumValue={defaultDistance}
             step={1}
             style={styles.slider}
-            thumbTintColor={device.iOS ? '#FFF' : myColors.colorAccent}
+            thumbTintColor={device.iOS ? 'white' : myColors.colorAccent}
             minimumTrackTintColor={myColors.colorAccent}
           />
         </View>
-        <Text style={styles.title}>Categorias</Text>
+        <MyText style={styles.title}>Categorias</MyText>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', padding: 8 }}>
-          {categoriesArray.map((category, index) => {
-            const categoryId = index + 1;
-            const isSelected = categoriasList.includes(categoryId.toString());
-            return (
-              <Chip
-                key={categoryId}
-                title={category}
-                titleStyle={{ color: isSelected ? '#FFF' : '#191919' }}
-                style={{
-                  margin: 4,
-                  backgroundColor: isSelected
-                    ? myColors.colorAccent
-                    : '#ECECEC',
-                }}
-                onPress={() => {
-                  if (isSelected) {
-                    setCategoriasList((c) =>
-                      c.filter((i) => i !== categoryId.toString())
-                    );
-                  } else {
-                    setCategoriasList((c) => [...c, categoryId.toString()]);
-                  }
-                }}
-              />
-            );
-          })}
+          {chipsBar}
         </View>
       </ScrollView>
       <MyButton
         title='Ver resultados'
         type='outline'
-        buttonStyle={styles.button}
+        buttonStyle={globalStyles.bottomButton}
         onPress={() => {
           routing.pop(2);
-          routing.push(
-            { screen: 'Search', path: '/pesquisa' },
-            { categories: categoriasList }
-          );
+          routing.push('Search', {
+            orderBy,
+            category: categories,
+            ...objectConditional(distance !== defaultDistance)({ distance }),
+          });
         }}
       />
     </>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  conteiner: {
+  container: {
     backgroundColor: myColors.background,
     paddingBottom: 56,
   },
@@ -164,16 +172,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  iconConteiner: {
+  iconContainer: {
     padding: 8,
     borderRadius: 24,
   },
   buttonText: {
     marginLeft: 12,
     fontSize: 17,
-    fontFamily: 'Regular',
+    fontFamily: myFonts.Regular,
   },
-  distanceConteiner: {
+  distanceContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -191,15 +199,6 @@ const styles = StyleSheet.create({
   slider: {
     marginTop: 8,
     marginHorizontal: 16,
-  },
-  button: {
-    position: 'absolute',
-    alignSelf: 'center',
-    bottom: device.iPhoneNotch ? 38 : 12,
-    borderWidth: 2,
-    width: 210,
-    height: 46,
-    backgroundColor: '#fff',
   },
 });
 

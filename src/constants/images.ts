@@ -1,4 +1,3 @@
-import loadProdImage from '@public/icons/loadProdImage.png';
 import account from '@public/icons/account.png';
 import splash from '@public/splash.png';
 import logo from '@public/logo.webp';
@@ -18,8 +17,7 @@ import visa from '@public/icons/visa.png';
 import elo from '@public/icons/elo.png';
 import device from './device';
 
-const imgs = {
-  /* loadProdImage, */
+const rawImages = {
   account,
   splash,
   logo,
@@ -38,26 +36,18 @@ const imgs = {
   visa,
   elo,
 };
-type imgsKey = keyof typeof imgs;
+type ImagesName = keyof typeof rawImages;
 
-function images() {
-  const kv = Object.entries(imgs);
-
-  let res = {} as {
-    [o in imgsKey]: { source: any; defaultSource?: any };
-  };
-
-  for (const i of kv) {
-    const [k, v] = i;
-    res = {
-      ...res,
-      [k]: device.web
-        ? { source: v.src, defaultSource: v.blurDataURL }
-        : { source: v },
-    };
+const images = Object.entries(rawImages).reduce(
+  (images, [name, v]) => ({
+    ...images,
+    [name]: device.web
+      ? { source: v.src, defaultSource: v.blurDataURL }
+      : { source: v },
+  }),
+  {} as {
+    [x in ImagesName]: { source: any; defaultSource?: any };
   }
+);
 
-  return res;
-}
-
-export default images();
+export default images;

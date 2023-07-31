@@ -5,8 +5,9 @@ import MyTouchable from './MyTouchable';
 import MyText from './MyText';
 import MyIcon from './MyIcon';
 import useRouting from '~/hooks/useRouting';
+import { screenFrom } from '~/functions/converter';
 
-function NavigationBar() {
+const NavigationBar = () => {
   const { pathname } = useRouting();
 
   const tabs = [
@@ -50,7 +51,7 @@ function NavigationBar() {
                 paddingTop: 8,
                 paddingBottom: 6,
               }}
-              path={path}>
+              screen={screenFrom(path)}>
               <MyIcon
                 name={isSelected ? icon : `${icon}-outline`}
                 color={color}
@@ -70,6 +71,6 @@ function NavigationBar() {
       </View>
     </View>
   );
-}
+};
 
 export default NavigationBar;

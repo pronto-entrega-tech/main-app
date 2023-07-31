@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleProp, ViewStyle, TextStyle, PixelRatio } from 'react-native';
+import { StyleProp, ViewStyle, TextStyle, StyleSheet } from 'react-native';
 import myColors from '~/constants/myColors';
 import myFonts from '~/constants/myFonts';
 import device from '~/constants/device';
@@ -8,7 +8,7 @@ import MyTouchable, { ButtonOrLink } from './MyTouchable';
 import useHover from '~/hooks/useHover';
 import MyIcon, { IconNames, MyIconProps } from './MyIcon';
 
-interface MyButtonBase {
+type MyButtonBase = {
   title: string;
   icon?: IconNames | MyIconProps;
   image?: JSX.Element;
@@ -17,16 +17,16 @@ interface MyButtonBase {
   type?: 'solid' | 'outline' | 'clear';
   buttonStyle?: StyleProp<ViewStyle>;
   titleStyle?: StyleProp<TextStyle>;
-}
+};
 
 type MyButtonProps = ButtonOrLink<MyButtonBase>;
 
 /**
- * Use `onPress` if want a button, or `path` if want a link.
+ * Use `onPress` if want a button, or `screen` if want a link.
  */
-function MyButton({
-  onPress = () => {},
-  path,
+const MyButton = ({
+  onPress = () => void 0,
+  screen,
   params,
   title,
   image,
@@ -36,7 +36,7 @@ function MyButton({
   type = 'solid',
   buttonStyle,
   titleStyle,
-}: MyButtonProps) {
+}: MyButtonProps) => {
   const baseStyle: ViewStyle = {
     borderRadius: 4,
     minHeight: 44,
@@ -55,30 +55,25 @@ function MyButton({
   const _useHover = useHover();
   const [hovered] = _useHover;
 
-  const isHovered = hovered && (path || !disabled); // should be a link or a button not disabled
+  const isHovered = hovered && (screen || !disabled); // should be a link or a button not disabled
 
   const hoverColor = !isHovered ? myColors.primaryColor : '#48a2eb';
   const solidTextColor = !disabled ? 'white' : '#99a1a8';
   const textColor = !disabled ? hoverColor : '#9CA3AA';
   const backgroundColor = !disabled ? hoverColor : '#E3E6E8';
 
-  const typeStyle: ViewStyle = (() => {
-    switch (type) {
-      case 'solid':
-        return {
-          backgroundColor,
-        };
-      case 'outline':
-        return {
-          borderColor: textColor,
-          borderWidth: 1,
-        };
-      default:
-        return {};
-    }
-  })();
+  const typeStyle = StyleSheet.create({
+    solid: {
+      backgroundColor,
+    },
+    outline: {
+      borderColor: textColor,
+      borderWidth: 1,
+    },
+    clear: {},
+  })[type];
 
-  const ButtonText = () => (
+  const buttonText = (
     <>
       {image}
       {icon && (
@@ -106,12 +101,12 @@ function MyButton({
       useHover={_useHover}
       {...({
         onPress,
-        path,
+        screen,
         params,
       } as ButtonOrLink)}>
-      <ButtonText />
+      {buttonText}
     </MyTouchable>
   );
-}
+};
 
 export default MyButton;

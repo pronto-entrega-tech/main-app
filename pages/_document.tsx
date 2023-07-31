@@ -1,4 +1,4 @@
-import { getInitialProps, style } from '@expo/next-adapter/document';
+import { style } from '@expo/next-adapter/document';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 import React from 'react';
 import { AppRegistry } from 'react-native';
@@ -30,6 +30,14 @@ const myStyle = `
 
 body::-webkit-scrollbar {
   width: 0;
+}
+
+input {
+  outline-style: none;
+}
+
+textarea {
+  outline-style: none;
 }
 `;
 
@@ -135,21 +143,22 @@ class CustomDocument extends Document {
   }
 }
 
-interface RenderPage {
-  renderPage: any;
-}
-async function myGetInitialProps({ renderPage }: RenderPage) {
+type RenderPage = { renderPage: any };
+const myGetInitialProps = async ({ renderPage }: RenderPage) => {
   AppRegistry.registerComponent('Main', () => Main);
-  // @ts-ignore
+  /**
+   * AppRegistry don't have getApplication on declaration
+   *
+   * @ts-expect-error */
   const { getStyleElement } = AppRegistry.getApplication('Main');
   const page = renderPage();
+
   const _style = <style dangerouslySetInnerHTML={{ __html: style }} />;
   const _myStyle = <style dangerouslySetInnerHTML={{ __html: myStyle }} />;
-  return {
-    ...page,
-    styles: React.Children.toArray([_style, _myStyle, getStyleElement()]),
-  };
-}
+  const styles = [_style, _myStyle, getStyleElement()];
+
+  return { ...page, styles: React.Children.toArray([styles]) };
+};
 
 Document.getInitialProps = myGetInitialProps;
 

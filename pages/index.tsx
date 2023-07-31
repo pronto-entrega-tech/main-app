@@ -1,54 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, StyleSheet, Image, useWindowDimensions } from 'react-native';
 import { myColors, globalStyles, images, myFonts } from '~/constants';
 import MyButton from '~/components/MyButton';
 import MyText from '~/components/MyText';
 import useRouting from '~/hooks/useRouting';
-import { addressModel } from './endereco';
-import { saveActiveAddress, saveActiveAddressIndex } from '~/core/dataStorage';
+import { saveActiveAddress, saveActiveAddressId } from '~/core/dataStorage';
+import { Address } from '~/core/models';
 
-async function saveCity(city: { city: string; state: string }) {
-  const address: addressModel = {
-    apelido: '',
-    rua: '',
-    numero: '',
-    bairro: '',
-    cidade: city.city,
-    estado: city.state,
+const saveCity = async (p: { city: string; state: string }) => {
+  const address: Address = {
+    id: '',
+    nickname: '',
+    street: '',
+    number: '',
+    district: '',
+    city: p.city,
+    state: p.state,
   };
-  await Promise.all([saveActiveAddressIndex(-1), saveActiveAddress(address)]);
-}
+  await Promise.all([saveActiveAddressId(null), saveActiveAddress(address)]);
+};
 
-function Splash() {
-  /* const cites = [{ city: 'Jataí', path: 'jatai-go' }]; */
-  const cites = [{ city: 'Jataí', state: 'GO' }];
+const cities = [{ city: 'Jataí', state: 'GO' }];
+
+const Main = () => {
   const routing = useRouting();
   const { width } = useWindowDimensions();
 
-  const [isTablet, setTablet] = useState(false);
-  const [isTabletM, setTabletM] = useState(false);
-
-  useEffect(() => {
-    setTablet(width > 665);
-    setTabletM(width > 425);
-  }, [width]);
+  const isTablet = width > 665;
+  const isTabletM = width > 425;
 
   const titleSize = { fontSize: isTablet ? 20 : 18 };
   const title = { fontSize: isTablet ? 32 : 28 };
   const subtitle = { fontSize: isTablet ? 22 : 20 };
 
   return (
-    <View
-      style={{
-        backgroundColor: myColors.background,
-      }}>
+    <View style={{ backgroundColor: myColors.background }}>
       <View style={{ backgroundColor: '#f8f8f8' }}>
         <MyButton
           title='Entrar'
           type='clear'
           titleStyle={titleSize}
           buttonStyle={styles.loginButton}
-          path='/entrar'
+          screen='SignIn'
         />
         <Image {...images.pineapple} style={styles.pineapple} />
         <Image {...images.tomato} style={styles.tomato} />
@@ -73,27 +66,26 @@ function Splash() {
             color: myColors.background,
             style: { marginRight: 3 },
           }}
-          path='/selecione-endereco'
+          screen='SelectAddress'
         />
       </View>
       <MyText style={[styles.cityText, titleSize]}>Escolha uma cidade</MyText>
-      {cites.map((item, index) => (
+      {cities.map((item) => (
         <MyButton
-          key={index}
+          key={item.city}
           title={item.city}
           type='clear'
           titleStyle={titleSize}
           buttonStyle={styles.cityButton}
-          /* path={`/inicio/explore/${item.path}`} */
           onPress={async () => {
             await saveCity(item);
-            routing.navigate('/inicio');
+            routing.navigate('Home');
           }}
         />
       ))}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   titleLoginButton: {
@@ -174,4 +166,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Splash;
+export default Main;

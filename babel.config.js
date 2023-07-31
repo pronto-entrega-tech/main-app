@@ -1,8 +1,7 @@
 module.exports = function (api) {
   api.cache(true);
-  const isWeb = process.env.WEB === 'true';
   return {
-    presets: [isWeb ? '@expo/next-adapter/babel' : 'babel-preset-expo'],
+    presets: ['babel-preset-expo'],
     plugins: [
       [
         'module-resolver',
@@ -15,14 +14,9 @@ module.exports = function (api) {
           },
         },
       ],
+      'transform-inline-environment-variables',
+      'babel-plugin-styled-components',
       'react-native-reanimated/plugin',
-      isWeb
-        ? ([
-            '@babel/plugin-proposal-private-property-in-object',
-            { loose: true },
-          ],
-          ['@babel/plugin-proposal-private-methods', { loose: true }])
-        : {},
     ],
   };
 };

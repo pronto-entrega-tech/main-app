@@ -6,7 +6,7 @@ import myColors from '~/constants/myColors';
 
 export type IconNames = keyof typeof icons;
 
-export interface MyIconProps {
+export type MyIconProps = {
   name: IconNames;
   /**
    * @default primaryColor
@@ -17,14 +17,18 @@ export interface MyIconProps {
    */
   size?: number;
   style?: StyleProp<TextStyle>;
-}
-function MyIcon({
+};
+const MyIcon = ({
   name,
   color = myColors.primaryColor,
   size = 24,
   style,
-}: MyIconProps) {
-  return <Icon name={name} color={color} size={size} style={style} />;
-}
+}: MyIconProps) => (
+  /**
+   * cellphone-android and cellphone-iphone was removed
+   *
+   * @ts-expect-error */
+  <Icon name={name} color={color} size={size} style={style} />
+);
 
 export default MyIcon;

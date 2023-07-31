@@ -1,4 +1,4 @@
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions, Platform, StatusBar } from 'react-native';
 
 const android = Platform.OS === 'android';
 const iOS = Platform.OS === 'ios';
@@ -14,6 +14,14 @@ const aspectRatio = height / width;
 const iPhoneNotch =
   iOS && (height === 812 || height === 844 || height === 896 || height === 926);
 
+export const appOrSite = web ? 'site' : 'app';
+
+export const notchHeight = android
+  ? StatusBar.currentHeight
+  : iPhoneNotch
+  ? 34
+  : 0;
+
 const device = {
   android,
   aspectRatio,
@@ -23,13 +31,6 @@ const device = {
   iPad,
   web,
   width,
-};
-
-export const isDevice = {
-  android,
-  iOS,
-  iPad,
-  web,
 };
 
 export default device;

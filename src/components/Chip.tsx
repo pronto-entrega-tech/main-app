@@ -1,18 +1,17 @@
 import React from 'react';
 import { StyleProp, ViewStyle, TextStyle } from 'react-native';
 import IconButton from './IconButton';
-import MyIcon from './MyIcon';
 import MyText from './MyText';
 import MyTouchable from './MyTouchable';
 
-export default function Chip(props: {
+const Chip = (props: {
   title?: string;
   icon?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
   titleStyle?: StyleProp<TextStyle>;
   onPress?: () => void;
   onClose?: () => void;
-}) {
+}) => {
   const { title, icon, style, titleStyle, onPress, onClose } = props;
   return (
     <MyTouchable
@@ -53,4 +52,6 @@ export default function Chip(props: {
       )}
     </MyTouchable>
   );
-}
+};
+
+export default Chip;

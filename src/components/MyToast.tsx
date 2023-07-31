@@ -1,68 +1,70 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Animated } from 'react-native';
 import { device, globalStyles } from '~/constants';
+import { zIndex } from '~/constants/zIndex';
 import useMyContext from '~/core/MyContext';
-import MyIcon from './MyIcon';
+import MyIcon, { IconNames } from './MyIcon';
 import MyText from './MyText';
 
-function MyToast() {
-  const { modalState, modalRefresh } = useMyContext();
+export type ToastState = {
+  message: string;
+  long?: boolean;
+  type?: 'Confirmation' | 'Error';
+};
 
-  const [modal] = React.useState({
+const MyToast = () => {
+  const { toastState } = useMyContext();
+  const [modalState] = useState({
     opacity: new Animated.Value(0),
     scale: new Animated.Value(0.5),
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (toastState.message === '') return;
+
     const useNativeDriver = !device.web;
-    if (modalState.message === '') return;
-    Animated.parallel([
-      Animated.timing(modal.opacity, {
-        toValue: 0,
-        duration: 0,
-        useNativeDriver,
-      }),
-      Animated.timing(modal.scale, {
-        toValue: 0.5,
-        duration: 0,
-        useNativeDriver,
-      }),
-    ]).start();
+
+    modalState.opacity.setValue(0);
+    modalState.scale.setValue(0.5);
 
     Animated.parallel([
-      Animated.timing(modal.opacity, {
+      Animated.timing(modalState.opacity, {
         toValue: 1,
         duration: 150,
         useNativeDriver,
       }),
-      Animated.timing(modal.scale, {
+      Animated.timing(modalState.scale, {
         toValue: 1,
         duration: 150,
         useNativeDriver,
       }),
     ]).start();
 
-    setTimeout(
-      () => {
-        Animated.parallel([
-          Animated.timing(modal.opacity, {
-            toValue: 0,
-            duration: 150,
-            useNativeDriver,
-          }),
-          Animated.timing(modal.scale, {
-            toValue: 0.5,
-            duration: 150,
-            useNativeDriver,
-          }),
-        ]).start();
-      },
-      modalState.long ? 3500 : 2000
+    Animated.delay(toastState.long ? 3500 : 2000).start(() =>
+      Animated.parallel([
+        Animated.timing(modalState.opacity, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver,
+        }),
+        Animated.timing(modalState.scale, {
+          toValue: 0.5,
+          duration: 150,
+          useNativeDriver,
+        }),
+      ]).start()
     );
+
     return () => {
-      modalState.message = '';
+      toastState.message = '';
     };
-  }, [modalRefresh]);
+  }, [toastState, modalState.opacity, modalState.scale]);
+
+  const map: { [x: string]: { icon: IconNames; color: string } } = {
+    Error: { icon: 'close-circle', color: 'red' },
+    Confirmation: { icon: 'check', color: '#4BB543' },
+  };
+  const { icon, color } = map[toastState.type ?? ''] ?? map.Confirmation;
 
   return (
     <Animated.View
@@ -70,23 +72,24 @@ function MyToast() {
         styles.model,
         globalStyles.elevation4,
         {
-          opacity: modal.opacity,
-          transform: [{ scale: modal.scale }],
+          backgroundColor: color,
+          opacity: modalState.opacity,
+          transform: [{ scale: modalState.scale }],
         },
       ]}>
-      <MyIcon name='check' size={24} color='#FFF' />
-      <MyText style={{ color: '#FFF', marginLeft: 8 }}>
-        {modalState.message}
+      <MyIcon name={icon} size={24} color='white' />
+      <MyText style={{ color: 'white', marginLeft: 8 }}>
+        {toastState.message}
       </MyText>
     </Animated.View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   model: {
+    zIndex: zIndex.Toast,
     position: !device.web ? 'absolute' : ('fixed' as any),
     bottom: 0,
-    backgroundColor: '#4BB543',
     padding: 10,
     marginBottom: device.iPhoneNotch ? 142 : 112,
     borderRadius: 50,

@@ -1,88 +1,87 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { RadioButton } from 'react-native-paper';
-import Header from '~/components/Header';
+import MyHeader from '~/components/MyHeader';
 import MyButton from '~/components/MyButton';
 import MyDivider from '~/components/MyDivider';
 import { myColors, device } from '~/constants';
 import useRouting from '~/hooks/useRouting';
-import { scheduleModel } from './carrinho';
+import MyText from '~/components/MyText';
+import { isScheduleEqual } from '~/functions/converter';
+import { useCartContext } from '~/contexts/CartContext';
+import { OrderSchedule } from '~/core/models';
 
-function Schedule() {
-  const routing = useRouting();
-  const [activeSchedule, setActiveSchedule] = useState<
-    scheduleModel | undefined
-  >(routing.params.active);
-  const list: scheduleModel[] = JSON.parse(routing.params.list ?? '{}');
+const Schedule = () => {
+  const { goBack, replace } = useRouting();
+  const { activeSchedule, schedules, setActiveSchedule } = useCartContext();
+  const [localSchedule, setLocalSchedule] = useState(activeSchedule);
+
+  useEffect(() => {
+    if (!schedules) replace('Cart');
+  }, [replace, schedules]);
+
+  const schedulesObject =
+    schedules?.reduce((m, s) => {
+      const a = m[s.dayText] ?? [];
+      return { ...m, [s.dayText]: [...a, s] };
+    }, {} as { [x: string]: OrderSchedule[] }) ?? {};
+
+  const schedulesMap = Object.entries(schedulesObject);
+  const [selectedDay, setSelectedDay] = useState(schedulesMap[0]?.[0]);
 
   return (
-    <View
-      style={{
-        backgroundColor: myColors.background,
-        flex: 1,
-      }}>
-      <Header title={'Agendameto'} />
+    <View style={{ backgroundColor: myColors.background, flex: 1 }}>
+      <MyHeader title='Agendamento' />
+      <View style={{ flexDirection: 'row', paddingTop: 22, paddingBottom: 18 }}>
+        {schedulesMap.map(([day]) => (
+          <MyButton
+            key={day}
+            title={day}
+            type={day === selectedDay ? 'solid' : 'outline'}
+            onPress={() => setSelectedDay(day)}
+            buttonStyle={{ marginLeft: 16, width: 100 }}
+          />
+        ))}
+      </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.paddingBottom}>
-        <Text style={styles.title}>Escolha um horário</Text>
-        {!!list?.length &&
-          list.map((item, index) => (
-            <View key={item.horarios}>
-              {index !== 0 && <MyDivider style={styles.divider} />}
-              <RadioButton.Item
-                label={item.horarios}
-                labelStyle={styles.radioButton}
-                color={myColors.primaryColor}
-                uncheckedColor={myColors.grey}
-                value=''
-                status={
-                  item.horarios === activeSchedule?.horarios
-                    ? 'checked'
-                    : 'unchecked'
-                }
-                onPress={() => {
-                  setActiveSchedule(
-                    item.horarios === activeSchedule?.horarios
-                      ? undefined
-                      : item
-                  );
-                }}
-              />
-            </View>
-          ))}
+        <MyText style={styles.title}>Escolha um horário</MyText>
+        {schedulesObject[selectedDay]?.map((item, index) => (
+          <View key={item.hours}>
+            {index !== 0 && <MyDivider style={styles.divider} />}
+            <RadioButton.Item
+              label={item.hours}
+              labelStyle={styles.radioButton}
+              color={myColors.primaryColor}
+              uncheckedColor={myColors.grey}
+              value=''
+              status={
+                isScheduleEqual(item, localSchedule) ? 'checked' : 'unchecked'
+              }
+              onPress={() => setLocalSchedule(item)}
+            />
+          </View>
+        ))}
       </ScrollView>
       <MyButton
         title='Confirmar'
         type='outline'
-        disabled={isScheduleEqual(routing.params.active, activeSchedule)}
+        disabled={isScheduleEqual(localSchedule, activeSchedule)}
         buttonStyle={styles.button}
         onPress={() => {
-          routing.navigate('/carrinho', {
-            callback: 'activeSchedule',
-            value: JSON.stringify(activeSchedule),
-          });
+          setActiveSchedule(localSchedule);
+          goBack('Cart');
         }}
       />
     </View>
   );
-}
-
-export function isScheduleEqual(
-  schedule1?: scheduleModel,
-  schedule2?: scheduleModel
-) {
-  return (
-    schedule1?.diaDoMes === schedule2?.diaDoMes &&
-    schedule1?.horarios === schedule2?.horarios
-  );
-}
+};
 
 const styles = StyleSheet.create({
   title: {
     marginLeft: 16,
-    marginTop: 14,
-    marginBottom: 2,
+    marginVertical: 2,
     fontSize: 18,
     color: myColors.text5,
   },
