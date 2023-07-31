@@ -44,7 +44,7 @@ const useProviderValues = () => {
         ?.market.name;
 
       Notifications.scheduleNotificationAsync({
-        content: { title: marketName || 'Messagem nova', body: msg.message },
+        content: { title: marketName || 'Mensagem nova', body: msg.message },
         trigger: null,
       });
     });
