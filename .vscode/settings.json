@@ -3,6 +3,5 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "workbench.iconTheme": "material-icon-theme",
-  "material-icon-theme.activeIconPack": "react",
-  "cSpell.words": ["notif"]
+  "material-icon-theme.activeIconPack": "react"
 }
