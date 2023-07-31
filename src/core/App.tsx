@@ -8,7 +8,7 @@ import {
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
-import { myColors, images, fonts, globalStyles } from '~/constants';
+import { myColors, images, fonts, globalStyles, device } from '~/constants';
 import { myScreenOptions } from '~/constants/others';
 import Loading from '~/components/Loading';
 import linking from '~/constants/routes';
@@ -42,13 +42,14 @@ import { useUpdateAddress } from '~/hooks/useAddress';
 
 SplashScreen.preventAutoHideAsync();
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+if (!device.web)
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
 
 const Stack = createStackNavigator();
 
