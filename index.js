@@ -4,7 +4,7 @@
 
 const { exec } = require('child_process');
 
-const app = exec('rtx exec yarn web:prod');
+const app = exec('rtx exec pnpm web:prod');
 
 app.stdout.on('data', (data) => {
   process.stdout.write(data);

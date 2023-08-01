@@ -3,9 +3,9 @@ import { View, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 import { myColors, device, globalStyles } from '~/constants';
 import { saveIsNewUser } from '~/core/dataStorage';
+import useRouting from '~/hooks/useRouting';
 import Loading from '~/components/Loading';
 import MyButton from '~/components/MyButton';
-import useRouting from '~/hooks/useRouting';
 import MyText from '~/components/MyText';
 
 const NewUser = () => {

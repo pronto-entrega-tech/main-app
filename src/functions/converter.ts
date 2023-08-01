@@ -88,7 +88,7 @@ export const createUseContext = <T>(context: Context<T>) => {
           // eslint-disable-next-line react-hooks/rules-of-hooks
           return useContextSelector(context, (c: any) => c[name]);
         },
-      }
+      },
     ) as T;
 };
 
@@ -107,7 +107,7 @@ export const omit = <T, K extends keyof T>(obj: T, ...keys: K[]): Omit<T, K> =>
       delete result[key];
       return result;
     },
-    { ...obj }
+    { ...obj },
   );
 
 type FalsyValue = undefined | null | false | 0 | '';
@@ -133,7 +133,7 @@ export const formatCardBrand = (card: PaymentCard) =>
 export const digitsMask = (raw: string, data: [number, string][]) =>
   data.reduce(
     (v, [n, s]) => (v.length > n ? v.slice(0, n) + s + v.slice(n) : v),
-    raw.replace(/\D/g, '')
+    raw.replace(/\D/g, ''),
   );
 
 export const documentMask = (doc: string) => {
@@ -160,7 +160,7 @@ export const computeDistance = (coords1: Coords, coords2: Coords) => {
     kilometerConst *
     Math.acos(
       Math.sin(radLat1) * Math.sin(radLat2) +
-        Math.cos(radLat1) * Math.cos(radLat2) * Math.cos(radLng2 - radLng1)
+        Math.cos(radLat1) * Math.cos(radLat2) * Math.cos(radLng2 - radLng1),
     )
   )
     .toFixed(1)
@@ -197,14 +197,14 @@ export const formatDeliveryTime = (order: Order) => {
 
 export const isScheduleEqual = (
   schedule1?: OrderSchedule,
-  schedule2?: OrderSchedule
+  schedule2?: OrderSchedule,
 ) =>
   schedule1?.dayNumber === schedule2?.dayNumber &&
   schedule1?.hours === schedule2?.hours;
 
 export const fail = (message?: string) => {
   const error = new Error(message);
-  Error.captureStackTrace(error, fail);
+  Error.captureStackTrace?.(error, fail);
   throw error;
 };
 
@@ -218,8 +218,8 @@ const queryFrom = (params: Params, path: string) => {
 
   return Object.fromEntries(
     Object.entries(params).filter(
-      ([name, value]) => value && !paramsNames?.includes(name)
-    )
+      ([name, value]) => value && !paramsNames?.includes(name),
+    ),
   );
 };
 
@@ -229,7 +229,7 @@ export const urlFrom = (screen: string, params?: Params) => {
 
   const pathWithParams = path.replace(
     pathRegex,
-    (param) => `/${params?.[param.slice(2, -1)]}`
+    (param) => `/${params?.[param.slice(2, -1)]}`,
   );
 
   return {
@@ -297,4 +297,4 @@ export const getStateCode = (region: string) =>
     'sao-paulo': 'SP',
     sergipe: 'SE',
     tocantins: 'TO',
-  }[removeAccents(region)] ?? region);
+  })[removeAccents(region)] ?? region;

@@ -5,7 +5,7 @@ import {
   createStackNavigator,
   StackNavigationProp,
 } from '@react-navigation/stack';
-import * as Font from 'expo-font';
+import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
 import { myColors, images, fonts, globalStyles, device } from '~/constants';
@@ -57,6 +57,7 @@ const App = () => {
   const { isAuth } = useAuthContext();
   const updateAddress = useUpdateAddress();
   const [initialScreen, setInitialScreen] = useState('NewUser');
+  const [fontsLoaded] = useFonts(fonts);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -64,8 +65,6 @@ const App = () => {
 
     (async () => {
       try {
-        await Font.loadAsync(fonts);
-
         if (!isAuth) {
           const isNew = await getIsNewUser();
 
@@ -114,7 +113,7 @@ const App = () => {
     );
   };
 
-  if (!isReady) return null;
+  if (!isReady || !fontsLoaded) return null;
 
   return (
     <NavigationContainer

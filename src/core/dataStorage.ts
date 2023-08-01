@@ -100,7 +100,7 @@ export const getShoppingList = async () => {
 // activeMarketId
 export const saveActiveMarketId = async (
   market_id?: string,
-  city_slug?: string
+  city_slug?: string,
 ) => {
   if (!market_id || !city_slug)
     return AsyncStorage.removeItem(key.activeMarketId);

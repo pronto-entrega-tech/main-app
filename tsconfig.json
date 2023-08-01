@@ -16,11 +16,9 @@
     "jsx": "preserve",
     "module": "esnext",
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "incremental": false
   },
   "extends": "expo/tsconfig.base",
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "ts-node": {
-    "swc": true
-  }
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }

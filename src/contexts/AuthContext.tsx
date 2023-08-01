@@ -66,14 +66,14 @@ export const AuthProvider = (props: any) => {
           const _refreshToken = device.web
             ? undefined
             : refreshToken === null
-            ? fail()
+            ? fail('Unauthorized')
             : refreshToken;
 
           const res = await api.auth.revalidate(_refreshToken);
           setAccessToken(res.access_token);
           setRefreshToken(res.refresh_token ?? null);
         } catch (err) {
-          api.isError('Unauthorized', err)
+          api.isError('Unauthorized', err) || err.message === 'Unauthorized'
             ? setAccessToken(null)
             : alert('Error ao tentar entrar', 'Tente novamente mais tarde');
         }
@@ -87,7 +87,7 @@ export const AuthProvider = (props: any) => {
     const expiration = getJwtExpiration(accessToken) - 60 * 1000;
     const revalidateTimeout = setTimeout(
       revalidateToken,
-      expiration - Date.now()
+      expiration - Date.now(),
     );
     return () => clearTimeout(revalidateTimeout);
   }, [hasInternet, accessToken, refreshToken, alert]);
