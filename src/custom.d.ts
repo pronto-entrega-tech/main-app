@@ -17,3 +17,7 @@ declare module '*.webp' {
   const content: number;
   export default content;
 }
+
+interface MapConstructor {
+  new <K, V>(iterable?: Iterable<readonly [K, V]>): Map<K, V>;
+}

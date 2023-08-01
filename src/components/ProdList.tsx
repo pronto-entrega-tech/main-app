@@ -81,7 +81,7 @@ const ProdList = (props: {
       try {
         const prodFeed = await api.products.findMany(city, {
           ...searchParams,
-          latLong: getLatLong(address),
+          latLong: address ? getLatLong(address) : undefined,
         });
 
         setInnerData(prodFeed);

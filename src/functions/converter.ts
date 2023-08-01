@@ -92,7 +92,10 @@ export const createUseContext = <T>(context: Context<T>) => {
     ) as T;
 };
 
-export const pick = <T, K extends keyof T>(obj: T, ...keys: K[]): Pick<T, K> =>
+export const pick = <T extends object, K extends keyof T>(
+  obj: T,
+  ...keys: K[]
+): Pick<T, K> =>
   keys.reduce((result, key) => {
     if (key in obj) result[key] = obj[key];
     return result;
@@ -110,7 +113,6 @@ export const omit = <T, K extends keyof T>(obj: T, ...keys: K[]): Omit<T, K> =>
 type FalsyValue = undefined | null | false | 0 | '';
 type Truly<T> = T extends FalsyValue ? never : T;
 type Falsy<T> = T extends FalsyValue ? T : never;
-
 
 export const filterFalsy = <T>(arr: T[]) => arr.filter(Boolean) as Truly<T>[];
 

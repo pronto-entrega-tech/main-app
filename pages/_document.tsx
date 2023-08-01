@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import { style } from '@expo/next-adapter/document';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
 import React from 'react';
@@ -143,21 +144,24 @@ class CustomDocument extends Document {
   }
 }
 
-type RenderPage = { renderPage: any };
-const myGetInitialProps = async ({ renderPage }: RenderPage) => {
+const myGetInitialProps: typeof Document.getInitialProps = async ({
+  renderPage,
+}) => {
   AppRegistry.registerComponent('Main', () => Main);
   /**
    * AppRegistry don't have getApplication on declaration
    *
    * @ts-expect-error */
   const { getStyleElement } = AppRegistry.getApplication('Main');
-  const page = renderPage();
+  const page = await renderPage();
 
-  const _style = <style dangerouslySetInnerHTML={{ __html: style }} />;
-  const _myStyle = <style dangerouslySetInnerHTML={{ __html: myStyle }} />;
-  const styles = [_style, _myStyle, getStyleElement()];
+  const styles = [
+    <style dangerouslySetInnerHTML={{ __html: style }} />,
+    <style dangerouslySetInnerHTML={{ __html: myStyle }} />,
+    getStyleElement(),
+  ];
 
-  return { ...page, styles: React.Children.toArray([styles]) };
+  return { ...page, styles: React.Children.toArray(styles) };
 };
 
 Document.getInitialProps = myGetInitialProps;

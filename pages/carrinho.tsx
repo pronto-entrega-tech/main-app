@@ -8,11 +8,15 @@ import ProdList from '~/components/ProdList';
 import ProdListHorizontal from '~/components/ProdListHorizontal';
 import { myColors, device, globalStyles, myFonts } from '~/constants';
 import {
+  Address,
+  Coords,
   Market,
+  OrderPayment,
   OrderSchedule,
   Product,
   Profile,
   SetState,
+  ShoppingList,
   weekDayNames,
 } from '~/core/models';
 import MyText from '~/components/MyText';
@@ -366,7 +370,18 @@ const Cart = () => {
   const needDocument =
     payment?.method === 'PIX' && payment?.inApp && !profile?.document;
 
-  const [buttonText, dto] = (() => {
+  const [buttonText, dto] = ((): [
+    string,
+    {
+      accessToken: string;
+      market: Market;
+      address: Address;
+      coords: Coords;
+      payment: OrderPayment;
+      shoppingList: ShoppingList;
+      activeSchedule: OrderSchedule;
+    }?
+  ] => {
     const isTotalBelowMin = money.isLess(subtotal ?? 0, market.order_min);
     const orderMin = money.toString(market.order_min, 'R$');
 
@@ -374,7 +389,7 @@ const Cart = () => {
 
     if (!activeSchedule) return ['Escolha um agendamento'];
 
-    if (!isAuth) return ['Entre ou cadastre-se'];
+    if (accessToken == null) return ['Entre ou cadastre-se'];
 
     if (isTotalBelowMin) return [`Subtotal mínimo de ${orderMin}`];
 
