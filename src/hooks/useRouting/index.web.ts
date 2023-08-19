@@ -10,9 +10,9 @@ const useRouting = (): MyRouting => {
   // pseudo `canGoBack` implemented by tracking if we've navigated
   const canGoBack = useRef(() => hasNavigated.current).current;
 
-  const navigate = useCallback(
+  const navigate: MyRouting['navigate'] = useCallback(
     (screen, params) => push(urlFrom(screen, params)),
-    [push]
+    [push],
   );
 
   return {
@@ -20,7 +20,7 @@ const useRouting = (): MyRouting => {
     push: navigate,
     replace: useCallback(
       (screen, params) => replace(urlFrom(screen, params)),
-      [replace]
+      [replace],
     ),
     canGoBack,
     goBack: (fallback = 'Home') => {

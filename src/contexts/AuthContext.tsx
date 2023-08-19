@@ -73,7 +73,8 @@ export const AuthProvider = (props: any) => {
           setAccessToken(res.access_token);
           setRefreshToken(res.refresh_token ?? null);
         } catch (err) {
-          api.isError('Unauthorized', err) || err.message === 'Unauthorized'
+          api.isError('Unauthorized', err) ||
+          (err as Error).message === 'Unauthorized'
             ? setAccessToken(null)
             : alert('Error ao tentar entrar', 'Tente novamente mais tarde');
         }

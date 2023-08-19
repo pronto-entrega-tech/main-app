@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   ScrollView,
   StyleSheet,
   useWindowDimensions,
@@ -35,18 +37,21 @@ const Slider = (p: { slidesNames?: string[] }) => {
   /* const itemWidth = (width - 32) / columns;
   const itemHeight = Math.round((itemWidth * slideHeight) / slideWidth); */
 
-  const onScroll = useCallback((event) => {
-    const slideSize = event.nativeEvent.layoutMeasurement.width;
-    const index = event.nativeEvent.contentOffset.x / slideSize;
-    const roundIndex = Math.round(index);
+  const onScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const slideSize = event.nativeEvent.layoutMeasurement.width;
+      const index = event.nativeEvent.contentOffset.x / slideSize;
+      const roundIndex = Math.round(index);
 
-    const distance = Math.abs(roundIndex - index);
+      const distance = Math.abs(roundIndex - index);
 
-    // Prevent one pixel triggering
-    const isNoMansLand = 0.4 < distance;
+      // Prevent one pixel triggering
+      const isNoMansLand = 0.4 < distance;
 
-    setIndex((i) => (roundIndex !== i && !isNoMansLand ? roundIndex : i));
-  }, []);
+      setIndex((i) => (roundIndex !== i && !isNoMansLand ? roundIndex : i));
+    },
+    [],
+  );
 
   if (!slidesNames) return null;
 
