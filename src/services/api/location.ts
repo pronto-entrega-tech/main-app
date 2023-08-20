@@ -4,7 +4,7 @@ const { ApiClient } = Utils;
 
 const geocode = async (address: string) => {
   const { data } = await ApiClient.get(
-    `/location/coords/from-address/${address}`
+    `/location/coords/from-address/${address}`,
   );
 
   return data as {
@@ -13,9 +13,15 @@ const geocode = async (address: string) => {
   };
 };
 
-const reverseGeocode = async (coords: string) => {
+const reverseGeocode = async ({
+  latitude,
+  longitude,
+}: {
+  latitude: number;
+  longitude: number;
+}) => {
   const { data } = await ApiClient.get(
-    `/location/address/from-coords/${coords}`
+    `/location/address/from-coords/${latitude},${longitude}`,
   );
 
   return data as {

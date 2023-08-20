@@ -4,7 +4,6 @@ import {
   getForegroundPermissionsAsync,
   hasServicesEnabledAsync,
   LocationAccuracy,
-  LocationGeocodedLocation,
   reverseGeocodeAsync,
 } from 'expo-location';
 import { getStateCode } from '~/functions/converter';
@@ -29,7 +28,7 @@ export const updateAddress = async (alert: MyContextValues['alert']) => {
 };
 
 export const getAddress = async (
-  alert: MyContextValues['alert']
+  alert: MyContextValues['alert'],
 ): Promise<Address | undefined> => {
   if (device.web) {
     if (!navigator.geolocation) {
@@ -44,7 +43,7 @@ export const getAddress = async (
           maximumAge: 5 * 60 * 1000,
           timeout: 10 * 1000,
         });
-      }
+      },
     ).catch(() => undefined);
 
     if (!location) {
@@ -52,18 +51,15 @@ export const getAddress = async (
       return;
     }
 
-    const { latitude, longitude } = location.coords;
-    const coordsString = `${latitude},${longitude}`;
-
-    const address = await api.location.reverseGeocode(coordsString);
+    const address = await api.location.reverseGeocode(location.coords);
 
     return {
       id: '',
       nickname: '',
       ...address,
       coords: {
-        lat: latitude,
-        lng: longitude,
+        lat: location.coords.latitude,
+        lng: location.coords.longitude,
       },
     };
   }
@@ -77,10 +73,7 @@ export const getAddress = async (
     return;
   }
 
-  const { latitude, longitude } = location.coords;
-  const loc: LocationGeocodedLocation = { latitude, longitude };
-
-  const [raw] = await reverseGeocodeAsync(loc);
+  const [raw] = await reverseGeocodeAsync(location.coords);
 
   return {
     id: '',
@@ -91,8 +84,8 @@ export const getAddress = async (
     city: (device.iOS ? raw.city : raw.subregion) ?? '',
     state: raw.region ? getStateCode(raw.region) : '',
     coords: {
-      lat: latitude,
-      lng: longitude,
+      lat: location.coords.latitude,
+      lng: location.coords.longitude,
     },
   };
 };
