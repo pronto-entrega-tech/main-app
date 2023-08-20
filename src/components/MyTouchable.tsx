@@ -80,7 +80,10 @@ const MyTouchable = ({
   if (device.web) {
     const [isHovered, hoverBind] = useHover ?? innerUseHover();
 
-    const baseStyle = { transitionDuration: '200ms' } as ViewStyle;
+    const baseStyle: React.CSSProperties = {
+      transitionDuration: '200ms',
+      cursor: 'pointer',
+    };
     const baseHoverStyle = { opacity: 0.5 };
     const hovered = !!(isHovered && (screen || !disabled)); // should be a link or a button not disabled
 
@@ -89,7 +92,11 @@ const MyTouchable = ({
         accessibilityRole={screen ? 'link' : 'button'}
         {...hoverBind}
         {...{ onClick: !screen && !disabled ? onPress : undefined }}
-        style={[style, baseStyle, hovered && (hoverStyle ?? baseHoverStyle)]}>
+        style={[
+          baseStyle as ViewStyle,
+          style,
+          hovered && (hoverStyle ?? baseHoverStyle),
+        ]}>
         <>{children}</>
       </View>
     );
