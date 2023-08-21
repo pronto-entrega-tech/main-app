@@ -1,56 +1,50 @@
-import React from 'react';
-import { NativeModules, Switch as NativeSwitch } from 'react-native';
-import { device } from '~/constants';
+import React, { ComponentProps } from 'react';
+import { Switch as NativeSwitch } from 'react-native';
+import { device, myColors } from '~/constants';
 
-const version = NativeModules.PlatformConstants
-  ? NativeModules.PlatformConstants.reactNativeVersion
-  : undefined;
-
-type Props = React.ComponentPropsWithRef<typeof NativeSwitch> & {
+type Props = ComponentProps<typeof NativeSwitch> & {
   color?: string;
 };
-const Switch = ({ value, disabled, onValueChange, color, ...rest }: Props) => {
-  const onTintColor = device.iOS
-    ? color
-    : disabled
+const Switch = ({
+  onValueChange,
+  color = myColors.colorAccent,
+  ...props
+}: Props) => {
+  const activeTrackColor = props.disabled
     ? 'rgba(255, 255, 255, 0.12)'
-    : 'rgba(6, 121, 183, 0.5)'; /* setColor(color).alpha(0.5).rgb().string() */
+    : 'rgba(6, 121, 183, 0.5)';
 
-  const thumbTintColor = device.iOS
-    ? undefined
-    : disabled
+  const thumbColor = props.disabled
     ? '#bdbdbd'
-    : value
+    : props.value
     ? color
     : '#fafafa';
 
-  const props =
-    version && version.major === 0 && version.minor <= 56
-      ? {
-          onTintColor,
-          thumbTintColor,
-        }
-      : device.web
-      ? {
-          activeTrackColor: onTintColor,
-          thumbColor: thumbTintColor,
-          activeThumbColor: color,
-        }
-      : {
-          thumbColor: thumbTintColor,
-          trackColor: {
-            true: onTintColor,
-            false: '',
-          },
-        };
+  const baseProps = device.web
+    ? {
+        thumbColor,
+        activeThumbColor: color,
+      }
+    : device.iOS
+    ? {
+        trackColor: {
+          true: color,
+          false: '',
+        },
+      }
+    : {
+        thumbColor,
+        trackColor: {
+          true: activeTrackColor,
+          false: '',
+        },
+      };
 
   return (
     <NativeSwitch
-      value={value}
-      disabled={disabled}
-      onValueChange={disabled ? undefined : onValueChange}
+      onValueChange={props.disabled ? undefined : onValueChange}
+      {...baseProps}
       {...props}
-      {...rest}
     />
   );
 };

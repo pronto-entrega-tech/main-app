@@ -48,7 +48,6 @@ const NotifConfig = () => {
             setConfig(_configState);
             saveNotifConfig(_configState);
           }}
-          color={myColors.colorAccent}
         />
       </View>
       <MyDivider style={styles.divider} />
