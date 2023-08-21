@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, Image, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import { myColors, globalStyles, images, myFonts } from '~/constants';
 import MyButton from '~/components/MyButton';
 import MyText from '~/components/MyText';
 import useRouting from '~/hooks/useRouting';
 import { saveActiveAddress, saveActiveAddressId } from '~/core/dataStorage';
 import { Address } from '~/core/models';
+import { useMediaQuery } from '~/hooks/useMediaQuery';
 
 const saveCity = async (p: { city: string; state: string }) => {
   const address: Address = {
@@ -24,10 +25,7 @@ const cities = [{ city: 'Jataí', state: 'GO' }];
 
 const Main = () => {
   const routing = useRouting();
-  const { width } = useWindowDimensions();
-
-  const isTablet = width > 665;
-  const isTabletM = width > 425;
+  const { isTablet } = useMediaQuery();
 
   const titleSize = { fontSize: isTablet ? 20 : 18 };
   const title = { fontSize: isTablet ? 32 : 28 };
@@ -52,10 +50,10 @@ const Main = () => {
           accessibilityLabel='Logo do ProntoEntrega'
         />
         <MyText style={[styles.title, title]}>
-          {`Faça suas compras${isTabletM ? ' ' : '\n'}sem sair de casa`}
+          Faça suas compras sem sair de casa
         </MyText>
         <MyText style={[styles.subtitle, subtitle]}>
-          {'Veja mercados perto de você'}
+          Veja mercados perto de você
         </MyText>
         <MyButton
           title='Insira seu endereço'

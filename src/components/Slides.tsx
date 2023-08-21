@@ -4,12 +4,12 @@ import {
   NativeSyntheticEvent,
   ScrollView,
   StyleSheet,
-  useWindowDimensions,
   View,
 } from 'react-native';
 import { Image } from 'react-native-elements/dist/image/Image';
 import { globalStyles } from '~/constants';
 import { getImageUrl } from '~/functions/converter';
+import { useMediaQuery } from '~/hooks/useMediaQuery';
 import { api } from '~/services/api';
 
 const slideHeight = 456;
@@ -18,7 +18,7 @@ const slideWidth = 1024;
 const Slider = (p: { slidesNames?: string[] }) => {
   const [index, setIndex] = useState(0);
   const [slidesNames, setSlidesNames] = useState(p.slidesNames);
-  const { width } = useWindowDimensions();
+  const { width, size } = useMediaQuery();
 
   useEffect(() => {
     if (slidesNames) return;
@@ -26,16 +26,15 @@ const Slider = (p: { slidesNames?: string[] }) => {
     api.products.slides().then(setSlidesNames);
   }, [slidesNames]);
 
-  const columns = (() => {
-    if (width > 768) return 3; // desktop
-    if (width > 425) return 1.25; // tablet
-    return 1; // mobile
-  })();
+  const columns = (
+    {
+      lg: 3,
+      md: 1.25,
+      sm: 1,
+    } as const
+  )[size];
   const itemWidth = (width - 32) / columns;
   const itemHeight = Math.round((itemWidth * slideHeight) / slideWidth);
-
-  /* const itemWidth = (width - 32) / columns;
-  const itemHeight = Math.round((itemWidth * slideHeight) / slideWidth); */
 
   const onScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -90,12 +89,10 @@ const Slider = (p: { slidesNames?: string[] }) => {
         showsHorizontalScrollIndicator={false}
         disableIntervalMomentum={true}
         decelerationRate='fast'
-        /* snapToEnd={false} */
         snapToInterval={itemWidth + 8}
         contentContainerStyle={styles.scrollContainer}
         style={{
           width: '100%',
-          /* aspectRatio: ((slideWidth + 32) / (slideHeight + 8)) * columns , */
         }}>
         {images}
       </ScrollView>

@@ -1,11 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  FlatList,
-  StyleProp,
-  ViewStyle,
-  RefreshControl,
-  useWindowDimensions,
-} from 'react-native';
+import { FlatList, StyleProp, ViewStyle, RefreshControl } from 'react-native';
 import { myColors } from '~/constants';
 import { SearchParams } from '~/services/api/products';
 import { useConnection } from '~/functions/connection';
@@ -18,6 +12,7 @@ import { getLatLong, toCityState } from '~/functions/converter';
 import { useAddressContext } from '~/contexts/AddressContext';
 import { api } from '~/services/api';
 import { useCartContext } from '~/contexts/CartContext';
+import { useMediaQuery } from '~/hooks/useMediaQuery';
 
 const ProdList = (props: {
   header?: JSX.Element;
@@ -43,13 +38,20 @@ const ProdList = (props: {
     refreshLess = false,
     tryAgain,
   } = props;
-  const { shoppingList, addProduct, removeProduct } = useCartContext();
+  const {
+    shoppingList: innerShoppingList,
+    addProduct,
+    removeProduct,
+  } = useCartContext();
   const { address } = useAddressContext();
   const [innerData, setInnerData] = useState<Product[]>();
   const [serverErr, setServerErr] = useState<'server'>();
   const [refreshing, setRefreshing] = useState(false);
 
   const listData = data ?? innerData;
+  const shoppingList = data
+    ? innerShoppingList ?? new Map()
+    : innerShoppingList;
 
   const hasInternet = useConnection();
   const connectErr = hasInternet === false ? 'connection' : undefined;
@@ -65,12 +67,14 @@ const ProdList = (props: {
         : 'nothing_feed'
       : undefined;
 
-  const { width } = useWindowDimensions();
-  const columns = (() => {
-    if (width > 768) return 5; // desktop
-    if (width > 430) return 4; // tablet
-    return 3; // mobile
-  })();
+  const { width, size } = useMediaQuery();
+  const columns = (
+    {
+      lg: 5,
+      md: 4,
+      sm: 3,
+    } as const
+  )[size];
 
   const numColumns = horizontal ? 1 : columns;
 
@@ -90,7 +94,7 @@ const ProdList = (props: {
         setServerErr('server');
       }
     },
-    [listData, connectErr, city, searchParams, address]
+    [listData, connectErr, city, searchParams, address],
   );
 
   const searchParamsString = JSON.stringify(searchParams);
@@ -103,7 +107,7 @@ const ProdList = (props: {
   }, [tryAgain, tryFeed, city]);
 
   const error = connectErr ?? missingAddress ?? nothingErr ?? serverErr;
-  if (error)
+  if (error && !data)
     return (
       <>
         {header}
