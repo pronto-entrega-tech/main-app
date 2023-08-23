@@ -12,28 +12,36 @@ import { useModalState } from '~/hooks/useModalState';
 import MyText from '~/components/MyText';
 import useRouting from '~/hooks/useRouting';
 import { createURL } from 'expo-linking';
-import { googleExpoClientId, googleWebClientId } from '~/constants/ids';
+import { GoogleClientId } from '~/constants/ids';
 import { useAuthContext } from '~/contexts/AuthContext';
 import { objectConditional } from '~/functions/conditionals';
 import { api } from '~/services/api';
 import { useUpdateAddress } from '~/hooks/useAddress';
+import useMyContext from '~/core/MyContext';
 
 WebBrowser.maybeCompleteAuthSession();
 
 const SignIn = () => {
   const routing = useRouting();
+  const { alert } = useMyContext();
   const { isAuth, signIn } = useAuthContext();
   const updateAddress = useUpdateAddress();
   const [isLoading, setIsLoading] = useState(false);
   const [modalState, openModal, closeModal] = useModalState();
   const [, , promptAsync] = Google.useAuthRequest({
-    expoClientId: googleExpoClientId,
-    webClientId: googleWebClientId,
+    expoClientId: GoogleClientId.expo,
+    androidClientId: GoogleClientId.android,
+    iosClientId: GoogleClientId.ios,
+    webClientId: GoogleClientId.web,
     responseType: ResponseType.IdToken,
     ...objectConditional(device.web)({
       redirectUri: createURL('/entrar'),
     }),
   });
+
+  const authIsWipAlert = useCallback(() => {
+    alert('Esse demo não tem log-in', 'Entre como convidado');
+  }, [alert]);
 
   const next = useCallback(async () => {
     if (!routing.params.newUser) return routing.goBack();
@@ -59,8 +67,8 @@ const SignIn = () => {
       ]}
       titleStyle={{ fontFamily: myFonts.Medium, color: myColors.text2 }}
       onPress={async () => {
-        setIsLoading(true);
-        closeModal();
+        authIsWipAlert();
+        /* setIsLoading(true);
 
         const promptRes = await promptAsync();
 
@@ -68,7 +76,7 @@ const SignIn = () => {
 
         const authRes = await api.auth.social(
           'GOOGLE',
-          promptRes.params.id_token
+          promptRes.params.id_token,
         );
 
         signIn({
@@ -76,12 +84,12 @@ const SignIn = () => {
           refreshToken: authRes.refresh_token,
         });
 
-        next();
+        next(); */
       }}
     />
   );
 
-  /* const facebookButton = (
+  const facebookButton = (
     <MyButton
       title='Entrar com o Facebook'
       image={
@@ -93,12 +101,12 @@ const SignIn = () => {
       buttonStyle={[styles.button, { backgroundColor: '#1877f2' }]}
       onPress={() => {
         closeModal();
-        alert('Ainda não');
+        authIsWipAlert();
       }}
     />
-  ); */
+  );
 
-  /* const appleButton = (
+  const appleButton = (
     <MyButton
       title='Entrar com a Apple'
       image={
@@ -111,10 +119,10 @@ const SignIn = () => {
       titleStyle={{ fontFamily: myFonts.Medium }}
       onPress={() => {
         closeModal();
-        alert('Ainda não');
+        authIsWipAlert();
       }}
     />
-  ); */
+  );
 
   const emailButton = (
     <MyButton
@@ -127,7 +135,8 @@ const SignIn = () => {
       ]}
       onPress={() => {
         closeModal();
-        routing.navigate('EmailSignIn');
+        authIsWipAlert();
+        /* routing.navigate('EmailSignIn'); */
       }}
     />
   );
@@ -148,8 +157,8 @@ const SignIn = () => {
       {googleButton}
       {device.web ? (
         <>
-          {/* {facebookButton} */}
-          {/* {appleButton} */}
+          {facebookButton}
+          {appleButton}
           {emailButton}
         </>
       ) : (
@@ -226,8 +235,8 @@ const SignIn = () => {
             }}>
             Como deseja entrar?
           </MyText>
-          {/* {facebookButton} */}
-          {/* {appleButton} */}
+          {facebookButton}
+          {appleButton}
           {emailButton}
         </BottomModal>
       )}
