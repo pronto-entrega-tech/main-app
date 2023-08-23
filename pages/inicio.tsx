@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { WithBottomNav } from '~/components/Layout';
 import { myColors, device, globalStyles, myFonts } from '~/constants';
-import Slider from '~/components/Slides';
+import Banners from '~/components/Banners';
 import IconButtonText from '~/components/IconButtonText';
 import ProdList from '~/components/ProdList';
 import MyDivider from '~/components/MyDivider';
@@ -11,7 +11,7 @@ import MyButton from '~/components/MyButton';
 import MyText from '~/components/MyText';
 import MyIcon from '~/components/MyIcon';
 import useRouting from '~/hooks/useRouting';
-import { Product } from '~/core/models';
+import { Banner, Product } from '~/core/models';
 import { stringifyShortAddress } from '~/functions/converter';
 import { useAddressContext } from '~/contexts/AddressContext';
 
@@ -78,8 +78,10 @@ export const ListHeader = ({
 );
 
 // props from the `/inicio/explore/[city]` route
-const Home = (props: { products?: Product[]; slides?: string[] }) => {
-  const { products, slides } = props;
+export type HomeProps = { products?: Product[]; banners?: Banner[] };
+
+const Home = (p: HomeProps) => {
+  const { products, banners } = p;
 
   return (
     <>
@@ -89,7 +91,7 @@ const Home = (props: { products?: Product[]; slides?: string[] }) => {
           data={products}
           header={
             <View>
-              <Slider slidesNames={slides} />
+              <Banners banners={banners} />
 
               <View style={styles.buttons}>
                 <IconButtonText
@@ -149,7 +151,6 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: -12,
     marginHorizontal: 16,
     paddingBottom: 6,
   },

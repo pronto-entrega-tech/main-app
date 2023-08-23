@@ -20,7 +20,7 @@ export const weekDayArray = [
   'FRI',
   'SAT',
 ] as const;
-export type WeekDay = typeof weekDayArray[number];
+export type WeekDay = (typeof weekDayArray)[number];
 
 export type BusinessHours = {
   days: WeekDay[];
@@ -79,6 +79,12 @@ export type CreatePaymentCard = {
 };
 
 export type UpdatePaymentCard = Pick<PaymentCard, 'id' | 'nickname'>;
+
+export type Banner = {
+  name: string;
+  thumbhash: string;
+  description: string;
+};
 
 export type Market = {
   market_id: string;

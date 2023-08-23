@@ -1,4 +1,4 @@
-import { ItemOrderBy, Product } from '~/core/models';
+import { Banner, ItemOrderBy, Product } from '~/core/models';
 import { validateProduct } from '~/functions/converter';
 import Utils from './utils';
 
@@ -27,9 +27,9 @@ const findOne = async (city: string, itemId: string) => {
   return validateProduct(data);
 };
 
-const slides = async () => {
-  const { data } = await StaticClient.get('/slide/slides.json');
-  return data as string[];
+const banners = async () => {
+  const { data } = await StaticClient.get('/banners/meta.json');
+  return data as Banner[];
 };
 
-export const apiProducts = { findMany, findOne, slides };
+export const apiProducts = { findMany, findOne, banners };

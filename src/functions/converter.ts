@@ -241,7 +241,7 @@ export const urlFrom = (screen: string, params?: Params) => {
 export const screenFrom = (path: string) =>
   [...screensPaths.entries()].find(([, p]) => p === path)?.[0];
 
-type ImageDir = 'main' | 'market' | 'product' | 'slide';
+type ImageDir = 'main' | 'market' | 'product' | 'banners';
 export const getImageUrl = (dir: ImageDir, image: string) =>
   `${Urls.STATIC}/${dir}/${image}.webp`;
 
