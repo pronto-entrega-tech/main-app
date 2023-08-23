@@ -40,6 +40,10 @@ input {
 textarea {
   outline-style: none;
 }
+
+img {
+  -webkit-user-drag: none;
+}
 `;
 
 class CustomDocument extends Document {

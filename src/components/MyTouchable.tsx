@@ -48,7 +48,7 @@ type MyTouchableBase = {
   /**
    *  @platform web.
    */
-  hoverStyle?: ViewStyle;
+  hoverStyle?: StyleProp<ViewStyle>;
   useHover?: UseHover;
   solid?: boolean;
 };
@@ -82,14 +82,14 @@ const MyTouchable = ({
 
     const baseStyle: React.CSSProperties = {
       transitionDuration: '200ms',
-      cursor: 'pointer',
+      cursor: disabled ? 'default' : 'pointer',
     };
     const baseHoverStyle = { opacity: 0.5 };
     const hovered = !!(isHovered && (screen || !disabled)); // should be a link or a button not disabled
 
     const Touchable = (
       <View
-        accessibilityRole={screen ? 'link' : 'button'}
+        role={screen ? 'link' : 'button'}
         {...hoverBind}
         {...{ onClick: !screen && !disabled ? onPress : undefined }}
         style={[

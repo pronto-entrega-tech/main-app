@@ -54,7 +54,7 @@ const MySearchBar = ({
           fontFamily: myFonts.Regular,
         }}
         placeholder='O que você procura?'
-        accessibilityRole='search'
+        role='searchbox'
         value={query}
         onChangeText={setSearchQuery}
         onSubmitEditing={submit}

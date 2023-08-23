@@ -1,6 +1,6 @@
 import React, { useEffect, createRef, useState } from 'react';
 import { StyleSheet, View, TextInput } from 'react-native';
-import { getDocumentAsync, DocumentResult } from 'expo-document-picker';
+import { getDocumentAsync, DocumentPickerAsset } from 'expo-document-picker';
 import Loading from '~/components/Loading';
 import { device, globalStyles, myColors, myFonts } from '~/constants';
 import useMyContext from '~/core/MyContext';
@@ -38,7 +38,7 @@ const UploadQuestionBody = () => {
   const [titleError, setTitleError] = useState(false);
   const [message, setMessage] = useState('');
   const [messageError, setMessageError] = useState(false);
-  const [documents, setDocuments] = useState<DocumentResult[]>([]);
+  const [documents, setDocuments] = useState<DocumentPickerAsset[]>([]);
 
   const inputTitle = createRef<TextInput>();
   const inputMessage = createRef<TextInput>();
@@ -71,9 +71,9 @@ const UploadQuestionBody = () => {
 
     const document = await getDocumentAsync({ copyToCacheDirectory: false });
 
-    if (document.type === 'cancel') return;
+    if (document.canceled) return;
 
-    setDocuments([...documents, document]);
+    setDocuments([...documents, ...document.assets]);
   };
 
   return (
@@ -148,7 +148,6 @@ const UploadQuestionBody = () => {
             onPress={addFile}
           />
           {documents.map((doc, i) => {
-            if (doc.type === 'cancel') return;
             return (
               <View key={i}>
                 <MyDivider
