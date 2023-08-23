@@ -55,6 +55,7 @@ const MySearchBar = ({
         }}
         placeholder='O que você procura?'
         role='searchbox'
+        enterKeyHint='search'
         value={query}
         onChangeText={setSearchQuery}
         onSubmitEditing={submit}

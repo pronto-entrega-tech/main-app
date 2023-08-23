@@ -95,7 +95,7 @@ const UploadQuestionBody = () => {
             setEmailError(false);
             setEmail(v);
           }}
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputTitle.current?.focus()}
         />
         <MyInput
@@ -109,7 +109,7 @@ const UploadQuestionBody = () => {
             setTitleError(false);
             setTitle(v);
           }}
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputMessage.current?.focus()}
         />
         <MyInput

@@ -126,6 +126,7 @@ const SendMsgInput = () => {
         placeholder='Digite uma mensagem'
         maxLength={300}
         multiline
+        enterKeyHint='send'
         containerStyle={{ flex: 1 }}
       />
       <IconButton

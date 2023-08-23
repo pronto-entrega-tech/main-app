@@ -122,7 +122,7 @@ const NewAddress = () => {
           placeholder={!device.web ? `Endereço ${addressIndex + 1}` : ''}
           onChangeText={(text) => (address.nickname = text)}
           defaultValue={address.nickname ?? undefined}
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputStreet.current?.focus()}
         />
         <MyInput
@@ -138,7 +138,7 @@ const NewAddress = () => {
             device.web ? ('address-line1' as any) : 'street-address'
           }
           textContentType='streetAddressLine1'
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputNumber.current?.focus()}
         />
         <MyInput
@@ -153,7 +153,7 @@ const NewAddress = () => {
           keyboardType='numeric'
           autoComplete={'address-line2' as any}
           textContentType='streetAddressLine2'
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputDistrict.current?.focus()}
         />
         <MyInput

@@ -28,7 +28,7 @@ const cpfValidation = (raw: string) => {
   const verify = (pos: number) => {
     const sum = range(0, 8 + pos).reduce(
       (sum, i) => sum + +v[i] * (10 + pos - i),
-      0
+      0,
     );
     const remainder = 11 - (sum % 11);
     const checkDigit = remainder > 9 ? 0 : remainder;
@@ -169,7 +169,7 @@ const MyProfile = () => {
             setName(t);
             setNameError(!t);
           }}
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputEmail.current?.focus()}
         />
         <MyInput
@@ -187,7 +187,7 @@ const MyProfile = () => {
             setDocument(v);
             setCpfValid(cpfValidation(v));
           }}
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputPhone.current?.focus()}
         />
         <MyInput

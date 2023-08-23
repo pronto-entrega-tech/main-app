@@ -42,7 +42,7 @@ const Suggestion = () => {
             setNameError(false);
             setName(v);
           }}
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputCity.current?.focus()}
         />
         <MyInput
@@ -53,7 +53,7 @@ const Suggestion = () => {
             setCityError(false);
             setCity(v);
           }}
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputPhone.current?.focus()}
         />
         <MyInput
@@ -61,7 +61,7 @@ const Suggestion = () => {
           label='Telefone para contato'
           keyboardType='phone-pad'
           labelStyle={{ color: myColors.optionalInput }}
-          returnKeyType='send'
+          enterKeyHint='send'
           onSubmitEditing={send}
         />
       </FormContainer>

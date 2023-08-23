@@ -97,7 +97,7 @@ export const PaymentCardBody = ({
         keyboardType='numeric'
         autoComplete='cc-number'
         textContentType='creditCardNumber'
-        returnKeyType='next'
+        enterKeyHint='next'
         onSubmitEditing={() => inputExpiration.current?.focus()}
       />
       <View style={{ flexDirection: 'row' }}>
@@ -116,7 +116,7 @@ export const PaymentCardBody = ({
           }}
           keyboardType='numeric'
           autoComplete='cc-exp'
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputCvv.current?.focus()}
           containerStyle={{ flex: 1 }}
         />
@@ -131,7 +131,7 @@ export const PaymentCardBody = ({
           }}
           keyboardType='numeric'
           autoComplete='cc-csc'
-          returnKeyType='next'
+          enterKeyHint='next'
           onSubmitEditing={() => inputName.current?.focus()}
           containerStyle={{ flex: 1 }}
         />
