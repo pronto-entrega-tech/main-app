@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -24,10 +24,10 @@ const BottomModal = ({
 }) => {
   const [show, setShow] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [state] = useState({
+  const state = useRef({
     opacity: new Animated.Value(0),
     modal: new Animated.Value(device.height),
-  });
+  }).current;
 
   useEffect(() => {
     const useNativeDriver = !device.web;
@@ -74,7 +74,7 @@ const BottomModal = ({
       () => {
         dismiss();
         return true;
-      }
+      },
     );
     return backHandler.remove;
   }, [isVisible, dismiss]);

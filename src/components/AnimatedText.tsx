@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import { device, myFonts } from '~/constants';
 import { Money, money } from '~/functions/money';
@@ -17,10 +17,10 @@ const AnimatedText = ({
   animateZero?: boolean;
 }) => {
   const [showValue, setShowValue] = useState(value);
-  const [valueState] = useState({
+  const valueState = useRef({
     translateY: new Animated.Value(0),
     opacity: new Animated.Value(1),
-  });
+  }).current;
 
   useEffect(() => {
     if (money.isEqual(showValue, value)) return;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { device, myColors, myFonts } from '~/constants';
 import MyTouchable from '~/components/MyTouchable';
@@ -21,9 +21,9 @@ const CartBar = ({ toped = false }: { toped?: boolean }) => {
   const { screen, navigate } = useRouting();
 
   const translateValue = getTranslateValue(subtotal, screen);
-  const [barState] = useState({
+  const barState = useRef({
     translateY: new Animated.Value(translateValue),
-  });
+  }).current;
 
   useEffect(() => {
     Animated.timing(barState.translateY, {

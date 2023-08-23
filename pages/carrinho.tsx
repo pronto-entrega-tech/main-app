@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, ScrollView, Animated } from 'react-native';
 import { Image } from 'react-native-elements/dist/image/Image';
 import IconButton from '~/components/IconButton';
@@ -64,9 +64,9 @@ const CartHeader = ({
 }) => {
   const routing = useRouting();
   const { cleanCart } = useCartContext();
-  const [tabState] = useState({
+  const tabState = useRef({
     indicator: new Animated.Value(0),
-  });
+  }).current;
 
   useEffect(() => {
     Animated.timing(tabState.indicator, {
@@ -149,7 +149,7 @@ const getUpdatedSchedule = ({
 
   const { isOpen, nextHour, intervals } = isMarketOpen(
     business_hours,
-    schedule_max_days
+    schedule_max_days,
   );
 
   const activeSchedule = (() => {
@@ -317,12 +317,15 @@ const Cart = () => {
       const updateSchedulesTask = () => {
         const minTimeInMs = market.min_time * minute;
 
-        updateScheduleTimer = setTimeout(() => {
-          if (canceled) return;
+        updateScheduleTimer = setTimeout(
+          () => {
+            if (canceled) return;
 
-          updateSchedules();
-          updateSchedulesTask();
-        }, hour - ((Date.now() + minTimeInMs) % hour));
+            updateSchedules();
+            updateSchedulesTask();
+          },
+          hour - ((Date.now() + minTimeInMs) % hour),
+        );
       };
       updateSchedulesTask();
     })().catch(() => setError('server'));
@@ -380,7 +383,7 @@ const Cart = () => {
       payment: OrderPayment;
       shoppingList: ShoppingList;
       activeSchedule: OrderSchedule;
-    }?
+    }?,
   ] => {
     const isTotalBelowMin = money.isLess(subtotal ?? 0, market.order_min);
     const orderMin = money.toString(market.order_min, 'R$');
@@ -760,7 +763,7 @@ const Cart = () => {
                 await revalidateCart();
                 setIsExiting(false);
               },
-            }
+            },
           );
 
         alert('Error ao fazer o pedido');

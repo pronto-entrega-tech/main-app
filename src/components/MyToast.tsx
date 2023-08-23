@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { StyleSheet, Animated } from 'react-native';
 import { device, globalStyles } from '~/constants';
 import { zIndex } from '~/constants/zIndex';
@@ -14,10 +14,10 @@ export type ToastState = {
 
 const MyToast = () => {
   const { toastState } = useMyContext();
-  const [modalState] = useState({
+  const modalState = useRef({
     opacity: new Animated.Value(0),
     scale: new Animated.Value(0.5),
-  });
+  }).current;
 
   useEffect(() => {
     if (toastState.message === '') return;
@@ -52,7 +52,7 @@ const MyToast = () => {
           duration: 150,
           useNativeDriver,
         }),
-      ]).start()
+      ]).start(),
     );
 
     return () => {
