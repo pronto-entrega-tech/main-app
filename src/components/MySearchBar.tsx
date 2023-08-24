@@ -43,6 +43,7 @@ const MySearchBar = ({
           padding: 12,
           aspectRatio: 1,
         }}
+        disabledStyle={{}}
         disabled={!query}
         onPress={submit}
       />

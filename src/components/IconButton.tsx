@@ -29,6 +29,11 @@ type IconButtonBase = {
    */
   color?: string;
   style?: StyleProp<ViewStyle>;
+  disabledStyle?: StyleProp<ViewStyle>;
+  /**
+   *  @platform web.
+   */
+  hoverStyle?: StyleProp<ViewStyle>;
   disabled?: boolean;
   type?: ButtonTypes;
   hitSlop?: Insets;
@@ -44,6 +49,8 @@ const IconButton = ({
   size = 24,
   color = myColors.primaryColor,
   style,
+  disabledStyle,
+  hoverStyle,
   disabled,
   type,
   hitSlop,
@@ -114,7 +121,13 @@ const IconButton = ({
   return (
     <MyTouchable
       hitSlop={hitSlop ?? innerHitSlop}
-      style={[styles.base, iconStyle, style]}
+      style={[
+        styles.base,
+        iconStyle,
+        disabled ? disabledStyle ?? { opacity: 0.4 } : {},
+        style,
+      ]}
+      hoverStyle={hoverStyle}
       disabled={disabled}
       {...({
         onPress,
