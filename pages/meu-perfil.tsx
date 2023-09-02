@@ -4,8 +4,6 @@ import { KeyboardAvoidingView, TextInput } from 'react-native';
 import { myColors, device, globalStyles } from '~/constants';
 import useMyContext from '~/core/MyContext';
 import Loading from '~/components/Loading';
-/* import BottomModal from '~/components/BottomModal';
-import IconButtonText from '~/components/IconButtonText'; */
 import MyButton from '~/components/MyButton';
 import useRouting from '~/hooks/useRouting';
 import { range } from '~/functions/range';
@@ -59,8 +57,6 @@ const MyProfile = () => {
   const { toast } = useMyContext();
   const { isAuth, accessToken } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
-  /* const [ready, setReady] = useState(true); */
-  //const [isModalVisible, setIsModalVisible] = useState(false);
   const [name, setName] = useState<string>();
   const [document, setDocument] = useState('');
   const [phone, setPhone] = useState('');
@@ -70,17 +66,6 @@ const MyProfile = () => {
   useEffect(() => {
     if (isAuth === false) return navigate('Profile');
 
-    /* ImagePicker.getPendingResultAsync().then(result => {
-      if (result.length == 0) return;
-      const image = result[result.length-1]
-      if (!image.cancelled)
-      getProfile()
-        .then(profile => {
-          profile.photoUri = result[result.length-1].uri;
-          saveProfile(profile)
-        })
-        .catch(() => alert('Erro ao salvar foto de perfil'))
-    }) */
     if (accessToken)
       api.customers.find(accessToken).then((profile) => {
         setName(profile.name);
@@ -90,53 +75,6 @@ const MyProfile = () => {
         setIsLoading(false);
       });
   }, [isAuth, accessToken, navigate]);
-
-  /* const openCamera = () => {
-    setIsModalVisible(false);
-    (async () => {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') return;
-      
-      const image = await ImagePicker.launchCameraAsync({aspect: [1,1], quality: 0.5});
-      if (image.cancelled) return;
-      getProfile()
-        .then(profile => {
-          profile.photoUri = {uri: image.uri}
-          saveProfile(profile)
-          setProfile(profile)
-        })
-        .catch(() => alert('Erro ao salvar foto de perfil'))
-    })();
-  }
-  
-  const openPhotos = () => {
-    setIsModalVisible(false);
-    (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') return;
-      
-      const image = await ImagePicker.launchImageLibraryAsync({allowsEditing: true, aspect: [1,1], quality: 0.5});
-      if (image.cancelled) return;
-      getProfile()
-        .then(profile => {
-          profile.photoUri = {uri: image.uri}
-          saveProfile(profile)
-          setProfile(profile)
-        })
-        .catch(() => alert('Erro ao salvar foto de perfil'))
-    })();
-  }
-  
-  const removePhoto = () => {
-    setIsModalVisible(false);
-    getProfile()
-      .then(profile => {
-        profile.photoUri = undefined
-        saveProfile(profile)
-        setProfile(profile)
-      })
-      .catch(() => alert('Erro ao remover foto de perfil'))
-  } */
 
   const inputEmail = createRef<TextInput>();
   const inputCPF = createRef<TextInput>();
@@ -148,16 +86,6 @@ const MyProfile = () => {
     <>
       <MyHeader title='Meu Perfil' />
       <FormContainer>
-        {/* <Image
-          placeholderStyle={{backgroundColor: '#FFF'}}
-          containerStyle={{height: 120, width: 120, borderRadius: 120}}
-          source={profile?.photoUri? profile.photoUri : images.account} />
-        <IconButton
-          onPress={() => setIsModalVisible(true)}
-          icon='camera-outline'
-          size={32}
-          color={myColors.grey2}
-          type='profile'/> */}
         <MyInput
           label='Nome Completo'
           placeholder='Seu nome'
@@ -225,14 +153,6 @@ const MyProfile = () => {
             });
         }}
       />
-      {/* <BottomModal
-        isVisible={isModalVisible}
-        onDismiss={() => setIsModalVisible(false)}
-        style={styles.modal} >
-          <IconButtonText icon='camera' text={`Abrir\ncâmera`} onPress={openCamera} type='profile2' />
-          <IconButtonText icon='image' text={`Adicionar\nfoto`} onPress={openPhotos} type='profile2' />
-          <IconButtonText icon='delete' text={`Remover\nfoto`} onPress={removePhoto} type='profile2' />
-      </BottomModal> */}
     </>
   );
 
@@ -246,15 +166,5 @@ const MyProfile = () => {
     </KeyboardAvoidingView>
   );
 };
-
-/* const styles = StyleSheet.create({
-  modal: {
-    paddingRight: '20%',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    paddingTop: 24,
-    paddingBottom: 26,
-  },
-}); */
 
 export default MyProfile;

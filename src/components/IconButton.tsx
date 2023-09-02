@@ -14,7 +14,6 @@ type ButtonTypes =
   | 'back'
   | 'profile'
   | 'prodIcons'
-  | 'profile2'
   | 'cancel';
 
 type IconButtonBase = {
@@ -104,9 +103,6 @@ const IconButton = ({
         globalStyles.darkBorder,
       ];
       break;
-    case 'profile2':
-      iconStyle = [styles.buttonProfile2, globalStyles.elevation4];
-      break;
     default:
       iconStyle = [
         styles.buttonDefault,
@@ -190,12 +186,6 @@ const styles = StyleSheet.create({
     right: -40,
     marginBottom: 8,
     backgroundColor: '#fff',
-    margin: 5,
-  },
-  buttonProfile2: {
-    width: 50,
-    height: 50,
-    backgroundColor: myColors.primaryColor,
     margin: 5,
   },
   cancel: {
