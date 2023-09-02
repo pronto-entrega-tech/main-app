@@ -28,7 +28,9 @@ import { api } from '~/services/api';
 
 const useIsProductRoute = () => useRouting().screen.startsWith('Product');
 
-export const MarketFeed = (...[props]: Parameters<typeof MarketFeedBody>) => (
+type MarketFeedProps = { marketId?: string } & MarketAndProducts;
+
+export const MarketFeed = (props: MarketFeedProps) => (
   <>
     {!useIsProductRoute() && <MarketHeader />}
     <MarketFeedBody {...props} />
@@ -65,7 +67,7 @@ type MarketAndProducts = {
   market?: Market;
   products?: Product[];
 };
-const MarketFeedBody = (props: { marketId?: string } & MarketAndProducts) => {
+const MarketFeedBody = (props: MarketFeedProps) => {
   const { params } = useRouting();
   const marketId = props.marketId ?? params.marketId;
 
@@ -89,7 +91,7 @@ const MarketFeedBody = (props: { marketId?: string } & MarketAndProducts) => {
 
       setData({ market, products });
     })().catch((err) =>
-      setError(api.isError('NotFound', err) ? 'nothing_market' : 'server')
+      setError(api.isError('NotFound', err) ? 'nothing_market' : 'server'),
     );
   }, [tryAgain, market, params.city, marketId]);
 
@@ -104,13 +106,10 @@ const MarketFeedBody = (props: { marketId?: string } & MarketAndProducts) => {
   const marketFee = money.toString(market.delivery_fee, 'R$');
 
   const marketDetails: { icon: IconNames; text: string }[] = [
-    {
-      icon: 'clock',
-      text: marketOpenness(market),
-    },
+    { icon: 'clock', text: marketOpenness(market) },
     ...(distance
-      ? [{ icon: 'map-marker', text: `Á ${distance}km de você` }]
-      : ([] as any)),
+      ? [{ icon: 'map-marker', text: `Á ${distance}km de você` } as const]
+      : []),
     {
       icon: 'truck-fast',
       text: `${market.min_time}-${market.max_time}min • ${marketFee}`,
@@ -248,7 +247,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<MarketFeedProps> = async ({
+  params,
+}) => {
   const city = params?.city?.toString();
   const marketId = params?.marketId?.toString();
 

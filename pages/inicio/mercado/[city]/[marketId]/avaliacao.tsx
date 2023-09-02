@@ -14,7 +14,9 @@ import Errors, { MyErrors } from '~/components/Errors';
 import MyDivider from '~/components/MyDivider';
 import { lightFormat } from 'date-fns';
 
-const MarketRatingBody = (props: { market?: MarketRatingType }) => {
+type MarketRatingProps = { market?: MarketRatingType };
+
+const MarketRatingBody = (props: MarketRatingProps) => {
   const {
     params: { city, marketId },
   } = useRouting();
@@ -30,7 +32,7 @@ const MarketRatingBody = (props: { market?: MarketRatingType }) => {
       .reviews(city, marketId)
       .then(setMarket)
       .catch((err) =>
-        setError(api.isError('NotFound', err) ? 'nothing_market' : 'server')
+        setError(api.isError('NotFound', err) ? 'nothing_market' : 'server'),
       );
   }, [tryAgain, market, city, marketId]);
 
@@ -93,7 +95,7 @@ const Nothing = () => (
   </View>
 );
 
-const MarketRating = (...[props]: Parameters<typeof MarketRatingBody>) => (
+const MarketRating = (props: MarketRatingProps) => (
   <>
     <MyHeader title='Avaliação' />
     <MarketRatingBody {...props} />
@@ -104,13 +106,19 @@ export default WithBottomNav(MarketRating);
 
 export { getStaticPaths } from '../[marketId]';
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<MarketRatingProps> = async ({
+  params,
+}) => {
   const city = params?.city?.toString();
   const marketId = params?.marketId?.toString();
 
   const props =
     city && marketId
-      ? { market: await api.markets.reviews(city, marketId).catch(() => null) }
+      ? {
+          market: await api.markets
+            .reviews(city, marketId)
+            .catch(() => undefined),
+        }
       : {};
 
   return {

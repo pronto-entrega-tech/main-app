@@ -73,7 +73,7 @@ const CartBar = ({ toped = false }: { toped?: boolean }) => {
 
 const styles = StyleSheet.create({
   cartBarContainer: {
-    position: !device.web ? 'absolute' : ('fixed' as any),
+    position: device.web ? ('fixed' as any) : 'absolute',
     overflow: 'hidden',
     bottom: 0,
     width: '100%',

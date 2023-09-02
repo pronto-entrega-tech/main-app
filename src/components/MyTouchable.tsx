@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import device from '~/constants/device';
 import innerUseHover, { UseHover } from '~/hooks/useHover';
-import useRouting from '~/hooks/useRouting';
+import useRouting, { Params } from '~/hooks/useRouting';
 import { urlFrom } from '~/functions/converter';
 
 type OnlyButton = {
@@ -33,12 +33,12 @@ type OnlyLink = {
   /**
    * Params to pass to the route, use with `screen`.
    */
-  params?: any;
+  params?: Params;
 
   onPress?: undefined;
 };
 
-export type ButtonOrLink<T = any> = (OnlyButton | OnlyLink) & T;
+export type ButtonOrLink<T> = (OnlyButton | OnlyLink) & T;
 
 type MyTouchableBase = {
   children?: React.ReactNode;
@@ -114,15 +114,21 @@ const MyTouchable = ({
   const onPressOrNav = !screen ? onPress : () => navigate(screen, params);
 
   if (device.iOS) {
-    const TouchableHybrid: any = solid ? TouchableHighlight : TouchableOpacity;
-    return (
-      <TouchableHybrid
+    return solid ? (
+      <TouchableHighlight
         underlayColor='#68b5f2'
         disabled={disabled}
         onPress={onPressOrNav}
         style={style}>
         <>{children}</>
-      </TouchableHybrid>
+      </TouchableHighlight>
+    ) : (
+      <TouchableOpacity
+        disabled={disabled}
+        onPress={onPressOrNav}
+        style={style}>
+        <>{children}</>
+      </TouchableOpacity>
     );
   }
 

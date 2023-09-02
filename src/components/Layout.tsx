@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ComponentType, ReactNode } from 'react';
 import MyToast from '~/components/MyToast';
 import CartBar from '~/components/CartBar';
 import NavigationBar from '~/components/NavigationBar';
@@ -12,10 +12,10 @@ const baseStyle: React.CSSProperties = {
   backgroundColor: myColors.background,
 };
 
-export const WithToast = (Page: any) => {
+export const WithToast = (Page: ComponentType) => {
   if (!device.web) return Page;
 
-  const Layout = (props: any) => (
+  const Layout: ComponentType = (props) => (
     <>
       <MyToast />
       <main style={baseStyle}>
@@ -26,10 +26,10 @@ export const WithToast = (Page: any) => {
   return Layout;
 };
 
-export const WithCartBar = (Page: any) => {
+export const WithCartBar = (Page: ComponentType) => {
   if (!device.web) return Page;
 
-  const Layout = (props: any) => (
+  const Layout: ComponentType = (props) => (
     <>
       <MyToast />
       <main style={baseStyle}>
@@ -41,24 +41,20 @@ export const WithCartBar = (Page: any) => {
   return Layout;
 };
 
-export const WithBottomNav = (Page: any) => {
+export const WithBottomNav = (Page: ComponentType) => {
   if (!device.web) return Page;
 
-  const Layout = (props: any) => (
-    <BottomNav
-      style={{
-        ...baseStyle,
-        paddingBottom: 54,
-      }}>
+  const Layout: ComponentType = (props) => (
+    <BottomNav>
       <Page {...props} />
     </BottomNav>
   );
   return Layout;
 };
 
-export const BottomNav = ({ children }: any) =>
+export const BottomNav = (p: { children: ReactNode }) =>
   !device.web ? (
-    children
+    p.children
   ) : (
     <>
       <MyToast />
@@ -67,7 +63,7 @@ export const BottomNav = ({ children }: any) =>
           ...baseStyle,
           paddingBottom: 54,
         }}>
-        {children}
+        {p.children}
       </main>
       <CartBar toped />
       <NavigationBar />

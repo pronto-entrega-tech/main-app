@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
 import { Image } from 'react-native-elements/dist/image/Image'; // react-native-elements don't tree shake
-import { StackNavigationProp } from '@react-navigation/stack';
 import { myColors, device, globalStyles, myFonts } from '~/constants';
 import { getImageUrl } from '~/functions/converter';
 import { calcPrices, money } from '~/functions/money';
@@ -13,7 +12,6 @@ import MyIcon from './MyIcon';
 import { Product } from '~/core/models';
 
 const ProdItem = (props: {
-  navigation?: StackNavigationProp<any, any>;
   item: Product;
   isFavorite?: boolean;
   quantity?: number;

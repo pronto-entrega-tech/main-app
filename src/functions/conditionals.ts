@@ -2,7 +2,7 @@
  * @example { ...objectConditional(condition)(value) }
  */
 export const objectConditional =
-  (condition: any) =>
+  (condition: unknown) =>
   <T>(value: T) =>
     condition ? value : undefined;
 
@@ -10,6 +10,6 @@ export const objectConditional =
  * @example [...arrayConditional(condition)(value)]
  */
 export const arrayConditional =
-  (condition: any) =>
+  (condition: unknown) =>
   <T>(value: T) =>
     condition ? [value] : [];

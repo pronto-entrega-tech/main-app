@@ -1,6 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import {
+  getFocusedRouteNameFromRoute,
+  useRoute,
+} from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
@@ -47,99 +50,105 @@ const createTabBarIcon = (name: IconNames) => {
   return TabBarIcon;
 };
 
-const BottomTabs = ({ route }: { route?: any }) => (
-  <>
-    <Tab.Navigator
-      shifting={false}
-      barStyle={{ backgroundColor: 'white' }}
-      activeColor={myColors.primaryColor}>
-      <Tab.Screen
-        name='HomeTab'
-        options={{
-          tabBarLabel: 'Início',
-          tabBarIcon: createTabBarIcon('home'),
-        }}>
-        {() => {
-          return (
-            <HomeStack.Navigator
-              detachInactiveScreens
-              screenOptions={myScreenOptions}>
-              <HomeStack.Screen name='Home' component={Home} />
-              <HomeStack.Screen name='Explore' component={Home} />
-              <HomeStack.Screen name='MarketList' component={MarketList} />
-              <HomeStack.Screen name='Cupons' component={Cupons} />
-              <HomeStack.Screen name='Favorites' component={Favorites} />
-              <HomeStack.Screen name='Market' component={Market} />
-              <HomeStack.Screen
-                name='MarketDetails'
-                component={MarketDetails}
-              />
-              <HomeStack.Screen name='MarketRating' component={MarketRating} />
-            </HomeStack.Navigator>
-          );
-        }}
-      </Tab.Screen>
-      <Tab.Screen
-        name='Categories'
-        component={Categories}
-        options={{
-          tabBarLabel: 'Categorias',
-          tabBarIcon: createTabBarIcon('view-grid'),
-        }}
-      />
-      <Tab.Screen
-        name='OrdersTab'
-        options={{
-          tabBarLabel: 'Compras',
-          tabBarIcon: createTabBarIcon('shopping'),
-        }}>
-        {() => {
-          const routeName = getFocusedRouteNameFromRoute(route);
-          return (
-            <View style={{ flex: routeName === 'OrdersTab' ? 1 : 0 }}>
-              <ShoppingStack.Navigator screenOptions={myScreenOptions}>
-                <ShoppingStack.Screen name='Orders' component={Orders} />
-                <ShoppingStack.Screen
-                  name='OrderDetails'
-                  component={OrderDetails}
+const BottomTabs = () => {
+  const route = useRoute();
+  return (
+    <>
+      <Tab.Navigator
+        shifting={false}
+        barStyle={{ backgroundColor: 'white' }}
+        activeColor={myColors.primaryColor}>
+        <Tab.Screen
+          name='HomeTab'
+          options={{
+            tabBarLabel: 'Início',
+            tabBarIcon: createTabBarIcon('home'),
+          }}>
+          {() => {
+            return (
+              <HomeStack.Navigator
+                detachInactiveScreens
+                screenOptions={myScreenOptions}>
+                <HomeStack.Screen name='Home' component={Home} />
+                <HomeStack.Screen name='Explore' component={Home} />
+                <HomeStack.Screen name='MarketList' component={MarketList} />
+                <HomeStack.Screen name='Cupons' component={Cupons} />
+                <HomeStack.Screen name='Favorites' component={Favorites} />
+                <HomeStack.Screen name='Market' component={Market} />
+                <HomeStack.Screen
+                  name='MarketDetails'
+                  component={MarketDetails}
                 />
-                <ShoppingStack.Screen name='Chat' component={Chat} />
-              </ShoppingStack.Navigator>
-            </View>
-          );
-        }}
-      </Tab.Screen>
-      <Tab.Screen
-        name='ProfileTab'
-        options={{
-          tabBarLabel: 'Perfil',
-          tabBarIcon: createTabBarIcon('account'),
-        }}>
-        {() => {
-          const routeName = getFocusedRouteNameFromRoute(route);
-          return (
-            <View style={{ flex: routeName === 'ProfileTab' ? 1 : 0 }}>
-              <ProfileStack.Navigator screenOptions={myScreenOptions}>
-                <ProfileStack.Screen name='Profile' component={Profile} />
-                <ProfileStack.Screen
-                  name='Notifications'
-                  component={Notifications}
+                <HomeStack.Screen
+                  name='MarketRating'
+                  component={MarketRating}
                 />
-                <ProfileStack.Screen name='Help' component={Help} />
-                <ProfileStack.Screen name='Questions' component={Questions} />
-                <ProfileStack.Screen name='Config' component={Config} />
-                <ProfileStack.Screen
-                  name='NotifConfig'
-                  component={NotifConfig}
-                />
-              </ProfileStack.Navigator>
-            </View>
-          );
-        }}
-      </Tab.Screen>
-    </Tab.Navigator>
-    <CartBar toped />
-  </>
-);
+              </HomeStack.Navigator>
+            );
+          }}
+        </Tab.Screen>
+        <Tab.Screen
+          name='Categories'
+          component={Categories}
+          options={{
+            tabBarLabel: 'Categorias',
+            tabBarIcon: createTabBarIcon('view-grid'),
+          }}
+        />
+        <Tab.Screen
+          name='OrdersTab'
+          options={{
+            tabBarLabel: 'Compras',
+            tabBarIcon: createTabBarIcon('shopping'),
+          }}>
+          {() => {
+            const routeName = getFocusedRouteNameFromRoute(route);
+            return (
+              <View style={{ flex: routeName === 'OrdersTab' ? 1 : 0 }}>
+                <ShoppingStack.Navigator screenOptions={myScreenOptions}>
+                  <ShoppingStack.Screen name='Orders' component={Orders} />
+                  <ShoppingStack.Screen
+                    name='OrderDetails'
+                    component={OrderDetails}
+                  />
+                  <ShoppingStack.Screen name='Chat' component={Chat} />
+                </ShoppingStack.Navigator>
+              </View>
+            );
+          }}
+        </Tab.Screen>
+        <Tab.Screen
+          name='ProfileTab'
+          options={{
+            tabBarLabel: 'Perfil',
+            tabBarIcon: createTabBarIcon('account'),
+          }}>
+          {() => {
+            const routeName = getFocusedRouteNameFromRoute(route);
+            return (
+              <View style={{ flex: routeName === 'ProfileTab' ? 1 : 0 }}>
+                <ProfileStack.Navigator screenOptions={myScreenOptions}>
+                  <ProfileStack.Screen name='Profile' component={Profile} />
+                  <ProfileStack.Screen
+                    name='Notifications'
+                    component={Notifications}
+                  />
+                  <ProfileStack.Screen name='Help' component={Help} />
+                  <ProfileStack.Screen name='Questions' component={Questions} />
+                  <ProfileStack.Screen name='Config' component={Config} />
+                  <ProfileStack.Screen
+                    name='NotifConfig'
+                    component={NotifConfig}
+                  />
+                </ProfileStack.Navigator>
+              </View>
+            );
+          }}
+        </Tab.Screen>
+      </Tab.Navigator>
+      <CartBar toped />
+    </>
+  );
+};
 
 export default BottomTabs;

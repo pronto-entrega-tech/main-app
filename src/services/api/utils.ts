@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { stringify } from 'qs';
 import { Urls } from '~/constants/urls';
 
-const paramsSerializer = (params: any) =>
+const paramsSerializer = (params: unknown) =>
   stringify(params, { arrayFormat: 'repeat' });
 
 const authHeader = (token: string) => ({

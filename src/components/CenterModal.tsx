@@ -49,7 +49,7 @@ const CenterModal = ({
 const styles = StyleSheet.create({
   container: {
     zIndex: zIndex.Modal,
-    position: !device.web ? 'absolute' : ('fixed' as any),
+    position: device.web ? ('fixed' as any) : 'absolute',
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },

@@ -12,23 +12,26 @@ const social = async (provider: Provider, token: string) => {
   const { data } = await ApiClient.post(
     `/customers/social`,
     { provider, token },
-    { params: { useCookie } }
+    { params: { useCookie } },
   );
-
-  return data as any;
+  return data as { access_token: string; refresh_token?: string };
 };
 
 const email = async (email: string) => {
-  type Res = {
+  const { data } = await ApiClient.post('/auth/email', { role, email });
+  return data as {
     status: 'Success';
     key: string;
   };
-  const { data } = await ApiClient.post<Res>('/auth/email', { role, email });
-  return data;
 };
 
 const validate = async (key: string, otp: string) => {
-  type Res = {
+  const { data } = await ApiClient.post(
+    '/auth/validate',
+    { role, key, otp },
+    { params: { useCookie } },
+  );
+  return data as {
     type: 'CREATE' | 'CONNECT' | 'ACCESS';
     token: string;
     session?: {
@@ -36,37 +39,28 @@ const validate = async (key: string, otp: string) => {
       expiresIn: Date;
     };
   };
-  const { data } = await ApiClient.post<Res>(
-    '/auth/validate',
-    { role, key, otp },
-    { params: { useCookie } }
-  );
-  return data;
 };
 
 const revalidate = async (refreshToken?: string) => {
-  type Res = { access_token: string; refresh_token?: string };
   const fetch = () =>
-    ApiClient.post<Res>(
+    ApiClient.post(
       `/auth/revalidate`,
       { role },
-      { params: { useCookie, refreshToken } }
+      { params: { useCookie, refreshToken } },
     );
   const { data } = await (refreshToken
     ? withCache(refreshToken, fetch)
     : fetch());
 
-  return data;
+  return data as { access_token: string; refresh_token?: string };
 };
 
 const signOut = async (refreshToken?: string) => {
-  const { data } = await ApiClient.post(
+  await ApiClient.post(
     `/auth/sign-out`,
     { role },
-    { params: { refreshToken } }
+    { params: { refreshToken } },
   );
-
-  return data as any;
 };
 
 export const apiAuth = { social, email, validate, revalidate, signOut };

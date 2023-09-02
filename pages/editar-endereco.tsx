@@ -134,9 +134,7 @@ const NewAddress = () => {
             setStreetError(false);
           }}
           defaultValue={address.street}
-          autoComplete={
-            device.web ? ('address-line1' as any) : 'street-address'
-          }
+          autoComplete={'address-line1'}
           textContentType='streetAddressLine1'
           enterKeyHint='next'
           onSubmitEditing={() => inputNumber.current?.focus()}
@@ -151,7 +149,7 @@ const NewAddress = () => {
           }}
           defaultValue={address.number}
           keyboardType='numeric'
-          autoComplete={'address-line2' as any}
+          autoComplete={'address-line2'}
           textContentType='streetAddressLine2'
           enterKeyHint='next'
           onSubmitEditing={() => inputDistrict.current?.focus()}

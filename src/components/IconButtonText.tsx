@@ -10,46 +10,15 @@ import MyText from './MyText';
 type IconButtonTextBase = {
   icon: IconNames;
   text: string;
-  type?: 'fill' | 'profile2';
 };
 
 type IconButtonTextProps = ButtonOrLink<IconButtonTextBase>;
 
-const IconButtonText = ({
-  onPress,
-  screen,
-  params,
-  icon,
-  text,
-  type = 'fill',
-}: IconButtonTextProps) => {
-  const props =
-    type === 'fill'
-      ? {
-          size: 32,
-          color: myColors.grey2,
-          style: {},
-        }
-      : {
-          size: 28,
-          color: '#fff',
-          style: { fontFamily: myFonts.Medium, paddingTop: 4 },
-        };
-
+const IconButtonText = ({ icon, text, ...props }: IconButtonTextProps) => {
   return (
     <View>
-      <IconButton
-        icon={icon}
-        size={props.size}
-        color={props.color}
-        type={type}
-        {...({
-          onPress,
-          screen,
-          params,
-        } as ButtonOrLink)}
-      />
-      <MyText style={[styles.text, props.style]}>{text}</MyText>
+      <IconButton icon={icon} size={32} color={myColors.grey2} {...props} />
+      <MyText style={styles.text}>{text}</MyText>
     </View>
   );
 };

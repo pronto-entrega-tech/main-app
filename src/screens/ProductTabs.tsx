@@ -6,11 +6,12 @@ import { myColors, myTitle } from '~/constants';
 import { ProductDetails } from '@pages/produto/[city]/[itemId]';
 import { MarketFeed } from '@pages/inicio/mercado/[city]/[marketId]';
 import ProductHeader from '~/components/ProductHeader';
-import { RouteProp } from '@react-navigation/native';
+import useRouting from '~/hooks/useRouting';
 
 const Tab = createMaterialTopTabNavigator();
 
-const ProductTabs = ({ route: { params } }: { route: RouteProp<any> }) => {
+const ProductTabs = () => {
+  const { params } = useRouting();
   const [marketId, setMarketId] = useState<string>();
 
   return (

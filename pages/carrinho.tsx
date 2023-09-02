@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, ScrollView, Animated } from 'react-native';
 import { Image } from 'react-native-elements/dist/image/Image';
@@ -50,6 +51,16 @@ import { range } from '~/functions/range';
 import HeaderContainer from '~/components/HeaderContainer';
 import useMyContext from '~/core/MyContext';
 import { minute, hour } from '~/constants/time';
+
+type OrderDto = {
+  accessToken: string;
+  market: Market;
+  address: Address;
+  coords: Coords;
+  payment: OrderPayment;
+  shoppingList: ShoppingList;
+  activeSchedule: OrderSchedule;
+};
 
 const extraWidth = device.android ? 0 : 10;
 
@@ -373,18 +384,7 @@ const Cart = () => {
   const needDocument =
     payment?.method === 'PIX' && payment?.inApp && !profile?.document;
 
-  const [buttonText, dto] = ((): [
-    string,
-    {
-      accessToken: string;
-      market: Market;
-      address: Address;
-      coords: Coords;
-      payment: OrderPayment;
-      shoppingList: ShoppingList;
-      activeSchedule: OrderSchedule;
-    }?,
-  ] => {
+  const [buttonText, dto] = ((): [string, OrderDto?] => {
     const isTotalBelowMin = money.isLess(subtotal ?? 0, market.order_min);
     const orderMin = money.toString(market.order_min, 'R$');
 
@@ -706,9 +706,7 @@ const Cart = () => {
     </View>
   );
 
-  const makeOrder = (total: Money) => {
-    if (!dto) return;
-
+  const makeOrder = (total: Money, dto: OrderDto) => {
     setIsExiting(true);
 
     createOrder(dto.accessToken, {
@@ -749,6 +747,7 @@ const Cart = () => {
         });
       })
       .catch((err) => {
+        if (!axios.isAxiosError(err)) throw err;
         const { total } = err.response?.data;
 
         if (total)
@@ -757,7 +756,7 @@ const Cart = () => {
             'O mercado atualizou preço dos produtos',
             {
               confirmTitle: 'Continuar',
-              onConfirm: () => makeOrder(money(total)),
+              onConfirm: () => makeOrder(money(total), dto),
               cancelTitle: 'Voltar',
               onCancel: async () => {
                 await revalidateCart();
@@ -788,7 +787,7 @@ const Cart = () => {
         title={buttonText}
         disabled={!dto}
         buttonStyle={styles.buttonContainer}
-        onPress={() => makeOrder(total)}
+        onPress={dto ? () => makeOrder(total, dto) : undefined}
       />
       <ChangeModal
         valuePrefix='Valor da compra aumentou para'
@@ -938,7 +937,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '95%',
-    position: (device.web ? 'fixed' : 'absolute') as any,
+    position: device.web ? ('fixed' as any) : 'absolute',
     bottom: device.iOS ? 36 : 6,
     alignSelf: 'center',
     height: 58,

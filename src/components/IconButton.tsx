@@ -11,7 +11,6 @@ type ButtonTypes =
   | 'add2'
   | 'addHorizontal'
   | 'addLarge'
-  | 'fill'
   | 'back'
   | 'profile'
   | 'prodIcons'
@@ -42,9 +41,6 @@ type IconButtonBase = {
 type IconButtonProps = ButtonOrLink<IconButtonBase>;
 
 const IconButton = ({
-  onPress,
-  screen,
-  params,
   icon,
   size = 24,
   color = myColors.primaryColor,
@@ -54,6 +50,7 @@ const IconButton = ({
   disabled,
   type,
   hitSlop,
+  ...props
 }: IconButtonProps) => {
   let innerHitSlop;
   let iconStyle: StyleProp<ViewStyle> = {};
@@ -129,11 +126,7 @@ const IconButton = ({
       ]}
       hoverStyle={hoverStyle}
       disabled={disabled}
-      {...({
-        onPress,
-        screen,
-        params,
-      } as ButtonOrLink)}>
+      {...props}>
       <MyIcon name={icon} size={size} color={color} />
     </MyTouchable>
   );

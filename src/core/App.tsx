@@ -1,10 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import {
-  createStackNavigator,
-  StackNavigationProp,
-} from '@react-navigation/stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
@@ -39,6 +36,7 @@ import PaymentCard from '@pages/meios-de-pagamento/cartao';
 import EmailSignIn from '@pages/entrar/email';
 import MyAlert from '~/components/MyAlert';
 import { useUpdateAddress } from '~/hooks/useAddress';
+import useRouting from '~/hooks/useRouting';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -84,11 +82,9 @@ const App = () => {
     })();
   }, [isReady, isAuth, updateAddress]);
 
-  const Splash = ({
-    navigation: { replace },
-  }: {
-    navigation: StackNavigationProp<any, any>;
-  }) => {
+  const Splash = () => {
+    const { replace } = useRouting();
+
     const onLayoutRootView = useCallback(async () => {
       SplashScreen.hideAsync();
 

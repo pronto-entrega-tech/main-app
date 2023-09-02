@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { createContext } from 'use-context-selector';
 import { getActiveAddress, saveActiveAddress } from '~/core/dataStorage';
-import { Address, SetState } from '~/core/models';
+import { Address } from '~/core/models';
 import { createUseContext } from '~/functions/converter';
 import { api } from '~/services/api';
 
 type AddressContextValues = {
   address?: Address | null;
-  setAddress: SetState<Address>;
+  setAddress: (v: Address) => void;
   addresses?: Address[];
   loadAddresses: (token: string) => Promise<void>;
   createAddress: (token: string, address: Address) => Promise<void>;
@@ -19,7 +19,7 @@ const AddressContext = createContext({} as AddressContextValues);
 
 export const useAddressContext = createUseContext(AddressContext);
 
-export const AddressProvider = (props: any) => {
+export const AddressProvider = (props: { children: ReactNode }) => {
   const [address, _setAddress] = useState<Address | null>();
   const [addresses, setAddresses] = useState<Address[]>();
 

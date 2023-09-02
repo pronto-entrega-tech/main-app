@@ -5,13 +5,14 @@ import MyButton from '~/components/MyButton';
 import MyInput from '~/components/MyInput';
 import MyText from '~/components/MyText';
 import MyTouchable from '~/components/MyTouchable';
-import { myColors, device, images, myFonts } from '~/constants';
+import { myColors, device, myFonts } from '~/constants';
 import { useCartContext } from '~/contexts/CartContext';
 import Portal from '~/core/Portal';
 import { arrayConditional, objectConditional } from '~/functions/conditionals';
 import { Money, money } from '~/functions/money';
 import useRouting from '~/hooks/useRouting';
 import CenterModal from '~/components/CenterModal';
+import { ImageSource, paymentImages } from '~/constants/images';
 
 const PaymentOnDelivery = () => {
   const { replace, pop, goBack } = useRouting();
@@ -24,29 +25,26 @@ const PaymentOnDelivery = () => {
 
   if (!activeMarket) return null;
 
-  const getPaymentTitle = (v: string) => v.replace(/.* /, '');
+  const getPaymentTitle = (title: string) => title.replace(/.* /, '');
 
-  const getPaymentIcon = (v: string) =>
-    ({
-      Dinheiro: images.cash,
-      Pix: images.pix,
-      Mastercard: images.mastercard,
-      Visa: images.visa,
-      Elo: images.elo,
-    }[getPaymentTitle(v)]);
+  const getPaymentIcon = (title: string) =>
+    paymentImages[getPaymentTitle(title)];
 
   const getPaymentMethod = (v: string) =>
-    ({ Dinheiro: 'CASH', Pix: 'PIX' }[v] ?? 'CARD');
+    ({ Dinheiro: 'CASH', Pix: 'PIX' })[v] ?? 'CARD';
 
-  const _payments = activeMarket.payments_accepted.reduce((o, name) => {
-    const [group = ''] = name.match(/Crédito|Débito/) ?? [];
+  const _payments = activeMarket.payments_accepted.reduce(
+    (o, name) => {
+      const [group = ''] = name.match(/Crédito|Débito/) ?? [];
 
-    return { ...o, [group]: [...(o[group] ?? []), getPaymentTitle(name)] };
-  }, {} as { [x: string]: string[] });
+      return { ...o, [group]: [...(o[group] ?? []), getPaymentTitle(name)] };
+    },
+    {} as Record<string, string[]>,
+  );
 
   const payments = Object.entries(_payments).reduce(
     (payments, [group, titles]) => {
-      const newItems = titles.map((title: any) => ({
+      const newItems = titles.map((title) => ({
         icon: getPaymentIcon(title),
         text: title,
         ...objectConditional(title === 'Dinheiro')({
@@ -58,16 +56,27 @@ const PaymentOnDelivery = () => {
         },
       }));
 
-      return [
-        ...payments,
-        ...arrayConditional(group)({ text: group }),
-        ...newItems,
-      ];
+      return [...payments, ...arrayConditional(group)({ group }), ...newItems];
     },
-    [] as any[]
+    [] as (
+      | { group: string }
+      | {
+          payment: { description: string; payment_method: string };
+          onPress?: () => void;
+          icon: ImageSource | undefined;
+          text: string;
+        }
+    )[],
   );
 
   const paymentItems = payments.map((item, index) => {
+    if ('group' in item)
+      return (
+        <MyText key={index} style={styles.title}>
+          {item.group}
+        </MyText>
+      );
+
     const saveInCard = () => {
       setPayment({
         ...item.payment,
@@ -78,14 +87,12 @@ const PaymentOnDelivery = () => {
       goBack('Cart');
     };
 
-    return !item.icon ? (
-      <MyText key={index} style={styles.title}>
-        {item.text}
-      </MyText>
-    ) : (
+    return (
       <View key={index}>
         <MyTouchable onPress={item.onPress ?? saveInCard} style={styles.card}>
-          <Image {...item.icon} style={{ width: 38, height: 38 }} />
+          {item.icon && (
+            <Image {...item.icon} style={{ width: 38, height: 38 }} />
+          )}
           <MyText style={styles.cardTitle}>{item.text}</MyText>
         </MyTouchable>
       </View>

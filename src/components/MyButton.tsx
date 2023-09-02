@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleProp, ViewStyle, TextStyle, StyleSheet } from 'react-native';
+import { StyleProp, ViewStyle, TextStyle } from 'react-native';
 import myColors from '~/constants/myColors';
 import myFonts from '~/constants/myFonts';
 import device from '~/constants/device';
@@ -25,9 +25,6 @@ type MyButtonProps = ButtonOrLink<MyButtonBase>;
  * Use `onPress` if want a button, or `screen` if want a link.
  */
 const MyButton = ({
-  onPress = () => void 0,
-  screen,
-  params,
   title,
   image,
   icon,
@@ -36,6 +33,7 @@ const MyButton = ({
   type = 'solid',
   buttonStyle,
   titleStyle,
+  ...props
 }: MyButtonProps) => {
   const baseStyle: ViewStyle = {
     borderRadius: 4,
@@ -62,7 +60,7 @@ const MyButton = ({
   const textColor = !disabled ? hoverColor : '#9CA3AA';
   const backgroundColor = !disabled ? hoverColor : '#E3E6E8';
 
-  const typeStyle = StyleSheet.create({
+  const typeStyle = {
     solid: {
       backgroundColor,
     },
@@ -71,10 +69,15 @@ const MyButton = ({
       borderWidth: 1,
     },
     clear: {},
-  })[type];
+  }[type];
 
-  const buttonText = (
-    <>
+  return (
+    <MyTouchable
+      solid={type === 'solid'}
+      disabled={disabled}
+      style={[baseStyle, typeStyle, buttonStyle]}
+      useHover={_useHover}
+      {...props}>
       {image}
       {icon && (
         <MyIcon {...(typeof icon === 'string' ? { name: icon } : icon)} />
@@ -90,21 +93,6 @@ const MyButton = ({
         ]}>
         {title}
       </MyText>
-    </>
-  );
-
-  return (
-    <MyTouchable
-      solid={type === 'solid'}
-      disabled={disabled}
-      style={[baseStyle, typeStyle, buttonStyle]}
-      useHover={_useHover}
-      {...({
-        onPress,
-        screen,
-        params,
-      } as ButtonOrLink)}>
-      {buttonText}
     </MyTouchable>
   );
 };

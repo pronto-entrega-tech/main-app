@@ -6,7 +6,7 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback } from 'react';
 
-type Params = Record<string, any>;
+export type Params = Record<string, any>;
 export type MyRouting = {
   navigate(screen: string, params?: Params): void;
   push(screen: string, params?: Params): void;
@@ -14,7 +14,7 @@ export type MyRouting = {
   canGoBack(): boolean;
   goBack(fallback?: string): void;
   pop(count?: number): void;
-  params: any;
+  params: Params;
   pathname: string;
   screen: string;
   isReady: boolean;
@@ -32,7 +32,7 @@ const useRouting = (): MyRouting => {
   const { params, path, name } = useRoute();
 
   const getScreenName = (
-    s: StackNavigationState<any>['routes'][number]['state']
+    s: StackNavigationState<any>['routes'][number]['state'],
   ): string => {
     if (s?.index === undefined) throw new Error();
 
@@ -42,10 +42,8 @@ const useRouting = (): MyRouting => {
 
   return {
     navigate: useCallback(
-      (...args) => {
-        navigate(...validate(...args));
-      },
-      [navigate]
+      (...args) => navigate(...validate(...args)),
+      [navigate],
     ),
     push: useCallback((...args) => push(...validate(...args)), [push]),
     replace: useCallback((...args) => replace(...validate(...args)), [replace]),
@@ -55,7 +53,7 @@ const useRouting = (): MyRouting => {
       navigate(fallback);
     },
     pop,
-    params: params ?? {},
+    params: (params ?? {}) as Params,
     pathname: path ?? '',
     screen: name !== 'BottomTabs' ? name : getScreenName(getState()),
     isReady: true,

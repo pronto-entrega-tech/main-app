@@ -22,11 +22,9 @@ import MyText from '~/components/MyText';
 import { api } from '~/services/api';
 import { useCartContext } from '~/contexts/CartContext';
 
-const ProductDetailsHeader = ({
-  setMarketId,
-}: {
-  setMarketId?: SetState<string | undefined>;
-}) => {
+type ProductDetailsProps = { setMarketId?: SetState<string | undefined> };
+
+const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
   const { params } = useRouting();
   const { shoppingList, addProduct, removeProduct } = useCartContext();
   const [error, setError] = useState<MyErrors>(null);
@@ -138,9 +136,7 @@ const ProductDetailsHeader = ({
   );
 };
 
-export const ProductDetails = (
-  ...[props]: Parameters<typeof ProductDetailsHeader>
-) => (
+export const ProductDetails = (props: ProductDetailsProps) => (
   <View style={{ backgroundColor: myColors.background, flex: 1 }}>
     <ProdListHorizontal header={<ProductDetailsHeader {...props} />} />
   </View>
@@ -280,7 +276,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<ProductDetailsProps> = async ({
+  params,
+}) => {
   const getProps = async () => {
     if (!params) return;
 

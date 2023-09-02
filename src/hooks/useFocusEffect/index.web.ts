@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { EffectCallback, useEffect } from 'react';
 
-const useFocusEffect = (callback: (...args: any) => any) =>
+const useFocusEffect = (callback: EffectCallback) =>
   useEffect(callback, [callback]);
 
 export default useFocusEffect;

@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 import { createContext, useContextSelector } from 'use-context-selector';
 import { Urls } from '~/constants/urls';
 import { ChatMsg } from '~/core/models';
-import { createUseContext } from '~/functions/createUseContext';
+import { createUseContext } from '~/functions/converter';
 import { transformCreatedAt } from '~/functions/transform';
 import { api } from '~/services/api';
 import { useAuthContext } from './AuthContext';
@@ -14,7 +14,7 @@ const useProviderValues = () => {
   const { accessToken } = useAuthContext();
   const { orders } = useOrderContext();
   const [allChats, setAllChats] = useState(
-    new Map<string, Map<string, ChatMsg>>()
+    new Map<string, Map<string, ChatMsg>>(),
   );
   const [allIsLoaded, setAllIsLoaded] = useState(new Map<string, boolean>());
 
@@ -65,7 +65,7 @@ const useProviderValues = () => {
       updateChat(market_id, msgs);
       setAllIsLoaded((v) => new Map(v).set(market_id, true));
     },
-    [updateChat]
+    [updateChat],
   );
 
   return { allChats, loadChat, allIsLoaded };
@@ -82,7 +82,7 @@ export const useChatItemContext = (market_id: string) => ({
     useContextSelector(ChatContext, (v) => v.allChats.get(market_id)) ??
     new Map<string, ChatMsg>(),
   isLoaded: useContextSelector(ChatContext, (v) =>
-    v.allIsLoaded.get(market_id)
+    v.allIsLoaded.get(market_id),
   ),
 });
 

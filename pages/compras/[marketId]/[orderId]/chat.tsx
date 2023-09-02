@@ -175,7 +175,7 @@ const RightMsgStyle = css`
 
 type MsgProps = { direction: 'left' | 'right'; pad: boolean };
 
-const MsgItemContainer = styled.View.attrs<unknown, MsgProps>({} as any)`
+const MsgItemContainer = styled.View.attrs<unknown, MsgProps>({} as MsgProps)`
   ${(p) => (p.direction === 'left' ? LeftMsgStyle : RightMsgStyle)}
   transform: scaleY(-1);
   flex-direction: row;

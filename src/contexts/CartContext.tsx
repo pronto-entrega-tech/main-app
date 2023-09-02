@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { createContext } from 'use-context-selector';
 import useMyContext from '~/core/MyContext';
 import { calcSubtotal } from '~/functions/calcSubtotal';
@@ -29,16 +29,16 @@ type CartValue = {
   totalOff: Money;
   total: Money;
   shoppingList?: ShoppingList;
-  revalidateCart: () => Promise<void>;
+  revalidateCart: () => Promise<void> | undefined;
   cleanCart: () => void;
   addProduct: (item: Product) => void;
   removeProduct: (item: Product) => void;
   payment?: OrderPayment | null;
-  setPayment: SetState<OrderPayment | null>;
+  setPayment: (v: OrderPayment | null) => void;
   loadLastPayment: (token: string) => Promise<void>;
   activeMarketId: FullMarketId;
   activeMarket?: Market;
-  setActiveMarket: SetState<Market>;
+  setActiveMarket: SetState<Market | undefined>;
   activeSchedule: OrderSchedule | undefined;
   setActiveSchedule: SetState<OrderSchedule | undefined>;
   schedules: OrderSchedule[] | undefined;
@@ -49,12 +49,12 @@ const CartContext = createContext({} as CartValue);
 
 export const useCartContext = createUseContext(CartContext);
 
-export const CartProvider = (props: any) => {
+export const CartProvider = (props: { children: ReactNode }) => {
   const { alert } = useMyContext();
   const [subtotal, setSubtotal] = useState(money('0'));
   const [totalOff, setTotalOff] = useState(money('0'));
   const [shoppingList, _setShoppingList] = useState<ShoppingList>();
-  const [activeMarketId, _setActiveMarketId] = useState({} as FullMarketId);
+  const [activeMarketId, _setActiveMarketId] = useState<FullMarketId>({});
   const [activeMarket, setActiveMarket] = useState<Market>();
   const [payment, _setPayment] = useState<OrderPayment | null>();
   const [activeSchedule, setActiveSchedule] = useState<OrderSchedule>();
@@ -118,7 +118,7 @@ export const CartProvider = (props: any) => {
             ]);
             setShoppingList(newShoppingList);
           },
-        }
+        },
       );
 
     const value = shoppingList?.get(item.item_id)?.quantity ?? 0;
@@ -171,7 +171,7 @@ export const CartProvider = (props: any) => {
       });
       setShoppingList(new Map(newList));
     },
-    [setShoppingList]
+    [setShoppingList],
   );
 
   useEffect(() => {
@@ -192,10 +192,9 @@ export const CartProvider = (props: any) => {
         totalOff,
         total,
         shoppingList,
-        setShoppingList,
         revalidateCart: useCallback(
           () => shoppingList && revalidateCart(shoppingList),
-          [shoppingList, revalidateCart]
+          [shoppingList, revalidateCart],
         ),
         cleanCart: useCallback(cleanCart, [setShoppingList]),
         addProduct: useCallback(addProduct, [

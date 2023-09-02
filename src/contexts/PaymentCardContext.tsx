@@ -1,17 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, { ReactNode, useCallback, useState } from 'react';
 import { createContext } from 'use-context-selector';
 import {
   CreatePaymentCard,
   PaymentCard,
-  SetState,
   UpdatePaymentCard,
 } from '~/core/models';
 import { createUseContext } from '~/functions/converter';
 import { api } from '~/services/api';
 
 type PaymentCardContextValues = {
-  paymentCard?: PaymentCard | null;
-  setPaymentCard: SetState<PaymentCard>;
   paymentCards?: PaymentCard[];
   loadPaymentCards: (token: string) => Promise<void>;
   createPaymentCard: (token: string, card: CreatePaymentCard) => Promise<void>;
@@ -23,7 +20,7 @@ const PaymentCardContext = createContext({} as PaymentCardContextValues);
 
 export const usePaymentCardContext = createUseContext(PaymentCardContext);
 
-export const PaymentCardProvider = (props: any) => {
+export const PaymentCardProvider = (props: { children: ReactNode }) => {
   const [paymentCards, setPaymentCards] = useState<PaymentCard[]>();
 
   const loadPaymentCards = async (token: string) => {
@@ -44,7 +41,7 @@ export const PaymentCardProvider = (props: any) => {
 
     if (paymentCards)
       setPaymentCards(
-        paymentCards.map((c) => (c.id === card.id ? { ...c, ...card } : c))
+        paymentCards.map((c) => (c.id === card.id ? { ...c, ...card } : c)),
       );
   };
 

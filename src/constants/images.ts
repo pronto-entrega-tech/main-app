@@ -38,6 +38,11 @@ const rawImages = {
 };
 type ImagesName = keyof typeof rawImages;
 
+export type ImageSource = {
+  source: number;
+  defaultSource?: number;
+};
+
 const images = Object.entries(rawImages).reduce(
   (images, [name, v]) => ({
     ...images,
@@ -46,8 +51,16 @@ const images = Object.entries(rawImages).reduce(
       : { source: v },
   }),
   {} as {
-    [x in ImagesName]: { source: any; defaultSource?: any };
-  }
+    [x in ImagesName]: ImageSource;
+  },
 );
+
+export const paymentImages: Record<string, ImageSource> = {
+  Dinheiro: images.cash,
+  Pix: images.pix,
+  Mastercard: images.mastercard,
+  Visa: images.visa,
+  Elo: images.elo,
+};
 
 export default images;

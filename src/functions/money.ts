@@ -6,8 +6,8 @@ export type Money = {
    */
   readonly dangerousInnerValue: number;
 };
-const createMoney = (raw: any): Money => {
-  if ((raw as Money)?.dangerousInnerValue) return raw;
+const createMoney = (raw: unknown): Money => {
+  if ('dangerousInnerValue' in (raw as Money)) return raw as Money;
 
   const _raw = `${raw}`.replace(/,/g, '.').replace(/(?![\.])\D/g, '');
   const [v1, v2 = ''] = _raw.split('.');

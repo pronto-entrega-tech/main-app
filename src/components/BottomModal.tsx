@@ -116,13 +116,13 @@ const BottomModal = ({
 const styles = StyleSheet.create({
   container: {
     zIndex: zIndex.Modal,
-    position: !device.web ? 'absolute' : ('fixed' as any),
+    position: device.web ? ('fixed' as any) : 'absolute',
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modal: {
     width: '100%',
-    position: !device.web ? 'absolute' : ('fixed' as any),
+    position: device.web ? ('fixed' as any) : 'absolute',
     bottom: 0,
     backgroundColor: myColors.background,
     borderTopLeftRadius: 16,

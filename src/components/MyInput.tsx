@@ -15,7 +15,7 @@ const MyInput = (props: InputArgs & { _ref?: RefObject<TextInput> }) => (
     inputContainerStyle={{ borderBottomColor: '#aaa' }}
     selectionColor={myColors.colorAccent}
     ref={props._ref}
-    {...(props as any)}
+    {...props}
   />
 );
 

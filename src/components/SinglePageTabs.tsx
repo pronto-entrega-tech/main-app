@@ -34,8 +34,8 @@ export const SinglePageTabs = ({
         {header}
         <View
           style={[
+            globalStyles.elevation3,
             {
-              ...globalStyles.elevation3,
               position: 'sticky' as any,
               top: 0,
               zIndex: 1,

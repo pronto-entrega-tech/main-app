@@ -5,13 +5,15 @@ import MyHeader from '~/components/MyHeader';
 import { device, myColors, myTitle } from '~/constants';
 import { PaymentOnApp } from '@pages/pagamento';
 import Portal from '~/core/Portal';
-import { RouteProp } from '@react-navigation/core';
 import PaymentOnDelivery from './PaymentOnDelivery';
 import { appOrSite, notchHeight } from '~/constants/device';
+import useRouting from '~/hooks/useRouting';
 
 const Tab = createMaterialTopTabNavigator();
 
-const PaymentTabs = ({ route }: { route: RouteProp<any> }) => {
+const PaymentTabs = () => {
+  const { params } = useRouting();
+
   const paymentTabs = (
     <Portal.Host>
       <View
@@ -32,13 +34,13 @@ const PaymentTabs = ({ route }: { route: RouteProp<any> }) => {
             name='PaymentInApp'
             options={{ tabBarLabel: `Pagar pelo ${appOrSite}` }}
             component={PaymentOnApp}
-            initialParams={route.params?.params}
+            initialParams={params.params}
           />
           <Tab.Screen
             name='PaymentOnDelivery'
             options={{ tabBarLabel: 'Pagar na entrega' }}
             component={PaymentOnDelivery}
-            initialParams={route.params?.params}
+            initialParams={params.params}
           />
         </Tab.Navigator>
       </View>

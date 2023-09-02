@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated } from 'react-native';
+import { Animated, StyleProp, TextStyle } from 'react-native';
 import { device, myFonts } from '~/constants';
 import { Money, money } from '~/functions/money';
 
@@ -11,7 +11,7 @@ const AnimatedText = ({
   animateZero = false,
 }: {
   children: number | Money;
-  style?: any;
+  style?: StyleProp<TextStyle>;
   distance?: number;
   duration?: number;
   animateZero?: boolean;

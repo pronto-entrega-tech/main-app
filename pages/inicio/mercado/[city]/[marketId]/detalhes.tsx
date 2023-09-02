@@ -4,7 +4,7 @@ import { Market, weekDayArray, weekDayNames } from '~/core/models';
 import Loading from '~/components/Loading';
 import Errors, { MyErrors } from '~/components/Errors';
 import MyText from '~/components/MyText';
-import { images, myColors, myFonts } from '~/constants';
+import { myColors, myFonts } from '~/constants';
 import { documentMask } from '~/functions/converter';
 import { WithBottomNav } from '~/components/Layout';
 import MyDivider from '~/components/MyDivider';
@@ -13,15 +13,18 @@ import useRouting from '~/hooks/useRouting';
 import { GetStaticProps } from 'next';
 import Chip from '~/components/Chip';
 import { api } from '~/services/api';
+import { paymentImages } from '~/constants/images';
 
-const MarketDetails = (props: any) => (
+type MarketDetailsProps = { market?: Market };
+
+const MarketDetails = (props: MarketDetailsProps) => (
   <>
     <MyHeader title='Informações' />
     <MarketDetailsBody {...props} />
   </>
 );
 
-const MarketDetailsBody = (props: { market?: Market }) => {
+const MarketDetailsBody = (props: MarketDetailsProps) => {
   const { params } = useRouting();
   const [error, setError] = useState<MyErrors>(null);
   const [tryAgain, setTryAgain] = useState(false);
@@ -35,7 +38,7 @@ const MarketDetailsBody = (props: { market?: Market }) => {
       .findOne(params.city, params.marketId)
       .then(setMarket)
       .catch((err) =>
-        setError(api.isError('NotFound', err) ? 'nothing_market' : 'server')
+        setError(api.isError('NotFound', err) ? 'nothing_market' : 'server'),
       );
   }, [tryAgain, market, params.city, params.marketId]);
 
@@ -44,16 +47,8 @@ const MarketDetailsBody = (props: { market?: Market }) => {
 
   if (!market) return <Loading />;
 
-  const icons: { [x: string]: any } = {
-    Dinheiro: images.cash,
-    Pix: images.pix,
-    Mastercard: images.mastercard,
-    Visa: images.visa,
-    Elo: images.elo,
-  };
-
   const payDelivery = market.payments_accepted.map((title) => ({
-    icon: icons[title.replace(/.* /, '')],
+    icon: paymentImages[title.replace(/.* /, '')],
     title,
   }));
 
@@ -162,7 +157,9 @@ export default WithBottomNav(MarketDetails);
 
 export { getStaticPaths } from '../[marketId]';
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<MarketDetailsProps> = async ({
+  params,
+}) => {
   const city = params?.city?.toString();
   const marketId = params?.marketId?.toString();
 

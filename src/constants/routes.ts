@@ -91,8 +91,8 @@ export const screensPaths = (() => {
       .join('/')
       .replace(/(?:\/):.*?(?=\/|$)/g, (param) => `/[${param.slice(2)}]`);
 
-  const iterate = (screens: any, path = '') => {
-    Object.entries(screens).forEach(([screen, route]: any) => {
+  const iterate = (screens: object, path = '') => {
+    Object.entries(screens).forEach(([screen, route]) => {
       typeof route === 'string'
         ? screensPaths.set(screen, `/${joinPaths([path, route])}`)
         : iterate(route.screens, joinPaths([path, route.path]));

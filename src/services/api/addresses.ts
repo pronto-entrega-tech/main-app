@@ -13,38 +13,29 @@ const create = async (token: string, address: Address) => {
   const { data } = await ApiClient.post(
     `/customers/addresses`,
     convert(address),
-    authHeader(token)
+    authHeader(token),
   );
-
   return data as { id: string };
 };
 
 const find = async (token: string) => {
   const { data } = await ApiClient.get(
     `/customers/addresses`,
-    authHeader(token)
+    authHeader(token),
   );
-
   return data as Address[];
 };
 
 const update = async (token: string, address: Address) => {
-  const { data } = await ApiClient.patch(
+  await ApiClient.patch(
     `/customers/addresses/${address.id}`,
     convert(address),
-    authHeader(token)
+    authHeader(token),
   );
-
-  return data as any;
 };
 
 const remove = async (token: string, id: Address['id']) => {
-  const { data } = await ApiClient.delete(
-    `/customers/addresses/${id}`,
-    authHeader(token)
-  );
-
-  return data as any;
+  await ApiClient.delete(`/customers/addresses/${id}`, authHeader(token));
 };
 
 export const apiAddresses = { create, find, update, remove };

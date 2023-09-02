@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { createContext } from 'use-context-selector';
 import {
   createUseContext,
@@ -29,7 +29,7 @@ const AuthContext = createContext({} as AuthContextValues);
 
 export const useAuthContext = createUseContext(AuthContext);
 
-export const AuthProvider = (props: any) => {
+export const AuthProvider = (props: { children: ReactNode }) => {
   const { alert } = useMyContext();
   const hasInternet = useConnection();
   const [accessToken, setAccessToken] = useState<string | null>();
@@ -93,12 +93,21 @@ export const AuthProvider = (props: any) => {
     return () => clearTimeout(revalidateTimeout);
   }, [hasInternet, accessToken, refreshToken, alert]);
 
+  const authValue = (() => {
+    if (accessToken === undefined) {
+      return { isAuth: undefined, accessToken: undefined };
+    }
+    if (accessToken === null) {
+      return { isAuth: false as const, accessToken: null };
+    }
+    return { isAuth: true as const, accessToken };
+  })();
+
   return (
     <AuthContext.Provider
       value={{
-        accessToken,
+        ...authValue,
         refreshToken,
-        isAuth,
         signIn: useCallback(signIn, []),
         signOut: useCallback(signOut, [refreshToken]),
       }}

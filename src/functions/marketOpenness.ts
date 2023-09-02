@@ -12,12 +12,12 @@ export const marketOpenness = (market: Market) => {
   const openMsg = isOpen ? 'Aberto' : 'Fechado';
   const tomorrowMsg = tomorrow ? ' de amanhã' : '';
 
-  return nextHour && `${openMsg} até ${nextHour}${tomorrowMsg}`;
+  return !nextHour ? openMsg : `${openMsg} até ${nextHour}${tomorrowMsg}`;
 };
 
 export const isMarketOpen = (
   business_hours: BusinessHours[],
-  intervalDaysQuantity = 1
+  intervalDaysQuantity = 1,
 ) => {
   const removeZero = (text: string) => text.replace(/^.{0}0/, '');
 
@@ -34,7 +34,7 @@ export const isMarketOpen = (
     if (intervalDaysQuantity <= 1) return [];
 
     const intervalDays = range(1, intervalDaysQuantity - 1).map(
-      (n) => (n + weekday) % 7
+      (n) => (n + weekday) % 7,
     );
 
     return intervalDays.reduce((list, intervalDay) => {
@@ -71,7 +71,7 @@ export const isMarketOpen = (
 
   const tomorrowWeekday = (weekday + 1) % 7;
   const tomorrowBHs = business_hours.filter(({ days }) =>
-    days.includes(weekDayArray[tomorrowWeekday])
+    days.includes(weekDayArray[tomorrowWeekday]),
   );
   if (tomorrowBHs.length) {
     const [{ open_time }] = tomorrowBHs;

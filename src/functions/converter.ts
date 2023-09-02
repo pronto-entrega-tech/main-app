@@ -15,6 +15,7 @@ import { objectConditional } from './conditionals';
 import { money } from './money';
 import { Buffer } from 'buffer';
 import { lightFormat } from 'date-fns';
+import { Params } from '~/hooks/useRouting';
 
 export const validateProduct = (v: any): Product => ({
   ...v,
@@ -79,29 +80,31 @@ export const validateOrder = (v: any): Order => ({
   },
 });
 
-export const createUseContext = <T>(context: Context<T>) => {
+export const createUseContext = <T extends Record<string | symbol, unknown>>(
+  context: Context<T>,
+) => {
   return () =>
-    new Proxy(
-      {},
-      {
-        get: (_, name) => {
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          return useContextSelector(context, (c: any) => c[name]);
-        },
+    new Proxy({} as T, {
+      get: (_, name) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        return useContextSelector(context, (c) => c[name]);
       },
-    ) as T;
+    });
 };
 
-export const pick = <T extends object, K extends keyof T>(
+export const pick = <T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
   ...keys: K[]
 ): Pick<T, K> =>
   keys.reduce((result, key) => {
     if (key in obj) result[key] = obj[key];
     return result;
-  }, {} as any);
+  }, {} as T);
 
-export const omit = <T, K extends keyof T>(obj: T, ...keys: K[]): Omit<T, K> =>
+export const omit = <T extends Record<string, unknown>, K extends keyof T>(
+  obj: T,
+  ...keys: K[]
+): Omit<T, K> =>
   keys.reduce(
     (result, key) => {
       delete result[key];
@@ -210,8 +213,6 @@ export const fail = (message?: string) => {
 
 // JavaScriptCore don't support lookbehind regex
 const pathRegex = /(?:\/)\[.*?](?=\/|$)/g;
-
-type Params = Record<string, any>;
 
 const queryFrom = (params: Params, path: string) => {
   const paramsNames = path.match(pathRegex)?.map((v) => v.slice(2, -1));
