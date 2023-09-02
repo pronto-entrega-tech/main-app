@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import {
   View,
@@ -29,8 +29,8 @@ const MyPicker = ({
   selectedValue?: string;
   onValueChange: (v: string) => void;
 }) => {
-  const [visible, setVisible] = React.useState(false);
-  const [value, setValue] = React.useState(selectedValue);
+  const [visible, setVisible] = useState(false);
+  const [value, setValue] = useState(selectedValue);
 
   const pickerItems = ['-', ...items].map((item, i) => (
     <Picker.Item

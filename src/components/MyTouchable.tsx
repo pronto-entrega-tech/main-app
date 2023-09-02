@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { CSSProperties, ReactNode } from 'react';
 import Link from 'next/link';
 import {
   View,
@@ -41,7 +41,7 @@ type OnlyLink = {
 export type ButtonOrLink<T> = (OnlyButton | OnlyLink) & T;
 
 type MyTouchableBase = {
-  children?: React.ReactNode;
+  children?: ReactNode;
   disabled?: boolean;
   hitSlop?: Insets;
   style?: StyleProp<ViewStyle>;
@@ -80,7 +80,7 @@ const MyTouchable = ({
   if (device.web) {
     const [isHovered, hoverBind] = useHover ?? innerUseHover();
 
-    const baseStyle: React.CSSProperties = {
+    const baseStyle: CSSProperties = {
       transitionDuration: '200ms',
       cursor: disabled ? 'default' : 'pointer',
     };

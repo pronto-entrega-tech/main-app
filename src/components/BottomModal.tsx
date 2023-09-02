@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -20,7 +20,7 @@ const BottomModal = ({
 }: {
   state: ModalState;
   style?: StyleProp<ViewStyle>;
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   const [show, setShow] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);

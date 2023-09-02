@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -91,7 +91,7 @@ const OrderDetails = () => {
   const navigate = useCallback(
     (page: OrderPages) =>
       setHistory((h) => (h.slice(-1)[0] !== page ? h.concat(page) : h)),
-    []
+    [],
   );
   const goBack = () => setHistory((h) => h.slice(0, -1));
   const orderId = params.orderId as string;
@@ -182,7 +182,7 @@ const OrderDetailsPage = ({
       Mastercard: images.mastercard,
       Visa: images.visa,
       Elo: images.elo,
-    }[cardBrand] ?? images.creditCard);
+    })[cardBrand] ?? images.creditCard;
 
   const paymentIcon = {
     CASH: images.cash,
@@ -422,7 +422,7 @@ const PageModal = ({
   ...props
 }: {
   state: ModalState;
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   const { height } = useWindowDimensions();
 
@@ -569,7 +569,7 @@ const ConfirmModal = ({ order }: { order: Order }) => {
 
       const { token: apiToken } = await api.orders.getConfirmationToken(
         accessToken,
-        order
+        order,
       );
       setConfirmToken(apiToken);
     });

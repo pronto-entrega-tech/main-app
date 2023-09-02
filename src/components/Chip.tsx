@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { StyleProp, ViewStyle, TextStyle } from 'react-native';
 import IconButton from './IconButton';
 import MyText from './MyText';
@@ -6,7 +6,7 @@ import MyTouchable from './MyTouchable';
 
 const Chip = (props: {
   title?: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   style?: StyleProp<ViewStyle>;
   titleStyle?: StyleProp<TextStyle>;
   onPress?: () => void;

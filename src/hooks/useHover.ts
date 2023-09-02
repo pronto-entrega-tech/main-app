@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 export type UseHover = [
   boolean,
@@ -6,11 +6,11 @@ export type UseHover = [
     onMouseEnter: () => void;
     onMouseLeave: () => void;
     onTouchCancel: () => void;
-  }
+  },
 ];
 
 const useHover = (): UseHover => {
-  const [hovered, setHovered] = React.useState(false);
+  const [hovered, setHovered] = useState(false);
 
   const hoverBind = {
     onMouseEnter: () => setHovered(true),

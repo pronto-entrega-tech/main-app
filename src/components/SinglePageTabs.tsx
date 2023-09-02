@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactNode, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { globalStyles, myColors } from '~/constants';
 import MyTouchable from './MyTouchable';
@@ -7,17 +7,17 @@ import MyDivider from './MyDivider';
 
 export type SinglePageTab = {
   title: string;
-  element: JSX.Element;
+  element: ReactNode;
 };
 export const SinglePageTabs = ({
   header,
   tabs,
 }: {
-  header: JSX.Element;
+  header: ReactNode;
   tabs: SinglePageTab[];
 }) => {
   const [selected, setSelected] = useState(0);
-  const pages = React.useRef(new Map([[0, tabs[0].element]]));
+  const pages = useRef(new Map([[0, tabs[0].element]]));
 
   return (
     <>

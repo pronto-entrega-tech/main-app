@@ -1,11 +1,11 @@
-import React, { ComponentType, ReactNode } from 'react';
+import React, { CSSProperties, ComponentType, ReactNode } from 'react';
 import MyToast from '~/components/MyToast';
 import CartBar from '~/components/CartBar';
 import NavigationBar from '~/components/NavigationBar';
 import myColors from '~/constants/myColors';
 import device from '~/constants/device';
 
-const baseStyle: React.CSSProperties = {
+const baseStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   flex: 1,

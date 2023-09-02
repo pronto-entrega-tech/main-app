@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { View, StyleSheet } from 'react-native';
 import useRouting from '~/hooks/useRouting';
 import { myColors, globalStyles, myFonts } from '~/constants';
@@ -24,7 +24,7 @@ const MyHeader = ({
   notchLess?: boolean;
   dividerLess?: boolean;
   smallDivider?: boolean;
-  rightIcon?: JSX.Element;
+  rightIcon?: ReactNode;
 }) => {
   const routing = useRouting();
   const goBack = onGoBack ?? routing.goBack;

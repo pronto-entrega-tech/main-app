@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { SetState } from './models';
 
 type PortalValues = {
-  setGates: SetState<React.ReactNode>;
+  setGates: SetState<ReactNode>;
 };
-const PortalContext = React.createContext({} as PortalValues);
+const PortalContext = createContext({} as PortalValues);
 
-const Portal = ({ children }: { children: React.ReactNode }) => {
-  const { setGates } = React.useContext(PortalContext);
+const Portal = ({ children }: { children: ReactNode }) => {
+  const { setGates } = useContext(PortalContext);
 
   useEffect(() => {
     if (setGates) setGates(children);
@@ -16,8 +22,8 @@ const Portal = ({ children }: { children: React.ReactNode }) => {
   return null;
 };
 
-const Host = (props: { children: React.ReactNode }) => {
-  const [gates, setGates] = useState<React.ReactNode>();
+const Host = (props: { children: ReactNode }) => {
+  const [gates, setGates] = useState<ReactNode>();
 
   return (
     <PortalContext.Provider value={{ setGates }}>

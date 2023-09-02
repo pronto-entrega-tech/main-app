@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -18,7 +18,7 @@ const CenterModal = ({
 }: {
   state: Partial<ModalState>;
   style?: StyleProp<ViewStyle>;
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   const [show, setShow] = useState(false);
   const [state] = useState({ opacity: new Animated.Value(0) });

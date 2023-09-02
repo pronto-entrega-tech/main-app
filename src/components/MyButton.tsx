@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { StyleProp, ViewStyle, TextStyle } from 'react-native';
 import myColors from '~/constants/myColors';
 import myFonts from '~/constants/myFonts';
@@ -11,7 +11,7 @@ import MyIcon, { IconNames, MyIconProps } from './MyIcon';
 type MyButtonBase = {
   title: string;
   icon?: IconNames | MyIconProps;
-  image?: JSX.Element;
+  image?: ReactNode;
   iconRight?: boolean;
   disabled?: boolean;
   type?: 'solid' | 'outline' | 'clear';

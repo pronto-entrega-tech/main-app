@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleProp, ViewStyle, RefreshControl } from 'react-native';
 import { myColors } from '~/constants';
 import { SearchParams } from '~/services/api/products';
@@ -15,7 +15,7 @@ import { useCartContext } from '~/contexts/CartContext';
 import { useMediaQuery } from '~/hooks/useMediaQuery';
 
 const ProdList = (props: {
-  header?: JSX.Element;
+  header?: ReactElement;
   data?: Product[];
   isSearch?: boolean;
   searchParams?: SearchParams;

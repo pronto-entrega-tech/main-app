@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 import { Product } from '~/core/models';
 import ProdList from './ProdList';
@@ -9,7 +9,7 @@ const ProdListHorizontal = ({
   style,
   hideMarketLogo,
 }: {
-  header?: JSX.Element;
+  header?: ReactElement;
   data?: Product[];
   style?: StyleProp<ViewStyle>;
   hideMarketLogo?: boolean;
