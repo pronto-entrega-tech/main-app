@@ -22,7 +22,7 @@ const Profile = () => {
         api.customers
           .find(accessToken)
           .then(({ name }) => setProfileName(name));
-    }, [accessToken])
+    }, [accessToken]),
   );
 
   if (isAuth === undefined || (isAuth && !profileName)) return <Loading />;
@@ -96,7 +96,6 @@ const Profile = () => {
               icon={{
                 name: item.icon,
                 size: 28,
-                color: myColors.primaryColor,
               }}
               buttonStyle={[
                 styles.button,
@@ -104,7 +103,7 @@ const Profile = () => {
                   ? styles.top
                   : index === row.length - 1
                   ? styles.bottom
-                  : { borderRadius: 0 },
+                  : styles.mid,
               ]}
               titleStyle={{
                 color: myColors.text2,
@@ -164,6 +163,9 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
+  },
+  mid: {
+    borderRadius: 0,
   },
   bottom: {
     borderRadius: 0,

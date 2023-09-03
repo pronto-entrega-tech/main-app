@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Image } from 'react-native-elements/dist/image/Image';
 import IconButton from '~/components/IconButton';
 import ProdListHorizontal from '~/components/ProdListHorizontal';
-import { myColors, device, myFonts } from '~/constants';
+import { myColors, device, myFonts, globalStyles } from '~/constants';
 import { getImageUrl } from '~/functions/converter';
 import { calcPrices, money } from '~/functions/money';
 import MyIcon from '~/components/MyIcon';
@@ -111,19 +111,27 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
 
           <View style={styles.containerAdd}>
             <IconButton
-              icon='minus'
-              size={24}
-              color={myColors.primaryColor}
-              type='addLarge'
               onPress={() => removeProduct(product)}
+              icon='minus'
+              style={[
+                styles.buttonAdd,
+                globalStyles.elevation4,
+                globalStyles.darkBorder,
+              ]}
+              hitSlop={{ top: 9, bottom: 9, left: 12, right: 12 }}
             />
             <AnimatedText style={styles.centerNumText} animateZero>
               {quantity ?? 0}
             </AnimatedText>
             <IconButton
-              icon='plus'
-              type='addLarge'
               onPress={() => addProduct(product)}
+              icon='plus'
+              style={[
+                styles.buttonAdd,
+                globalStyles.elevation4,
+                globalStyles.darkBorder,
+              ]}
+              hitSlop={{ top: 9, bottom: 9, left: 12, right: 12 }}
             />
           </View>
         </View>
@@ -250,8 +258,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 3,
+    paddingTop: 6,
     paddingHorizontal: 8,
+  },
+  buttonAdd: {
+    width: 34,
+    height: 30,
+    backgroundColor: '#fff',
   },
   centerNumText: {
     fontSize: 17,

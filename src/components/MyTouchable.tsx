@@ -2,13 +2,13 @@ import React, { CSSProperties, ReactNode } from 'react';
 import Link from 'next/link';
 import {
   View,
-  TouchableNativeFeedback,
   StyleProp,
   ViewStyle,
   Insets,
   GestureResponderEvent,
   TouchableHighlight,
   TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import device from '~/constants/device';
 import innerUseHover, { UseHover } from '~/hooks/useHover';
@@ -82,33 +82,31 @@ const MyTouchable = ({
 
     const baseStyle: CSSProperties = {
       transitionDuration: '200ms',
-      cursor: disabled ? 'default' : 'pointer',
     };
     const baseHoverStyle = { opacity: 0.5 };
     const hovered = !!(isHovered && (screen || !disabled)); // should be a link or a button not disabled
 
-    const Touchable = (
-      <View
-        role={screen ? 'link' : 'button'}
+    const fullStyle: StyleProp<ViewStyle> = [
+      baseStyle as ViewStyle,
+      style,
+      hovered && [baseHoverStyle, hoverStyle],
+    ];
+
+    return screen ? (
+      <Link href={urlFrom(screen, params)} passHref>
+        <View {...hoverBind} style={fullStyle}>
+          <>{children}</>
+        </View>
+      </Link>
+    ) : (
+      <Pressable
         {...hoverBind}
-        {...{ onClick: !screen && !disabled ? onPress : undefined }}
-        style={[
-          baseStyle as ViewStyle,
-          style,
-          hovered && (hoverStyle ?? baseHoverStyle),
-        ]}>
+        onPress={onPress}
+        disabled={disabled}
+        style={fullStyle}>
         <>{children}</>
-      </View>
+      </Pressable>
     );
-
-    if (screen)
-      return (
-        <Link href={urlFrom(screen, params)} passHref>
-          {Touchable}
-        </Link>
-      );
-
-    return Touchable;
   }
 
   const onPressOrNav = !screen ? onPress : () => navigate(screen, params);
@@ -117,15 +115,17 @@ const MyTouchable = ({
     return solid ? (
       <TouchableHighlight
         underlayColor='#68b5f2'
-        disabled={disabled}
         onPress={onPressOrNav}
+        disabled={disabled}
+        hitSlop={hitSlop}
         style={style}>
         <>{children}</>
       </TouchableHighlight>
     ) : (
       <TouchableOpacity
-        disabled={disabled}
         onPress={onPressOrNav}
+        disabled={disabled}
+        hitSlop={hitSlop}
         style={style}>
         <>{children}</>
       </TouchableOpacity>
@@ -134,18 +134,17 @@ const MyTouchable = ({
 
   // if android
   return (
-    <TouchableNativeFeedback
-      useForeground
-      background={
-        solid
-          ? TouchableNativeFeedback.Ripple('rgba(255, 255, 255, .32)', false)
-          : undefined
-      }
-      hitSlop={hitSlop}
+    <Pressable
+      onPress={onPressOrNav}
       disabled={disabled}
-      onPress={onPressOrNav}>
-      <View style={[{ overflow: 'hidden' }, style]}>{children}</View>
-    </TouchableNativeFeedback>
+      hitSlop={hitSlop}
+      android_ripple={{
+        foreground: true,
+        color: solid ? 'rgba(255 255 255 / .32)' : undefined,
+      }}
+      style={style}>
+      <>{children}</>
+    </Pressable>
   );
 };
 

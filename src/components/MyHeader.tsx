@@ -9,7 +9,6 @@ import HeaderContainer from './HeaderContainer';
 
 const MyHeader = ({
   title,
-  fallback,
   onGoBack,
   goBackLess,
   notchLess,
@@ -18,7 +17,6 @@ const MyHeader = ({
   rightIcon,
 }: {
   title?: string;
-  fallback?: string;
   onGoBack?: () => void;
   goBackLess?: boolean;
   notchLess?: boolean;
@@ -26,19 +24,10 @@ const MyHeader = ({
   smallDivider?: boolean;
   rightIcon?: ReactNode;
 }) => {
-  const routing = useRouting();
-  const goBack = onGoBack ?? routing.goBack;
-
   return (
     <HeaderContainer>
       <View style={[styles.header, !notchLess && globalStyles.notch]}>
-        {!goBackLess && (
-          <IconButton
-            icon='arrow-left'
-            type='back'
-            onPress={() => goBack(fallback)}
-          />
-        )}
+        {!goBackLess && <GoBackButton onGoBack={onGoBack} />}
         <MyText style={styles.textHeader}>{title}</MyText>
         <View style={styles.rightIcon}>{rightIcon}</View>
       </View>
@@ -48,6 +37,21 @@ const MyHeader = ({
         />
       )}
     </HeaderContainer>
+  );
+};
+
+export const GoBackButton = (p: { onGoBack?: () => void }) => {
+  const routing = useRouting();
+  const goBack = p.onGoBack ?? routing.goBack;
+  return (
+    <IconButton
+      onPress={() => goBack()}
+      icon='arrow-left'
+      style={{
+        width: 56,
+        height: 56,
+      }}
+    />
   );
 };
 

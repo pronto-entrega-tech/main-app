@@ -129,12 +129,7 @@ const SendMsgInput = () => {
         enterKeyHint='send'
         containerStyle={{ flex: 1 }}
       />
-      <IconButton
-        disabled={!accessToken}
-        onPress={sendMsg}
-        icon='send'
-        type='clear'
-      />
+      <IconButton disabled={!accessToken} onPress={sendMsg} icon='send' />
     </Row>
   );
 };

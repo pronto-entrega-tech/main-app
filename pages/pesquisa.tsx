@@ -3,7 +3,6 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import CartBar from '~/components/CartBar';
 import ProdList from '~/components/ProdList';
 import { myColors, globalStyles, myFonts } from '~/constants';
-import IconButton from '~/components/IconButton';
 import MySearchBar from '~/components/MySearchBar';
 import MyButton from '~/components/MyButton';
 import { categoriesArray } from './categorias';
@@ -14,22 +13,26 @@ import { omit, toArray } from '~/functions/converter';
 import Loading from '~/components/Loading';
 import HeaderContainer from '~/components/HeaderContainer';
 import { ItemOrderBy } from '~/core/models';
+import { arrayConditional } from '~/functions/conditionals';
+import { GoBackButton } from '~/components/MyHeader';
+
+type SearchParams = {
+  query?: string;
+  marketId?: string;
+  orderBy?: ItemOrderBy;
+  distance?: string;
+  category?: string;
+};
 
 const Search = () => {
   const { params, isReady, goBack, navigate } = useRouting();
-  const query = params?.query as string | undefined;
-  const marketId = params?.marketId as string | undefined;
-  const orderBy = params?.orderBy as ItemOrderBy | undefined;
-  const distance = params?.distance as string | undefined;
-  const categories = toArray(params.category) as string[] | undefined;
+  const { query, marketId, orderBy, distance, category } =
+    params as SearchParams;
+  const categories = toArray(category);
 
   const header = (
     <HeaderContainer style={[styles.header, globalStyles.notch]}>
-      <IconButton
-        icon='arrow-left'
-        type='back'
-        onPress={() => goBack('Home')}
-      />
+      <GoBackButton onGoBack={() => goBack('Home')} />
       <MySearchBar
         defaultValue={query}
         onSubmit={(query) => {
@@ -47,31 +50,32 @@ const Search = () => {
     [ItemOrderBy.Distance]: 'Por distância',
   }[orderBy ?? ItemOrderBy.Default];
 
-  const removeOrderBy = () => navigate('Search', omit(params, 'orderBy'));
-
-  const removeDistance = () => navigate('Search', omit(params, 'distance'));
-
-  const removeCategory = (category: string) => {
-    if (!categories) return;
-
-    navigate('Search', {
-      ...params,
-      category: categories.filter((v) => v !== category),
-    });
-  };
-
   const chipsValues = [
-    ...(filterName ? ([[filterName, removeOrderBy]] as const) : []),
-    ...(distance ? ([[`Até ${distance}km`, removeDistance]] as const) : []),
-    ...(categories?.map(
-      (c) => [categoriesArray[+c - 1], () => removeCategory(c)] as const
-    ) ?? []),
+    ...arrayConditional(filterName)({
+      title: filterName,
+      remove: () => navigate('Search', omit(params, 'orderBy')),
+    }),
+    ...arrayConditional(distance)({
+      title: `Até ${distance}km`,
+      remove: () => navigate('Search', omit(params, 'distance')),
+    }),
+    ...(categories?.map((c) => ({
+      title: categoriesArray[+c - 1],
+      remove: () => {
+        if (!c) return;
+
+        navigate('Search', {
+          ...params,
+          category: categories.filter((v) => v !== c),
+        });
+      },
+    })) ?? []),
   ];
   const chipsBar = chipsValues.length ? (
-    chipsValues.map(([value, remove]) => (
+    chipsValues.map(({ title, remove }) => (
       <Chip
-        key={value}
-        title={`${value}`}
+        key={title}
+        title={title}
         onClose={() => {
           if (chipsValues.length <= 1) return goBack();
 

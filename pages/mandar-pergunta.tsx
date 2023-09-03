@@ -185,11 +185,11 @@ const UploadQuestionBody = () => {
                       justifyContent: 'center',
                     }}>
                     <IconButton
-                      icon='close-circle'
-                      type='cancel'
                       onPress={() =>
                         setDocuments(documents.filter((v) => v !== doc))
                       }
+                      icon='close-circle'
+                      style={{ width: 48, height: 48 }}
                     />
                   </View>
                 </View>

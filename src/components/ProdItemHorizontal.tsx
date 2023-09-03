@@ -104,11 +104,29 @@ const ProdItemHorizontal = (props: {
         </View>
       </MyTouchable>
       <View style={styles.containerAdd}>
-        <IconButton icon='plus' type='addHorizontal' onPress={onPressAdd} />
+        <IconButton
+          onPress={onPressAdd}
+          icon='plus'
+          style={[
+            styles.buttonAdd,
+            globalStyles.elevation4,
+            globalStyles.darkBorder,
+          ]}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 12 }}
+        />
         <AnimatedText style={styles.centerNumText} distance={10} animateZero>
           {quantity}
         </AnimatedText>
-        <IconButton icon='minus' type='addHorizontal' onPress={onPressRemove} />
+        <IconButton
+          onPress={onPressRemove}
+          icon='minus'
+          style={[
+            styles.buttonAdd,
+            globalStyles.elevation4,
+            globalStyles.darkBorder,
+          ]}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 12 }}
+        />
       </View>
     </View>
   );
@@ -132,9 +150,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     height: 104,
-    paddingVertical: 6,
-    paddingLeft: 3,
+    paddingVertical: 8,
+    paddingLeft: 4,
     zIndex: 2,
+  },
+  buttonAdd: {
+    width: 26,
+    height: 26,
+    backgroundColor: '#fff',
   },
   centerNumText: {
     fontSize: 17,

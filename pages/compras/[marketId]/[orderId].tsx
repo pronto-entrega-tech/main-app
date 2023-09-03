@@ -366,9 +366,13 @@ const OrderDetailsPage = ({
 
   const helpButton = (
     <IconButton
-      icon='help-circle'
-      type='prodIcons'
       onPress={() => navigate('OrderHelp')}
+      icon='help-circle'
+      style={{
+        marginLeft: -8,
+        width: 56,
+        height: 56,
+      }}
     />
   );
 
@@ -477,7 +481,7 @@ const PixModal = ({ payment }: { payment: Order['payment'] }) => {
           editable={false}
           style={[styles.text, { width: '60%' }]}
         />
-        <IconButton icon='content-copy' type='clear' onPress={copyCode} />
+        <IconButton icon='content-copy' onPress={copyCode} />
       </View>
     </View>
   );

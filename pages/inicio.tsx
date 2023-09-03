@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginHorizontal: 16,
+    paddingHorizontal: 16,
     paddingBottom: 6,
   },
   line2: {

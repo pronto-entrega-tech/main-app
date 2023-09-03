@@ -42,7 +42,6 @@ const Chip = (props: {
       </MyText>
       {onClose && (
         <IconButton
-          type='blank'
           icon='close-circle'
           color='rgba(0, 0, 0, 0.54)'
           size={16}

@@ -16,6 +16,11 @@ type MyButtonBase = {
   disabled?: boolean;
   type?: 'solid' | 'outline' | 'clear';
   buttonStyle?: StyleProp<ViewStyle>;
+  disabledStyle?: StyleProp<ViewStyle>;
+  /**
+   *  @platform web.
+   */
+  hoverStyle?: StyleProp<ViewStyle>;
   titleStyle?: StyleProp<TextStyle>;
 };
 
@@ -32,6 +37,8 @@ const MyButton = ({
   disabled = false,
   type = 'solid',
   buttonStyle,
+  disabledStyle,
+  hoverStyle,
   titleStyle,
   ...props
 }: MyButtonProps) => {
@@ -56,6 +63,7 @@ const MyButton = ({
   const isHovered = hovered && (screen || !disabled); // should be a link or a button not disabled
 
   const hoverColor = !isHovered ? myColors.primaryColor : '#48a2eb';
+
   const solidTextColor = !disabled ? 'white' : '#99a1a8';
   const textColor = !disabled ? hoverColor : '#9CA3AA';
   const backgroundColor = !disabled ? hoverColor : '#E3E6E8';
@@ -76,6 +84,7 @@ const MyButton = ({
       solid={type === 'solid'}
       disabled={disabled}
       style={[baseStyle, typeStyle, buttonStyle]}
+      hoverStyle={hoverStyle}
       useHover={_useHover}
       {...props}>
       {image}

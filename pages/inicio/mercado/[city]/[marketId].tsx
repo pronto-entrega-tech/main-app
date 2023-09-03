@@ -48,7 +48,15 @@ const MarketHeader = () => {
     else navigator.share({ url });
   };
   const shareIcon = (
-    <IconButton icon='share-variant' type='prodIcons' onPress={sharePage} />
+    <IconButton
+      icon='share-variant'
+      onPress={sharePage}
+      style={{
+        marginLeft: -8,
+        width: 56,
+        height: 56,
+      }}
+    />
   );
 
   return (

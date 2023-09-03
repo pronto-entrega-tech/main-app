@@ -36,12 +36,10 @@ const MySearchBar = ({
       <IconButton
         icon='magnify'
         color='rgba(0, 0, 0, 0.54)'
-        type='clear'
         style={{
-          alignSelf: 'center',
           width: 48,
-          padding: 12,
-          aspectRatio: 1,
+          height: 48,
+          alignSelf: 'center',
         }}
         disabledStyle={{}}
         disabled={!query}
@@ -65,12 +63,11 @@ const MySearchBar = ({
         <IconButton
           icon='close'
           color='rgba(0, 0, 0, 0.54)'
-          type='clear'
           style={{
-            alignSelf: 'center',
             width: 48,
-            aspectRatio: 1,
+            height: 48,
             padding: 12,
+            alignSelf: 'center',
           }}
           onPress={() => setSearchQuery('')}
         />

@@ -71,14 +71,6 @@ const ProdItem = (props: {
               containerStyle={styles.marketLogo}
             />
           )}
-          {/* <IconButton
-          style={styles.fav}
-          icon={isFavorite ? 'heart' : 'heart-outline'}
-          size={24}
-          color={isFavorite ? myColors.primaryColor : myColors.grey2}
-          type='clear'
-          onPress={onPressFav}
-        /> */}
         </View>
         <View style={styles.container}>
           <MyText style={styles.priceText}>
@@ -101,30 +93,6 @@ const ProdItem = (props: {
             {item.quantity}
           </MyText>
         </View>
-        {/* <Divider
-        style={{
-          backgroundColor: myColors.divider2,
-          height: 1,
-          marginBottom: 0,
-        }}
-      />
-      <View style={styles.containerAdd}>
-        <IconButton
-          icon='minus'
-          size={24}
-          color={myColors.primaryColor}
-          type='add'
-          onPress={onPressRemove}
-        />
-        <MyText style={styles.centerNumText}>{quantity.toString()}</MyText>
-        <IconButton
-          icon='plus'
-          size={24}
-          color={myColors.primaryColor}
-          type='add'
-          onPress={onPressAdd}
-        />
-      </View> */}
       </MyTouchable>
       <View
         style={[
@@ -137,10 +105,10 @@ const ProdItem = (props: {
           },
         ]}>
         <IconButton
-          style={{ left: device.web ? 1 : 0 }}
-          icon={'plus'}
-          type='add2'
           onPress={onPressAdd}
+          icon='plus'
+          style={styles.add}
+          hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
         />
         {quantity !== 0 && (
           <>
@@ -148,10 +116,10 @@ const ProdItem = (props: {
               {quantity}
             </AnimatedText>
             <IconButton
-              style={styles.remove}
-              icon='minus'
-              type='add2'
               onPress={onPressRemove}
+              icon='minus'
+              style={[styles.add, styles.remove]}
+              hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
             />
           </>
         )}
@@ -203,15 +171,13 @@ const styles = StyleSheet.create({
     left: 36,
     position: 'absolute',
   },
-  remove: { position: 'absolute', [device.web ? 'right' : 'left']: 46 },
-  marketImage: {
+  add: {
+    width: 32,
+    height: 32,
+  },
+  remove: {
     position: 'absolute',
-    right: 0,
-    top: 80,
-    marginRight: 6,
-    height: 26,
-    width: 26,
-    borderRadius: 40,
+    [device.web ? 'right' : 'left']: 46,
   },
   image: {
     marginTop: 10,

@@ -4,13 +4,14 @@ import IconButton from '~/components/IconButton';
 import { myColors, device } from '~/constants';
 import useRouting from '~/hooks/useRouting';
 import { Urls } from '~/constants/urls';
+import { GoBackButton } from './MyHeader';
 
 const ProductHeader = () => {
-  const routing = useRouting();
+  const { params, goBack } = useRouting();
   /* const { notify, onPressNot } = useMyContext(); */
 
   const share = () => {
-    const { city, itemId } = routing.params;
+    const { city, itemId } = params;
     const url = `${Urls.WWW}/produto/${city}/${itemId}`;
 
     if (!device.web) Share.share({ message: url });
@@ -35,19 +36,27 @@ const ProductHeader = () => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           height: 46,
+          zIndex: 2,
         }}>
-        <IconButton
-          icon='arrow-left'
-          type='back'
-          onPress={() => routing.goBack('Home')}
-        />
+        <GoBackButton onGoBack={() => goBack('Home')} />
         <View style={{ flexDirection: 'row' }}>
           {/* <IconButton
-            icon={notify.has(item.prod_id) ? 'bell' : 'bell-outline'}
-            type='back'
             onPress={() => onPressNot(item)}
+            icon={notify.has(item.prod_id) ? 'bell' : 'bell-outline'}
+            style={{
+              width: 56,
+              height: 56,
+            }}
           /> */}
-          <IconButton icon='share-variant' type='prodIcons' onPress={share} />
+          <IconButton
+            onPress={share}
+            icon='share-variant'
+            style={{
+              marginLeft: -8,
+              width: 56,
+              height: 56,
+            }}
+          />
         </View>
       </View>
     </>

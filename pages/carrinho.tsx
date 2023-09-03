@@ -2,7 +2,6 @@ import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, ScrollView, Animated } from 'react-native';
 import { Image } from 'react-native-elements/dist/image/Image';
-import IconButton from '~/components/IconButton';
 import MyTouchable from '~/components/MyTouchable';
 import MyButton from '~/components/MyButton';
 import ProdList from '~/components/ProdList';
@@ -21,7 +20,7 @@ import {
   weekDayNames,
 } from '~/core/models';
 import MyText from '~/components/MyText';
-import MyHeader from '~/components/MyHeader';
+import MyHeader, { GoBackButton } from '~/components/MyHeader';
 import {
   getImageUrl,
   addToArray,
@@ -98,11 +97,7 @@ const CartHeader = ({
     <HeaderContainer
       style={[globalStyles.notch, { backgroundColor: myColors.background }]}>
       <View style={styles.headerContainer}>
-        <IconButton
-          icon='arrow-left'
-          type='back'
-          onPress={() => routing.goBack()}
-        />
+        <GoBackButton />
         <View style={styles.headerButtonsContainer}>
           <MyButton
             onPress={() => setIsDelivery(true)}

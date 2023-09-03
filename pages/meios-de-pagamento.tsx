@@ -84,7 +84,7 @@ export const PaymentMethodsBody = ({
       alert(
         'Apagar cartão',
         `Tem certeza que deseja apagar o cartão "${name}"?`,
-        { onConfirm: () => deletePaymentCard(accessToken, card.id) }
+        { onConfirm: () => deletePaymentCard(accessToken, card.id) },
       );
     };
 
@@ -117,14 +117,12 @@ export const PaymentMethodsBody = ({
         <View style={styles.itemButtonsContainer}>
           <IconButton
             icon='pencil'
-            type='blank'
             color={myColors.grey3}
             style={styles.itemButton}
             onPress={() => setModalCardId(card.id)}
           />
           <IconButton
             icon='delete'
-            type='blank'
             color={myColors.grey3}
             style={[styles.itemButton, { top: -8 }]}
             onPress={removeCard}
