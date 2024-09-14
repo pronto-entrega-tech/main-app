@@ -1,8 +1,8 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import { AnimatePresence, MotiView } from 'moti';
+import React, { ReactNode } from 'react';
 import {
   View,
   StyleSheet,
-  Animated,
   StyleProp,
   ViewStyle,
   Pressable,
@@ -20,29 +20,20 @@ const CenterModal = ({
   style?: StyleProp<ViewStyle>;
   children: ReactNode;
 }) => {
-  const [show, setShow] = useState(false);
-  const [state] = useState({ opacity: new Animated.Value(0) });
-
-  useEffect(() => {
-    if (isVisible) setShow(true);
-
-    Animated.timing(state.opacity, {
-      toValue: isVisible ? 1 : 0,
-      duration: 200,
-      useNativeDriver: !device.web,
-    }).start(() => setShow(!!isVisible));
-  }, [isVisible, state.opacity]);
-
-  return !show ? null : (
-    <Animated.View
-      style={[
-        StyleSheet.absoluteFill,
-        styles.container,
-        { opacity: state.opacity },
-      ]}>
-      <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
-      <View style={[styles.modal, style]}>{children}</View>
-    </Animated.View>
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <MotiView
+          transition={{ type: 'timing', duration: 200 }}
+          from={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          style={[StyleSheet.absoluteFill, styles.container]}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
+          <View style={[styles.modal, style]}>{children}</View>
+        </MotiView>
+      )}
+    </AnimatePresence>
   );
 };
 

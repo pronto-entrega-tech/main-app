@@ -98,6 +98,7 @@ export const PaymentMethodsBody = ({
             {cardIcon ? (
               <Image
                 {...cardIcon}
+                alt=''
                 resizeMode='contain'
                 containerStyle={{ width: 34, height: 34 }}
               />
@@ -205,6 +206,7 @@ export const PaymentMethodsBody = ({
       <View style={styles.cardNameContainer}>
         <Image
           {...images.pix}
+          alt=''
           resizeMode='contain'
           containerStyle={{ height: 34, width: 34 }}
         />

@@ -207,6 +207,7 @@ const OrderDetailsPage = ({
             style={{ padding: 16, flexDirection: 'row', alignItems: 'center' }}>
             <Image
               {...images.pix}
+              alt=''
               resizeMode='contain'
               containerStyle={{ height: 24, width: 24, marginRight: 8 }}
             />
@@ -295,6 +296,7 @@ const OrderDetailsPage = ({
       <View style={styles.marketContainer}>
         <Image
           source={{ uri: getImageUrl('market', order.market_id) }}
+          alt=''
           placeholderStyle={{ backgroundColor: 'white' }}
           containerStyle={{ borderRadius: 8, height: 65, width: 65 }}
         />
@@ -327,6 +329,7 @@ const OrderDetailsPage = ({
         </View>
         <Image
           {...paymentIcon}
+          alt=''
           resizeMode='contain'
           containerStyle={styles.paymentIcon}
           childrenContainerStyle={{ top: 2 }}

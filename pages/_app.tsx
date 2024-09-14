@@ -4,6 +4,8 @@ import { AppProps } from 'next/app';
 import { AppContexts } from '~/core/AppContexts';
 import MyAlert from '~/components/MyAlert';
 
+import 'raf/polyfill'; // makes Reanimated web usable with server-side rendering
+
 const MyApp = ({ Component, pageProps }: AppProps) => (
   <AppContexts>
     <Head>

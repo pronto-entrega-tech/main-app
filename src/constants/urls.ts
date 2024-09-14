@@ -4,6 +4,8 @@ const USE_HTTPS = process.env.NEXT_PUBLIC_HTTPS === 'true';
 const SSR_API = process.env.SSR_API;
 const SSR_STATIC = process.env.SSR_STATIC;
 
+console.log('USE_DEV_API: ', USE_DEV_API); // compilation cache is buggy
+
 const DEV_API = `http${USE_HTTPS ? 's' : ''}://${LOCAL_IP ?? 'localhost'}:3000`;
 const PROD_API = SSR_API ?? 'https://api.prontoentrega.com.br';
 

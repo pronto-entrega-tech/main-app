@@ -58,6 +58,7 @@ const SignIn = () => {
       image={
         <Image
           {...images.google}
+          alt=''
           style={{ height: 42, width: 42, position: 'absolute', left: 7 }}
         />
       }
@@ -95,6 +96,7 @@ const SignIn = () => {
       image={
         <Image
           {...images.facebook}
+          alt=''
           style={{ width: 28, height: 28, position: 'absolute', left: 16 }}
         />
       }
@@ -112,6 +114,7 @@ const SignIn = () => {
       image={
         <Image
           {...images.apple}
+          alt=''
           style={{ height: 38, width: 38, position: 'absolute', left: 12 }}
         />
       }
@@ -129,10 +132,7 @@ const SignIn = () => {
       title='Email'
       type='outline'
       titleStyle={{ color: myColors.text2 }}
-      buttonStyle={[
-        styles.button,
-        { paddingVertical: 14, borderColor: myColors.grey_1 },
-      ]}
+      buttonStyle={[styles.button, { borderColor: myColors.grey_1 }]}
       onPress={() => {
         closeModal();
         authIsWipAlert();
@@ -155,40 +155,34 @@ const SignIn = () => {
         Como deseja entrar?
       </MyText>
       {googleButton}
-      {device.web ? (
+      {!device.web ? (
+        <>
+          <MyButton
+            title='Outras opções'
+            type='outline'
+            buttonStyle={[styles.button, { borderColor: myColors.divider3 }]}
+            titleStyle={{ color: myColors.text_1 }}
+            onPress={openModal}
+          />
+        </>
+      ) : (
         <>
           {facebookButton}
           {appleButton}
           {emailButton}
         </>
-      ) : (
-        <>
-          <MyButton
-            title='Outras opções'
-            type='outline'
-            buttonStyle={{
-              height: 50,
-              width: '100%',
-              marginBottom: 24,
-              paddingVertical: 13,
-              borderColor: myColors.divider3,
-            }}
-            titleStyle={{ color: myColors.text_1 }}
-            onPress={openModal}
-          />
-          {!isAuth && (
-            <MyButton
-              title='Entrar como convidado'
-              type='clear'
-              buttonStyle={{ padding: 14 }}
-              titleStyle={{ color: myColors.grey2 }}
-              onPress={() => {
-                setIsLoading(true);
-                next();
-              }}
-            />
-          )}
-        </>
+      )}
+      {!isAuth && (
+        <MyButton
+          title='Entrar como convidado'
+          type='clear'
+          buttonStyle={{ marginTop: 8, padding: 14 }}
+          titleStyle={{ color: myColors.grey2 }}
+          onPress={() => {
+            setIsLoading(true);
+            next();
+          }}
+        />
       )}
     </>
   );
@@ -196,10 +190,10 @@ const SignIn = () => {
   return (
     <View style={device.web ? { height: 630 } : styles.container}>
       <View style={[styles.container, globalStyles.notch]}>
-        <Image {...images.pineapple} style={styles.pineapple} />
-        <Image {...images.tomato} style={styles.tomato} />
-        <Image {...images.broccoli} style={styles.broccoli} />
-        <Image {...images.logo} style={styles.logo} />
+        <Image {...images.pineapple} style={styles.pineapple} alt='' />
+        <Image {...images.tomato} style={styles.tomato} alt='' />
+        <Image {...images.broccoli} style={styles.broccoli} alt='' />
+        <Image {...images.logo} style={styles.logo} alt='' />
         <View style={styles.bottomContainer}>
           <MyText
             style={{
@@ -225,7 +219,11 @@ const SignIn = () => {
       {!device.web && (
         <BottomModal
           state={modalState}
-          style={{ paddingBottom: 32, paddingTop: 28 }}>
+          style={{
+            paddingBottom: 32,
+            paddingTop: 28,
+            alignItems: 'center',
+          }}>
           <MyText
             style={{
               fontSize: 18,

@@ -137,8 +137,9 @@ const MarketFeedBody = (props: MarketFeedProps) => {
         ]}>
         <View style={{ paddingTop: 2 }}>
           <Image
-            containerStyle={{ borderRadius: 8, height: 128, width: 128 }}
             source={{ uri: getImageUrl('market', market.market_id) }}
+            alt=''
+            containerStyle={{ borderRadius: 8, height: 128, width: 128 }}
           />
           {market.rating ? (
             <View style={styles.ratingContainer}>

@@ -89,7 +89,7 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
           <MyText style={styles.quantityText}>{product.quantity}</MyText>
         </View>
 
-        <View style={{ flexDirection: 'column' }}>
+        <View>
           {product.images_names ? (
             <Image
               placeholderStyle={{ backgroundColor: 'white' }}
@@ -97,13 +97,14 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
                 <MyIcon name='cart-outline' color={myColors.grey2} size={140} />
               }
               source={{ uri: getImageUrl('product', product.images_names[0]) }}
+              alt=''
               resizeMode='contain'
               style={styles.image}
             />
           ) : (
             <MyIcon
               name='cart-outline'
-              color={myColors.rating}
+              color={myColors.grey2}
               size={140}
               style={styles.image}
             />
@@ -112,6 +113,7 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
           <View style={styles.containerAdd}>
             <IconButton
               onPress={() => removeProduct(product)}
+              disabled={!quantity}
               icon='minus'
               style={[
                 styles.buttonAdd,
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: 6,
-    paddingHorizontal: 8,
+    paddingHorizontal: 14,
   },
   buttonAdd: {
     width: 34,
@@ -282,7 +284,7 @@ const styles = StyleSheet.create({
 
 export default ProductTabs;
 
-export const getStaticPaths: GetStaticPaths = async () => {
+/* export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: [{ params: { city: 'jatai-go', itemId: '1' } }],
     fallback: 'blocking',
@@ -306,4 +308,4 @@ export const getStaticProps: GetStaticProps<ProductDetailsProps> = async ({
     revalidate: 60,
     props: (await getProps()) ?? {},
   };
-};
+}; */

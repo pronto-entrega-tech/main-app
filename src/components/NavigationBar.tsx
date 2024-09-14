@@ -6,16 +6,23 @@ import MyText from './MyText';
 import MyIcon from './MyIcon';
 import useRouting from '~/hooks/useRouting';
 import { screenFrom } from '~/functions/converter';
+import { useMediaQuery } from '~/hooks/useMediaQuery';
+
+const tabs = [
+  { title: 'Início', path: '/inicio', icon: 'home' },
+  { title: 'Categorias', path: '/categorias', icon: 'view-grid' },
+  { title: 'Compras', path: '/compras', icon: 'shopping' },
+  { title: 'Perfil', path: '/perfil', icon: 'account' },
+] as const;
 
 const NavigationBar = () => {
-  const { pathname } = useRouting();
+  const { isDesktop } = useMediaQuery();
 
-  const tabs = [
-    { title: 'Início', path: '/inicio', icon: 'home' },
-    { title: 'Categorias', path: '/categorias', icon: 'view-grid' },
-    { title: 'Compras', path: '/compras', icon: 'shopping' },
-    { title: 'Perfil', path: '/perfil', icon: 'account' },
-  ] as const;
+  return isDesktop ? <BottomBar /> : <BottomBar />;
+};
+
+const BottomBar = () => {
+  const { pathname } = useRouting();
 
   return (
     <View
@@ -58,8 +65,6 @@ const NavigationBar = () => {
               />
               <MyText
                 style={{
-                  marginTop: 24,
-                  position: 'absolute',
                   color,
                   fontSize: 12,
                 }}>

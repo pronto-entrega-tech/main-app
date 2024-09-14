@@ -5,22 +5,22 @@ import NavigationBar from '~/components/NavigationBar';
 import myColors from '~/constants/myColors';
 import device from '~/constants/device';
 
-const baseStyle: CSSProperties = {
+const baseStyle = {
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
   backgroundColor: myColors.background,
-};
+} satisfies CSSProperties;
 
 export const WithToast = (Page: ComponentType) => {
   if (!device.web) return Page;
 
   const Layout: ComponentType = (props) => (
     <>
-      <MyToast />
       <main style={baseStyle}>
         <Page {...props} />
       </main>
+      <MyToast />
     </>
   );
   return Layout;
@@ -31,10 +31,10 @@ export const WithCartBar = (Page: ComponentType) => {
 
   const Layout: ComponentType = (props) => (
     <>
-      <MyToast />
       <main style={baseStyle}>
         <Page {...props} />
       </main>
+      <MyToast />
       <CartBar toped />
     </>
   );
@@ -57,7 +57,6 @@ export const BottomNav = (p: { children: ReactNode }) =>
     p.children
   ) : (
     <>
-      <MyToast />
       <main
         style={{
           ...baseStyle,
@@ -65,6 +64,7 @@ export const BottomNav = (p: { children: ReactNode }) =>
         }}>
         {p.children}
       </main>
+      <MyToast />
       <CartBar toped />
       <NavigationBar />
     </>

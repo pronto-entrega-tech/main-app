@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { device, myColors, myFonts } from '~/constants';
 import MyTouchable from '~/components/MyTouchable';
 import MyText from '~/components/MyText';
@@ -8,6 +8,7 @@ import MyIcon from './MyIcon';
 import useRouting from '~/hooks/useRouting';
 import { Money, money } from '~/functions/money';
 import { useCartContext } from '~/contexts/CartContext';
+import { MotiView } from 'moti';
 
 const screensWOCartBar = ['OrderDetails', 'Chat'];
 
@@ -20,18 +21,7 @@ const CartBar = ({ toped = false }: { toped?: boolean }) => {
   const { subtotal } = useCartContext();
   const { screen, navigate } = useRouting();
 
-  const translateValue = getTranslateValue(subtotal, screen);
-  const barState = useRef({
-    translateY: new Animated.Value(translateValue),
-  }).current;
-
-  useEffect(() => {
-    Animated.timing(barState.translateY, {
-      toValue: translateValue,
-      duration: 200,
-      useNativeDriver: !device.web,
-    }).start();
-  }, [translateValue, barState.translateY]);
+  const translateY = getTranslateValue(subtotal, screen);
 
   return (
     <View
@@ -39,8 +29,9 @@ const CartBar = ({ toped = false }: { toped?: boolean }) => {
         styles.cartBarContainer,
         toped ? { marginBottom: device.iPhoneNotch ? 54 + 34 : 54 } : {},
       ]}>
-      <Animated.View
-        style={{ transform: [{ translateY: barState.translateY }] }}>
+      <MotiView
+        transition={{ type: 'timing', duration: 200 }}
+        animate={{ translateY }}>
         <MyTouchable
           solid
           style={[
@@ -66,7 +57,7 @@ const CartBar = ({ toped = false }: { toped?: boolean }) => {
             <AnimatedText style={styles.priceCart}>{subtotal}</AnimatedText>
           </View>
         </MyTouchable>
-      </Animated.View>
+      </MotiView>
     </View>
   );
 };

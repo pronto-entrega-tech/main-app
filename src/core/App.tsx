@@ -102,6 +102,7 @@ const App = () => {
         ]}>
         <Image
           {...images.splash}
+          alt='splash'
           fadeDuration={0}
           style={{ aspectRatio: 0.462, height: '100%' }}
         />

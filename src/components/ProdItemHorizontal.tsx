@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Image } from 'react-native-elements/dist/image/Image';
 import { myColors, device, globalStyles, myFonts } from '~/constants';
 import { getImageUrl } from '~/functions/converter';
 import { calcPrices, money } from '~/functions/money';
@@ -11,6 +10,8 @@ import AnimatedText from './AnimatedText';
 import { objectConditional } from '~/functions/conditionals';
 import { Product } from '~/core/models';
 import MyText from './MyText';
+import { MotiView } from 'moti';
+import MyImage from './MyImage';
 
 const ProdItemHorizontal = (props: {
   item: Product;
@@ -43,18 +44,11 @@ const ProdItemHorizontal = (props: {
         <View style={styles.container}>
           <View style={styles.containerImage}>
             {item.images_names ? (
-              <Image
-                placeholderStyle={{ backgroundColor: 'white' }}
-                PlaceholderContent={
-                  <MyIcon
-                    name='cart-outline'
-                    color={myColors.grey2}
-                    size={80}
-                  />
-                }
+              <MyImage
+                thumbhash={item.thumbhash}
                 source={{ uri: getImageUrl('product', item.images_names[0]) }}
-                resizeMode='contain'
-                containerStyle={styles.image}
+                alt=''
+                style={styles.image}
               />
             ) : (
               <MyIcon
@@ -64,14 +58,6 @@ const ProdItemHorizontal = (props: {
                 style={styles.image}
               />
             )}
-            {/* <IconButton
-            style={styles.fav}
-            icon={isFavorite ? 'heart' : 'heart-outline'}
-            size={24}
-            color={isFavorite ? myColors.primaryColor : myColors.grey2}
-            type='clear'
-            onPress={onPressFav}
-          /> */}
           </View>
           <View style={styles.containerText}>
             <MyText numberOfLines={1} style={styles.prodText}>
@@ -94,16 +80,52 @@ const ProdItemHorizontal = (props: {
           </View>
           <View style={styles.marketContainer}>
             {showsMarketLogo && (
-              <Image
-                placeholderStyle={{ backgroundColor: 'white' }}
+              <MyImage
+                thumbhash={item.market_thumbhash}
                 source={{ uri: getImageUrl('market', item.market_id) }}
-                containerStyle={styles.marketImage}
+                alt=''
+                style={styles.marketImage}
               />
             )}
           </View>
         </View>
       </MyTouchable>
-      <View style={styles.containerAdd}>
+
+      <MotiView
+        transition={{ type: 'timing', duration: 200 }}
+        animate={{ width: quantity === 0 ? 32 : 32 * 2 + 16 }}
+        style={[
+          globalStyles.elevation4,
+          globalStyles.darkBorder,
+          styles.addBar,
+          { height: 32 },
+        ]}>
+        <IconButton
+          onPress={onPressAdd}
+          icon='plus'
+          style={styles.add}
+          hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
+        />
+        {quantity !== 0 && (
+          <>
+            <AnimatedText style={styles.centerNumText} distance={10}>
+              {quantity}
+            </AnimatedText>
+            <IconButton
+              onPress={onPressRemove}
+              icon='minus'
+              style={[styles.add, styles.remove]}
+              hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
+            />
+          </>
+        )}
+      </MotiView>
+      {/* <View
+        style={[
+          globalStyles.elevation4,
+          globalStyles.darkBorder,
+          styles.containerAdd,
+        ]}>
         <IconButton
           onPress={onPressAdd}
           icon='plus'
@@ -127,7 +149,7 @@ const ProdItemHorizontal = (props: {
           ]}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 12 }}
         />
-      </View>
+      </View> */}
     </View>
   );
 };
@@ -145,6 +167,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingLeft: 36,
   },
+
+  addBar: {
+    backgroundColor: 'white',
+    borderRadius: 30,
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  centerNumText: {
+    fontSize: 15,
+    color: myColors.text3,
+    fontFamily: myFonts.Medium,
+    left: 36,
+    position: 'absolute',
+  },
+  add: {
+    width: 32,
+    height: 32,
+  },
+  remove: {
+    position: 'absolute',
+    [device.web ? 'right' : 'left']: 46,
+  },
+
   containerAdd: {
     position: 'absolute',
     justifyContent: 'space-between',
@@ -159,11 +208,11 @@ const styles = StyleSheet.create({
     height: 26,
     backgroundColor: '#fff',
   },
-  centerNumText: {
+  /* centerNumText: {
     fontSize: 17,
     color: myColors.text3,
     fontFamily: myFonts.Medium,
-  },
+  }, */
   containerImage: {
     marginLeft: -6,
     alignItems: 'center',

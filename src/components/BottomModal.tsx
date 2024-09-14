@@ -1,13 +1,14 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import { MotiView, AnimatePresence } from 'moti';
+import { MotiPressable } from 'moti/interactions';
+import React, { ReactNode, useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
-  Pressable,
-  Animated,
   ViewStyle,
   StyleProp,
   BackHandler,
   Keyboard,
+  Pressable,
 } from 'react-native';
 import { myColors, device } from '~/constants';
 import { zIndex } from '~/constants/zIndex';
@@ -22,49 +23,7 @@ const BottomModal = ({
   style?: StyleProp<ViewStyle>;
   children: ReactNode;
 }) => {
-  const [show, setShow] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const state = useRef({
-    opacity: new Animated.Value(0),
-    modal: new Animated.Value(device.height),
-  }).current;
-
-  useEffect(() => {
-    const useNativeDriver = !device.web;
-
-    const openModal = () => {
-      setShow(true);
-      Animated.parallel([
-        Animated.timing(state.opacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver,
-        }),
-        Animated.timing(state.modal, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver,
-        }),
-      ]).start();
-    };
-
-    const closeModal = () => {
-      Animated.parallel([
-        Animated.timing(state.modal, {
-          toValue: device.height,
-          duration: 300,
-          useNativeDriver,
-        }),
-        Animated.timing(state.opacity, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver,
-        }),
-      ]).start(() => setShow(false));
-    };
-
-    isVisible ? openModal() : closeModal();
-  }, [isVisible, state.modal, state.opacity]);
 
   useEffect(() => {
     if (!isVisible || !device.android) return;
@@ -92,24 +51,37 @@ const BottomModal = ({
     };
   }, []);
 
-  return !show ? null : (
-    <View style={[StyleSheet.absoluteFill, styles.container]}>
-      <Animated.View
-        style={[StyleSheet.absoluteFill, { opacity: state.opacity }]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
-      </Animated.View>
-      <Animated.View
-        style={[
-          styles.modal,
-          {
-            paddingBottom: keyboardVisible ? 24 : 0,
-            transform: [{ translateY: state.modal }],
-          },
-          style,
-        ]}>
-        {children}
-      </Animated.View>
-    </View>
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <View style={[StyleSheet.absoluteFill, styles.container]}>
+          <Pressable onPress={dismiss} style={StyleSheet.absoluteFill}>
+            <MotiView
+              transition={{ type: 'timing', duration: 200 }}
+              from={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+              ]}
+            />
+          </Pressable>
+          <MotiView
+            transition={{ type: 'timing', duration: 200 }}
+            from={{ translateY: device.height }}
+            animate={{ translateY: 0 }}
+            exit={{ translateY: device.height }}
+            style={[
+              styles.modal,
+              { paddingBottom: keyboardVisible ? 24 : 0 },
+              style,
+            ]}>
+            {children}
+          </MotiView>
+        </View>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -118,7 +90,6 @@ const styles = StyleSheet.create({
     zIndex: zIndex.Modal,
     position: device.web ? ('fixed' as any) : 'absolute',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modal: {
     width: '100%',

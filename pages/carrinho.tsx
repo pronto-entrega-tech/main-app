@@ -1,7 +1,8 @@
 import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, ScrollView, Animated } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { Image } from 'react-native-elements/dist/image/Image';
+import { MotiView } from 'moti';
 import MyTouchable from '~/components/MyTouchable';
 import MyButton from '~/components/MyButton';
 import ProdList from '~/components/ProdList';
@@ -74,17 +75,6 @@ const CartHeader = ({
 }) => {
   const routing = useRouting();
   const { cleanCart } = useCartContext();
-  const tabState = useRef({
-    indicator: new Animated.Value(0),
-  }).current;
-
-  useEffect(() => {
-    Animated.timing(tabState.indicator, {
-      toValue: isDelivery ? 0 : 80 + extraWidth,
-      duration: 175,
-      useNativeDriver: !device.web,
-    }).start();
-  }, [isDelivery, tabState.indicator]);
 
   const emptyCard = () => {
     setIsExiting(true);
@@ -126,14 +116,13 @@ const CartHeader = ({
         />
       </View>
       <MyDivider style={{ marginTop: -1 }} />
-      <Animated.View
-        style={[
-          styles.indicator,
-          {
-            transform: [{ translateX: tabState.indicator }],
-            width: (isDelivery ? 80 : 70) + extraWidth,
-          },
-        ]}
+      <MotiView
+        transition={{ type: 'timing', duration: 175 }}
+        animate={{
+          translateX: isDelivery ? 0 : 80 + extraWidth,
+          width: (isDelivery ? 80 : 70) + extraWidth,
+        }}
+        style={styles.indicator}
       />
     </HeaderContainer>
   );
@@ -695,6 +684,7 @@ const Cart = () => {
         <Image
           style={{ height: 48, width: 48, borderRadius: 48 }}
           source={{ uri: getImageUrl('market', market.market_id) }}
+          alt=''
         />
         <MyText style={styles.marketName}>{market.name}</MyText>
       </View>

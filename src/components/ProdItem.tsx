@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, StyleProp, Platform } from 'react-native';
-import { Image } from 'react-native-elements/dist/image/Image'; // react-native-elements don't tree shake
+import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { myColors, device, globalStyles, myFonts } from '~/constants';
 import { getImageUrl } from '~/functions/converter';
 import { calcPrices, money } from '~/functions/money';
@@ -10,6 +9,8 @@ import MyText from './MyText';
 import AnimatedText from './AnimatedText';
 import MyIcon from './MyIcon';
 import { Product } from '~/core/models';
+import { MotiView } from 'moti';
+import MyImage from './MyImage';
 
 const ProdItem = (props: {
   item: Product;
@@ -45,15 +46,11 @@ const ProdItem = (props: {
         params={{ city: item.city_slug, itemId: item.item_id }}>
         <View style={styles.top}>
           {item.images_names ? (
-            <Image
-              placeholderStyle={{ backgroundColor: 'white' }}
-              PlaceholderContent={
-                <MyIcon name='cart-outline' color={myColors.grey2} size={70} />
-              }
-              source={{
-                uri: getImageUrl('product', item.images_names[0]),
-              }}
-              containerStyle={styles.image}
+            <MyImage
+              thumbhash={item.thumbhash}
+              source={getImageUrl('product', item.images_names[0])}
+              alt=''
+              style={styles.image}
             />
           ) : (
             <MyIcon
@@ -64,12 +61,15 @@ const ProdItem = (props: {
             />
           )}
           {showsMarketLogo && (
-            <Image
-              placeholderStyle={{ backgroundColor: 'white' }}
-              source={{ uri: getImageUrl('market', item.market_id) }}
-              resizeMode='contain'
-              containerStyle={styles.marketLogo}
-            />
+            <View style={styles.marketLogoContainer}>
+              <MyImage
+                thumbhash={item.market_thumbhash}
+                source={getImageUrl('market', item.market_id)}
+                alt=''
+                contentFit='contain'
+                style={styles.marketLogo}
+              />
+            </View>
           )}
         </View>
         <View style={styles.container}>
@@ -94,15 +94,14 @@ const ProdItem = (props: {
           </MyText>
         </View>
       </MyTouchable>
-      <View
+      <MotiView
+        transition={{ type: 'timing', duration: 200 }}
+        animate={{ width: quantity === 0 ? 32 : 32 * 2 + 16 }}
         style={[
           globalStyles.elevation4,
           globalStyles.darkBorder,
           styles.addBar,
-          {
-            height: 32,
-            width: quantity === 0 ? 32 : 32 * 2 + 16,
-          },
+          { height: 32 },
         ]}>
         <IconButton
           onPress={onPressAdd}
@@ -123,7 +122,7 @@ const ProdItem = (props: {
             />
           </>
         )}
-      </View>
+      </MotiView>
     </View>
   );
 };
@@ -140,11 +139,13 @@ const styles = StyleSheet.create({
   placeholderColor: {
     backgroundColor: 'transparent',
   },
-  marketLogo: {
+  marketLogoContainer: {
     top: 8,
     left: 6,
     position: 'absolute',
     alignSelf: 'flex-end',
+  },
+  marketLogo: {
     height: 28,
     width: 28,
     borderRadius: 40,
@@ -155,14 +156,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 6,
     right: 6,
-    alignItems: 'center',
     flexDirection: 'row-reverse',
-    ...Platform.select({
-      web: {
-        overflow: 'hidden',
-        transitionDuration: '200ms',
-      },
-    }),
+    alignItems: 'center',
+    overflow: 'hidden',
   },
   centerNumText: {
     fontSize: 15,

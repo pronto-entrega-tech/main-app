@@ -41,13 +41,13 @@ const Main = () => {
           buttonStyle={styles.loginButton}
           screen='SignIn'
         />
-        <Image {...images.pineapple} style={styles.pineapple} />
-        <Image {...images.tomato} style={styles.tomato} />
-        <Image {...images.broccoli} style={styles.broccoli} />
+        <Image {...images.pineapple} style={styles.pineapple} alt='' />
+        <Image {...images.tomato} style={styles.tomato} alt='' />
+        <Image {...images.broccoli} style={styles.broccoli} alt='' />
         <Image
           {...images.logo}
           style={styles.logo}
-          accessibilityLabel='Logo do ProntoEntrega'
+          alt='Logo do ProntoEntrega'
         />
         <MyText style={[styles.title, title]}>
           Faça suas compras sem sair de casa

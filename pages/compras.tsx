@@ -39,7 +39,7 @@ const OrdersBody = () => {
 
   useEffect(() => {
     const activeOrders = orders?.filter(
-      (o) => !isCompleted(o) && !isCanceled(o)
+      (o) => !isCompleted(o) && !isCanceled(o),
     );
     if (!accessToken || !activeOrders?.length) return;
 
@@ -51,8 +51,11 @@ const OrdersBody = () => {
     socket.on('orders', (newOrder: Partial<Order>) => {
       const getNew = (o: Order) => validateOrder({ ...(o ?? {}), ...newOrder });
 
-      setOrders((orders) =>
-        orders?.map((o) => (o.order_id === newOrder.order_id ? getNew(o) : o))
+      setOrders(
+        (orders) =>
+          orders?.map((o) =>
+            o.order_id === newOrder.order_id ? getNew(o) : o,
+          ),
       );
     });
 
@@ -99,6 +102,7 @@ const OrdersBody = () => {
         <View style={{ flexDirection: 'row' }}>
           <Image
             source={{ uri: getImageUrl('market', item.market_id) }}
+            alt=''
             placeholderStyle={{ backgroundColor: 'white' }}
             containerStyle={{ borderRadius: 8, height: 50, width: 50 }}
           />

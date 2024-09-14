@@ -111,7 +111,13 @@ const MarketDetailsBody = (props: MarketDetailsProps) => {
             <Chip
               key={item.title}
               title={item.title}
-              icon={<Image {...item.icon} style={{ height: 24, width: 24 }} />}
+              icon={
+                <Image
+                  {...item.icon}
+                  alt=''
+                  style={{ height: 24, width: 24 }}
+                />
+              }
               style={{ margin: 4, padding: 6 }}
             />
           ))}

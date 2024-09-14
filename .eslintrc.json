@@ -1,6 +1,3 @@
 {
-  "extends": "next/core-web-vitals",
-  "rules": {
-    "jsx-a11y/alt-text": "off" // RN don't have `alt`, we use `accessibilityLabel`
-  }
+  "extends": "next/core-web-vitals"
 }

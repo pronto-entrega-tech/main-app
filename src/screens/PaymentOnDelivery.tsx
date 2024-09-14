@@ -91,7 +91,7 @@ const PaymentOnDelivery = () => {
       <View key={index}>
         <MyTouchable onPress={item.onPress ?? saveInCard} style={styles.card}>
           {item.icon && (
-            <Image {...item.icon} style={{ width: 38, height: 38 }} />
+            <Image {...item.icon} alt='' style={{ width: 38, height: 38 }} />
           )}
           <MyText style={styles.cardTitle}>{item.text}</MyText>
         </MyTouchable>

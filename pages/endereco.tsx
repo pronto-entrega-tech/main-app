@@ -62,6 +62,7 @@ const Addresses = () => {
       if (!address) return;
       if (!canceled) setGpsAddress(address);
     };
+    // don't auto get location on web because reverse geocoding costs to our backend
     if (!device.web) tryGetLocation();
 
     return () => {
@@ -88,12 +89,14 @@ const Addresses = () => {
         return;
       }
 
-      await enableNetworkProviderAsync().catch(() => {
+      try {
+        await enableNetworkProviderAsync();
+      } catch {
         alert('Serviço de localização está desativado');
         setStatusText('Usar localização atual');
         setDisabled(false);
         return;
-      });
+      }
     }
 
     setActiveId(null);
@@ -195,17 +198,13 @@ const AddressesList = (props: {
       if (isSelected)
         return alert(
           'Este endereço está sendo usado!',
-          'Não é possível excluir um endereço que está sendo utilizado'
+          'Não é possível excluir um endereço que está sendo utilizado',
         );
-
-      const remove = () => deleteAddress(accessToken, address.id);
-
-      if (device.web) return remove();
 
       alert(
         'Apagar endereço',
         `Tem certeza que deseja apagar o endereço "${name}"?`,
-        { onConfirm: remove }
+        { onConfirm: () => deleteAddress(accessToken, address.id) },
       );
     };
 
@@ -246,14 +245,12 @@ const AddressesList = (props: {
         <View style={styles.itemButtonsContainer}>
           <IconButton
             icon='pencil'
-            type='blank'
             color={myColors.grey3}
             style={styles.itemButton}
             onPress={() => routing.navigate('EditAddress', { i: address.id })}
           />
           <IconButton
             icon='delete'
-            type='blank'
             color={myColors.grey3}
             style={styles.itemButton}
             onPress={removeAddress}

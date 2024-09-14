@@ -88,6 +88,7 @@ export type Banner = {
 
 export type Market = {
   market_id: string;
+  thumbhash: string;
   name: string;
   city_slug: string;
   type: string;
@@ -129,6 +130,8 @@ export type Product = {
   city_slug: string;
   prod_id: string;
   market_id: string;
+  thumbhash?: string;
+  market_thumbhash?: string;
   name: string;
   brand: string;
   quantity: string;

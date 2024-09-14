@@ -22,6 +22,7 @@ const MarketItem = (props: { market: Market; coords?: Coords }) => {
       params={{ city: market.city_slug, marketId: market.market_id }}>
       <Image
         source={{ uri: getImageUrl('market', market.market_id) }}
+        alt=''
         containerStyle={styles.image}
       />
       <View style={{ marginLeft: 10, marginTop: -5, justifyContent: 'center' }}>
