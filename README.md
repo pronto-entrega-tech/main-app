@@ -1,13 +1,31 @@
-# Main app
+# Main app (web & mobile app)
 
-## Use rtx to manage node and pnpm
+![screenshot of app](/docs/screenshot.png)
 
-<https://github.com/jdxcode/rtx#installation>
+## Use `mise` to manage node and pnpm
 
-## Running
+<https://mise.jdx.dev/getting-started.html>
 
-Start the web version by running the following command, notice that the API should also be running.
+## Run web
+
+Start the web version, notice that the Backend API should also be running.
 
 ```sh
 pnpm web
 ```
+
+## Run mobile
+
+You need to compile the mobile app and install it on your device or emulator/simulator.
+
+- Setup Android Studio or Xcode: <https://docs.expo.dev/get-started/set-up-your-environment/?mode=development-build&buildEnv=local>.
+
+- Run command to compile and install:
+
+```sh
+pnpm android
+# or
+pnpm ios
+```
+
+After install, start the Backend API to use the app.

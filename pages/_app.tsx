@@ -1,10 +1,10 @@
+import 'raf/polyfill'; // https://docs.swmansion.com/react-native-reanimated/docs/guides/web-support#nextjs-polyfill
+
 import React from 'react';
 import Head from 'next/head';
 import { AppProps } from 'next/app';
 import { AppContexts } from '~/core/AppContexts';
 import MyAlert from '~/components/MyAlert';
-
-import 'raf/polyfill'; // makes Reanimated web usable with server-side rendering
 
 const MyApp = ({ Component, pageProps }: AppProps) => (
   <AppContexts>
