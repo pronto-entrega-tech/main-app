@@ -11,7 +11,7 @@ npm-debug.*
 .env
 
 # Manual testing
-.test.ts
+src/test.ts
 
 # macOS
 .DS_Store
