@@ -42,7 +42,10 @@ const MarketListBody = () => {
         markets,
         coords: address.coords,
       });
-    })().catch(() => setError('server'));
+    })().catch((error) => {
+      console.error(error);
+      setError('server');
+    });
   }, [tryAgain, address]);
 
   if (!data && error)

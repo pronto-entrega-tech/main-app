@@ -39,7 +39,7 @@ export const validateMarket = (v: any): Market => ({
   max_time: +v.max_time,
   accept_scheduling: !!v.schedule_mins_interval,
   delivery_fee: money(v.delivery_fee),
-  order_min: money(v.order_min),
+  order_min: v.order_min&&money(v.order_min),
   rating: +v.rating,
   address: {
     street: v.address_street,
