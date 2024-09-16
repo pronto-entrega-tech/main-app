@@ -12,7 +12,6 @@
     "web:prod": "next start -p 3001",
     "web:https": "pnpm https-envs node scripts/https-server.js",
     "https-envs": "cross-env NODE_EXTRA_CA_CERTS=\"$(mkcert -CAROOT)/rootCA.pem\" NEXT_PUBLIC_HTTPS=true",
-    "use-local-ip": "cross-env NEXT_PUBLIC_LOCAL_IP=$(node -p \"require('os').networkInterfaces().en0.find((v) => v.family === 'IPv4').address\") pnpm",
     "lint": "next lint -d src -d pages",
     "type-check": "tsc --noEmit",
     "test": "jest",
