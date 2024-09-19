@@ -142,7 +142,7 @@ const MyTouchable = ({
         foreground: true,
         color: 'rgba(0 0 0 / .32)',
       }}
-      style={style}>
+      style={[{ overflow: 'hidden' }, style]}>
       <>{children}</>
     </Pressable>
   );

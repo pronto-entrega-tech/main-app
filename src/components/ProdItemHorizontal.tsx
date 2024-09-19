@@ -135,6 +135,7 @@ const ProdItemHorizontal = (props: {
 const textLinePad = device.android ? -2 : 1;
 const styles = StyleSheet.create({
   card: {
+    overflow: 'hidden',
     height: 104,
     marginHorizontal: 8,
     marginBottom: 8,

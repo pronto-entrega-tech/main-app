@@ -137,6 +137,7 @@ const ProdItem = (props: {
 
 const styles = StyleSheet.create({
   card: {
+    overflow: 'hidden',
     height: 185,
     borderRadius: 10,
     backgroundColor: 'white',
