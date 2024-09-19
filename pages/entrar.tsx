@@ -29,7 +29,6 @@ const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [modalState, openModal, closeModal] = useModalState();
   const [, , promptAsync] = Google.useAuthRequest({
-    expoClientId: GoogleClientId.expo,
     androidClientId: GoogleClientId.android,
     iosClientId: GoogleClientId.ios,
     webClientId: GoogleClientId.web,

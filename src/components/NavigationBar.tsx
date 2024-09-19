@@ -32,7 +32,7 @@ const BottomBar = () => {
           backgroundColor: 'white',
           height: 54,
           width: '100%',
-          position: 'fixed' as any,
+          position: 'fixed',
           bottom: 0,
           alignItems: 'center',
         },

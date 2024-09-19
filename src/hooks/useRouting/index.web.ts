@@ -2,10 +2,10 @@ import { useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { MyRouting } from '.';
 import { screenFrom, urlFrom } from '~/functions/converter';
-import useMyContext from '~/core/MyContext';
+import { useHasNavigatedContext } from '~/contexts/HasNavigatedContext';
 
 const useRouting = (): MyRouting => {
-  const { hasNavigated } = useMyContext();
+  const { hasNavigated } = useHasNavigatedContext();
   const { push, replace, back, pathname, query, isReady } = useRouter();
   // pseudo `canGoBack` implemented by tracking if we've navigated
   const canGoBack = useRef(() => hasNavigated.current).current;

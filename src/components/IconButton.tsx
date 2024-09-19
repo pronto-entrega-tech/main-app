@@ -55,6 +55,7 @@ const IconButton = ({
 
 const styles = StyleSheet.create({
   base: {
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 999,

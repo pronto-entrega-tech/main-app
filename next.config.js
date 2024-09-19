@@ -1,35 +1,38 @@
 // @ts-check
-// Learn more: https://github.com/expo/expo/blob/master/docs/pages/versions/unversioned/guides/using-nextjs.md#withexpo
-
-const withPlugins = require('next-compose-plugins');
-const withTM = require('next-transpile-modules')(['react-native-web', 'moti']);
-const WithFonts = require('next-fonts');
 const { withExpo } = require('@expo/next-adapter');
-const withPwa = require('next-pwa');
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
+const os = require('node:os');
 
 const isDev = process.env.NODE_ENV !== 'production';
 
 /**
  * @type {import('next').NextConfig}
  **/
-const nextConfig = {
+const nextConfig = withExpo({
   images: {
-    domains: ['static.prontoentrega.com.br'],
+    remotePatterns: [{ hostname: isDev ? '*' : 'static.prontoentrega.com.br' }],
   },
-  experimental: { forceSwcTransforms: true },
-  /* reactStrictMode: true, */
-};
-
-module.exports = withPlugins(
-  [
-    withTM,
-    WithFonts,
-    [withExpo, { projectRoot: __dirname }],
-    withBundleAnalyzer,
-    [withPwa, { pwa: { disable: isDev } }],
+  reactStrictMode: true,
+  swcMinify: true,
+  transpilePackages: [
+    'react-native',
+    'react-native-web',
+    'react-native-reanimated',
+    'expo',
+    'expo-modules-core',
+    'expo-linking',
+    'expo-constants',
+    'expo-notifications',
+    'expo-application',
+    'expo-location',
+    'moti',
   ],
-  nextConfig,
-);
+  experimental: { forceSwcTransforms: true },
+});
+
+module.exports = nextConfig;
+
+const lanIp =
+  os.networkInterfaces().en0?.find((v) => v.family === 'IPv4')?.address ??
+  fail('Missing LAN IP');
+
+process.env.NEXT_PUBLIC_LAN_IP = lanIp;

@@ -88,12 +88,12 @@ const BottomModal = ({
 const styles = StyleSheet.create({
   container: {
     zIndex: zIndex.Modal,
-    position: device.web ? ('fixed' as any) : 'absolute',
+    position: device.web ? 'fixed' : 'absolute',
     justifyContent: 'center',
   },
   modal: {
     width: '100%',
-    position: device.web ? ('fixed' as any) : 'absolute',
+    position: device.web ? 'fixed' : 'absolute',
     bottom: 0,
     backgroundColor: myColors.background,
     borderTopLeftRadius: 16,

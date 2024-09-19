@@ -1,5 +1,6 @@
 import React, {
   ComponentProps,
+  ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -12,13 +13,13 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { Image } from 'expo-image';
-import { device, globalStyles } from '~/constants';
+import { globalStyles } from '~/constants';
 import { getImageUrl } from '~/functions/converter';
 import { useMediaQuery } from '~/hooks/useMediaQuery';
 import { api } from '~/services/api';
 import IconButton from './IconButton';
 import { Banner } from '~/core/models';
+import MyImage from './MyImage';
 
 const slideHeight = 456;
 const slideWidth = 1024;
@@ -70,35 +71,47 @@ const Banners = (p: { banners?: Banner[] }) => {
     [gappedItemWidth, scrollableWidth],
   );
 
-  if (!banners) return null;
-
-  const lastIndex = banners.length - 1;
-  const images = banners.map((banner, index) => (
-    <View
-      key={index}
-      style={[
-        globalStyles.elevation5,
-        styles.slide,
-        {
-          height: itemHeight,
-          width: itemWidth,
-          marginRight: index === lastIndex ? margins * 2 : gap,
-          transform: `translateX(${margins}px)`,
-          backgroundColor: 'white',
-        },
-      ]}>
-      <Image
-        source={{ uri: getImageUrl('banners', banner.name) }}
-        placeholder={{
-          thumbhash: device.web // placeholder breaks image on android  (expo: ^49, expo-image: ~1.3.2)
-            ? banner.thumbhash
-            : undefined,
-        }}
-        alt={banner.description}
-        style={{ flex: 1 }}
-      />
-    </View>
-  ));
+  const images = !banners
+    ? [
+        <View
+          key={index}
+          style={[
+            globalStyles.elevation5,
+            styles.slide,
+            {
+              height: itemHeight,
+              width: itemWidth,
+              marginRight: margins * 2,
+              transform: `translateX(${margins}px)`,
+              backgroundColor: 'white',
+            },
+          ]}
+        />,
+      ]
+    : banners.map((banner, index) => (
+        <View
+          key={index}
+          style={[
+            globalStyles.elevation5,
+            styles.slide,
+            {
+              height: itemHeight,
+              width: itemWidth,
+              marginRight: index === banners.length - 1 ? margins * 2 : gap,
+              transform: `translateX(${margins}px)`,
+              backgroundColor: 'white',
+            },
+          ]}>
+          <MyImage
+            thumbhash={banner.thumbhash}
+            source={getImageUrl('banners', banner.name)}
+            alt={banner.description}
+            style={{ flex: 1 }}
+            height={itemHeight}
+            width={itemWidth}
+          />
+        </View>
+      ));
 
   return (
     <View style={styles.container}>
@@ -123,8 +136,8 @@ const Banners = (p: { banners?: Banner[] }) => {
       </ScrollView>
       {isMobile ? (
         <View style={styles.dotContainer}>
-          {banners.length > 1 &&
-            banners.map((_, i) => (
+          {images.length > 1 &&
+            images.map((_, i) => (
               <View
                 key={i}
                 style={[

@@ -922,7 +922,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '95%',
-    position: device.web ? ('fixed' as any) : 'absolute',
+    position: device.web ? 'fixed' : 'absolute',
     bottom: device.iOS ? 36 : 6,
     alignSelf: 'center',
     height: 58,

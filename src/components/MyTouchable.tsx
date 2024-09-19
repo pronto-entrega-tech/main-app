@@ -80,20 +80,20 @@ const MyTouchable = ({
   if (device.web) {
     const [isHovered, hoverBind] = useHover ?? innerUseHover();
 
-    const baseStyle: CSSProperties = {
+    const baseStyle: ViewStyle = {
       transitionDuration: '200ms',
     };
     const baseHoverStyle = { opacity: 0.5 };
     const hovered = !!(isHovered && (screen || !disabled)); // should be a link or a button not disabled
 
     const fullStyle: StyleProp<ViewStyle> = [
-      baseStyle as ViewStyle,
+      baseStyle,
       style,
       hovered && [baseHoverStyle, hoverStyle],
     ];
 
     return screen ? (
-      <Link href={urlFrom(screen, params)} passHref>
+      <Link href={urlFrom(screen, params)} passHref legacyBehavior>
         <View {...hoverBind} style={fullStyle}>
           <>{children}</>
         </View>
@@ -140,7 +140,7 @@ const MyTouchable = ({
       hitSlop={hitSlop}
       android_ripple={{
         foreground: true,
-        color: solid ? 'rgba(255 255 255 / .32)' : undefined,
+        color: 'rgba(0 0 0 / .32)',
       }}
       style={style}>
       <>{children}</>

@@ -51,6 +51,8 @@ const ProdItem = (props: {
               source={getImageUrl('product', item.images_names[0])}
               alt=''
               style={styles.image}
+              height={70}
+              width={70}
             />
           ) : (
             <MyIcon
@@ -66,8 +68,10 @@ const ProdItem = (props: {
                 thumbhash={item.market_thumbhash}
                 source={getImageUrl('market', item.market_id)}
                 alt=''
-                contentFit='contain'
+                /* contentFit='contain' */
                 style={styles.marketLogo}
+                height={28}
+                width={28}
               />
             </View>
           )}
@@ -163,7 +167,7 @@ const styles = StyleSheet.create({
   centerNumText: {
     fontSize: 15,
     color: myColors.text3,
-    fontFamily: myFonts.Medium,
+    fontFamily: myFonts.Bold,
     left: 36,
     position: 'absolute',
   },
@@ -173,7 +177,7 @@ const styles = StyleSheet.create({
   },
   remove: {
     position: 'absolute',
-    [device.web ? 'right' : 'left']: 46,
+    right: 48,
   },
   image: {
     marginTop: 10,

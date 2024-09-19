@@ -64,7 +64,7 @@ const MyToast = () => {
 const styles = StyleSheet.create({
   model: {
     zIndex: zIndex.Toast,
-    position: device.web ? ('fixed' as any) : 'absolute',
+    position: device.web ? 'fixed' : 'absolute',
     bottom: 0,
     padding: 10,
     marginBottom: device.iPhoneNotch ? 142 : 112,

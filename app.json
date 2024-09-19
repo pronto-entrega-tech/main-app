@@ -16,14 +16,13 @@
       "resizeMode": "contain",
       "backgroundColor": "#2196F3"
     },
+    "androidStatusBar": {
+      "translucent": true
+    },
     "androidNavigationBar": {
       "backgroundColor": "#FFF",
       "barStyle": "light-content"
     },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": ["**/*"],
     "android": {
       "package": "com.prontoentrega.prontoentrega",
       "versionCode": 1,
@@ -69,6 +68,19 @@
       "favicon": "./public/favicon.ico",
       "themeColor": "#2196F3",
       "lang": "pt-BR"
-    }
+    },
+    "plugins": [
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./src/assets/fonts/Roboto-Regular.ttf",
+            "./src/assets/fonts/Roboto-Medium.ttf",
+            "./src/assets/fonts/Roboto-Bold.ttf",
+            "./src/assets/fonts/RobotoCondensed-Regular.ttf"
+          ]
+        }
+      ]
+    ]
   }
 }

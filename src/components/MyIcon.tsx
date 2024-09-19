@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleProp, TextStyle } from 'react-native';
+import { StyleProp, ViewStyle } from 'react-native';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import icons from '~/constants/svgPaths';
 import myColors from '~/constants/myColors';
@@ -16,7 +16,7 @@ export type MyIconProps = {
    * @default 24
    */
   size?: number;
-  style?: StyleProp<TextStyle>;
+  style?: StyleProp<ViewStyle>;
 };
 const MyIcon = ({
   name,

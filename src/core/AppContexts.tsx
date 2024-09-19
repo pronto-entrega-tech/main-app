@@ -6,10 +6,12 @@ import { ChatProvider } from '~/contexts/ChatContext';
 import { OrderProvider } from '~/contexts/OrderContext';
 import { PaymentCardProvider } from '~/contexts/PaymentCardContext';
 import { MyProvider as CommonProvider } from './MyContext';
+import { HasNavigatedProvider } from '~/contexts/HasNavigatedContext';
 
 export const AppContexts = (p: { children: ReactNode }) =>
   nestComponents(p.children, [
     CommonProvider,
+    HasNavigatedProvider,
     AddressProvider,
     AuthProvider,
     CartProvider,

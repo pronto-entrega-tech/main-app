@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleProp, TextStyle } from 'react-native';
 import Animated, {
+  runOnJS,
   useSharedValue,
   withSequence,
   withTiming,
@@ -34,7 +35,7 @@ const AnimatedText = ({
 
     translateY.value = withSequence(
       withTiming(isGoingUp ? -distance : distance, { duration }, (finished) => {
-        if (finished) setShowValue(value);
+        if (finished) runOnJS(setShowValue)(value);
       }),
       withTiming(isGoingUp ? distance : -distance, { duration: 0 }),
       withTiming(0, { duration }),

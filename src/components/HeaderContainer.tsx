@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     zIndex: zIndex.Header,
   },
   subContainer: {
-    position: 'fixed' as any,
+    position: 'fixed',
     width: '100%',
   },
 });

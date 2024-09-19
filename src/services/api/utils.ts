@@ -36,8 +36,8 @@ ApiClient.interceptors.response.use(undefined, (err: AxiosError) => {
   };
 
   const errMsg = [
-    `${err.config.method?.toUpperCase()} ${err.request?.responseURL}`,
-    `Request ${format(err.config.data)}`,
+    `${err.config?.method?.toUpperCase()} ${err.request?.responseURL}`,
+    `Request ${format(err.config?.data)}`,
     `Response ${stringify(err.response?.data)}`,
   ].join('\n');
   console.error(errMsg);

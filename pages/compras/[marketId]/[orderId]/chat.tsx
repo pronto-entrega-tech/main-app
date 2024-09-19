@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as Notifications from 'expo-notifications';
 import { Avatar } from 'react-native-elements/dist/avatar/Avatar';
-import styled, { css } from 'styled-components/native';
 import Errors from '~/components/Errors';
 import IconButton from '~/components/IconButton';
 import Loading from '~/components/Loading';
@@ -15,10 +14,12 @@ import { ChatMsg } from '~/core/models';
 import { getImageUrl } from '~/functions/converter';
 import useRouting from '~/hooks/useRouting';
 import { api } from '~/services/api';
-import { GlobalStyles } from '~/constants/globalStyles';
+import globalStyles from '~/constants/globalStyles';
 import { zIndex } from '~/constants/zIndex';
 import { formatTime } from '~/functions/format';
 import { useChatContext, useChatItemContext } from '~/contexts/ChatContext';
+import { ScrollView, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 
 const Chat = () => {
   const { isAuth } = useAuthContext();
@@ -42,14 +43,14 @@ const Header = () => {
   const order = orders?.find((v) => v.order_id === params.orderId);
 
   return (
-    <HeaderContainer>
+    <View style={[globalStyles.elevation3, styles.headerContainer]}>
       <Avatar
         source={{ uri: order && getImageUrl('market', order.market_id) }}
         size='medium'
         rounded
       />
-      <Name>{order?.market.name ?? 'Mercado'}</Name>
-    </HeaderContainer>
+      <MyText style={styles.name}>{order?.market.name ?? 'Mercado'}</MyText>
+    </View>
   );
 };
 
@@ -72,11 +73,14 @@ const MsgsList = () => {
   if (!isLoaded) return <Loading />;
 
   return (
-    <MsgsListContainer contentContainerStyle={{ padding: 16 }}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={{ transform: 'scaleY(-1)' }}
+      contentContainerStyle={{ padding: 16 }}>
       {[...msgs.values()].reverse().map((msg, index, allMsgs) => (
         <MsgItem key={msg.id} {...{ msg, index, allMsgs }} />
       ))}
-    </MsgsListContainer>
+    </ScrollView>
   );
 };
 
@@ -93,13 +97,17 @@ const MsgItem = ({
   const pad = allMsgs[index - 1]?.author !== msg.author;
 
   return (
-    <MsgItemContainer {...{ direction, pad }}>
-      <MsgBody>
+    <View
+      style={[
+        { marginTop: pad ? 8 : 4 },
+        direction === 'left' ? styles.leftMsg : styles.rightMsg,
+      ]}>
+      <MyText style={styles.msgBody}>
         {msg.message}
         {' '.repeat(12)}
-      </MsgBody>
-      <MsgTime>{formatTime(msg.created_at)}</MsgTime>
-    </MsgItemContainer>
+      </MyText>
+      <MyText style={styles.msgTime}>{formatTime(msg.created_at)}</MyText>
+    </View>
   );
 };
 
@@ -118,7 +126,7 @@ const SendMsgInput = () => {
   };
 
   return (
-    <Row>
+    <View style={[globalStyles.elevation3, styles.row]}>
       <MyInput
         value={input}
         onChangeText={setInput}
@@ -130,78 +138,61 @@ const SendMsgInput = () => {
         containerStyle={{ flex: 1 }}
       />
       <IconButton disabled={!accessToken} onPress={sendMsg} icon='send' />
-    </Row>
+    </View>
   );
 };
 
-const HeaderContainer = styled.View`
-  ${GlobalStyles.elevation3}
-  background-color: white;
-  flex-direction: row;
-  align-items: center;
-  z-index: ${zIndex.Header};
-  padding: 16px;
-`;
-
-const Name = styled(MyText)`
-  font-size: 18px;
-  margin-left: 16px;
-`;
-
-const MsgsListContainer = styled.ScrollView.attrs({
-  showsVerticalScrollIndicator: false,
-})`
-  /* flex: 1; */
-  transform: scaleY(-1);
-`;
-
-const LeftMsgStyle = css`
-  align-self: flex-start;
-  border-bottom-left-radius: 0px;
-  border-color: #eee;
-  border-style: solid;
-  border-width: 2px;
-`;
-const RightMsgStyle = css`
-  align-self: flex-end;
-  border-bottom-right-radius: 0px;
-  background-color: #eee;
-`;
-
-type MsgProps = { direction: 'left' | 'right'; pad: boolean };
-
-const MsgItemContainer = styled.View.attrs<unknown, MsgProps>({} as MsgProps)`
-  ${(p) => (p.direction === 'left' ? LeftMsgStyle : RightMsgStyle)}
-  transform: scaleY(-1);
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: 10px;
-  border-radius: 16px;
-  max-width: 75%;
-  margin-top: ${(p) => (p.pad ? 8 : 4)}px;
-`;
-
-const MsgBody = styled(MyText)`
-  flex-shrink: 1;
-  font-size: 16px;
-`;
-
-const MsgTime = styled(MyText)`
-  font-size: 12px;
-  position: absolute;
-  align-self: flex-end;
-  bottom: 6px;
-  right: 12px;
-`;
-
-const Row = styled.View`
-  ${GlobalStyles.elevation3}
-  background-color: white;
-  flex-direction: row;
-  padding: 8px;
-  padding-top: 12px;
-  padding-bottom: 0px;
-`;
+const styles = StyleSheet.create({
+  headerContainer: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: zIndex.Header,
+    padding: 16,
+  },
+  name: {
+    fontSize: 18,
+    marginLeft: 16,
+  },
+  msgItemContainer: {
+    transform: 'scaleY(-1)',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+    padding: 10,
+    borderRadius: 16,
+    maxWidth: '75%',
+  },
+  leftMsg: {
+    alignSelf: 'flex-start',
+    borderBottomLeftRadius: 0,
+    borderColor: '#eee',
+    borderStyle: 'solid',
+    borderWidth: 2,
+  },
+  rightMsg: {
+    alignSelf: 'flex-end',
+    borderBottomRightRadius: 0,
+    backgroundColor: '#eee',
+  },
+  msgBody: {
+    flexShrink: 1,
+    fontSize: 16,
+  },
+  msgTime: {
+    fontSize: 12,
+    position: 'absolute',
+    alignSelf: 'flex-end',
+    bottom: 6,
+    right: 12,
+  },
+  row: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    padding: 8,
+    paddingTop: 12,
+    paddingBottom: 0,
+  },
+});
 
 export default Chat;

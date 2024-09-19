@@ -153,7 +153,7 @@ export const ProductDetails = (props: ProductDetailsProps) => (
 );
 
 const KitItems = ({ product }: { product: Product }) => {
-  const items = product.details.reverse().map(({ name, quantity }, i) => (
+  const items = product.details.toReversed().map(({ name, quantity }, i) => (
     <MyText
       key={i}
       style={{

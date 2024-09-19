@@ -36,3 +36,6 @@ src/test.ts
 /.pnp
 .pnp.js
 # @end @expo/next-adapter
+
+/android
+/ios

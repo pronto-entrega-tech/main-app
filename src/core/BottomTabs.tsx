@@ -5,7 +5,8 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createMaterialBottomTabNavigator } from 'react-native-paper/react-navigation';
+import { MD2LightTheme } from 'react-native-paper';
 import Icon from '@expo/vector-icons/MaterialCommunityIcons';
 import { myColors } from '~/constants';
 import { myScreenOptions } from '~/constants/others';
@@ -55,9 +56,17 @@ const BottomTabs = () => {
   return (
     <>
       <Tab.Navigator
+        theme={{
+          ...MD2LightTheme,
+          colors: {
+            ...MD2LightTheme.colors,
+            background: myColors.background,
+          },
+        }}
         shifting={false}
         barStyle={{ backgroundColor: 'white' }}
-        activeColor={myColors.primaryColor}>
+        activeColor={myColors.primaryColor}
+        inactiveColor='rgba(0, 0, 0, 0.5)'>
         <Tab.Screen
           name='HomeTab'
           options={{

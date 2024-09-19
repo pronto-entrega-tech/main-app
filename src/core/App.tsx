@@ -2,14 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
-import { myColors, images, fonts, globalStyles, device } from '~/constants';
+import { myColors, images, globalStyles, device } from '~/constants';
 import { myScreenOptions } from '~/constants/others';
 import Loading from '~/components/Loading';
 import linking from '~/constants/routes';
 import MyToast from '~/components/MyToast';
+import NewUser from '~/screens/NewUser';
 import BottomTabs from './BottomTabs';
 import { getActiveAddressId, getIsNewUser } from '~/core/dataStorage';
 import { Cupons } from '@pages/inicio/cupons';
@@ -18,7 +18,6 @@ import Addresses from '@pages/endereco';
 import ProductTabs from '~/screens/ProductTabs';
 import MarketRating from '@pages/inicio/mercado/[city]/[marketId]/avaliacao';
 import MarketDetails from '@pages/inicio/mercado/[city]/[marketId]/detalhes';
-import NewUser from '~/screens/NewUser';
 import Cart from '@pages/carrinho';
 import Schedule from '@pages/agendamento';
 import PaymentTabs from '~/screens/PaymentTabs';
@@ -30,13 +29,14 @@ import MyProfile from '@pages/meu-perfil';
 import Suggestion from '@pages/sugestao';
 import UploadQuestion from '@pages/mandar-pergunta';
 import Devices from '@pages/dispositivos';
-import { AppContexts } from './AppContexts';
-import { useAuthContext } from '~/contexts/AuthContext';
 import PaymentCard from '@pages/meios-de-pagamento/cartao';
 import EmailSignIn from '@pages/entrar/email';
+import { AppContexts } from './AppContexts';
+import { useAuthContext } from '~/contexts/AuthContext';
 import MyAlert from '~/components/MyAlert';
 import { useUpdateAddress } from '~/hooks/useAddress';
 import useRouting from '~/hooks/useRouting';
+import { StatusBar } from 'expo-status-bar';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -55,7 +55,6 @@ const App = () => {
   const { isAuth } = useAuthContext();
   const updateAddress = useUpdateAddress();
   const [initialScreen, setInitialScreen] = useState('NewUser');
-  const [fontsLoaded] = useFonts(fonts);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -110,7 +109,7 @@ const App = () => {
     );
   };
 
-  if (!isReady || !fontsLoaded) return null;
+  if (!isReady) return null;
 
   return (
     <NavigationContainer
@@ -158,10 +157,11 @@ const App = () => {
   );
 };
 
-const AppRoot = () => (
-  <AppContexts>
-    <App />
-  </AppContexts>
-);
-
-export default AppRoot;
+export default function AppRoot() {
+  return (
+    <AppContexts>
+      <StatusBar style='light' />
+      <App />
+    </AppContexts>
+  );
+}

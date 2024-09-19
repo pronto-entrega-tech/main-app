@@ -1,15 +1,7 @@
-import React, {
-  MutableRefObject,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { createContext } from 'use-context-selector';
 import { createUseContext } from '~/functions/converter';
 import { saveNotifies, saveFavorites, getFavorites } from '~/core/dataStorage';
-import { Router } from 'next/router';
 import { Product } from './models';
 import { ToastState } from '~/components/MyToast';
 import { AlertState } from '~/components/MyAlert';
@@ -19,7 +11,6 @@ export type MyContextValues = {
   setNotify: (item: Product) => void;
   favorites: Map<string, Product>;
   setFav: (item: Product) => void;
-  hasNavigated: MutableRefObject<boolean>;
   toastState: ToastState;
   toast: (message: string, opts?: Omit<ToastState, 'message'>) => void;
   alertState?: AlertState;
@@ -42,17 +33,8 @@ export const MyProvider = (props: { children: ReactNode }) => {
   const [toastState, setToastState] = useState<ToastState>({ message: '' });
   const [alertState, setAlertState] = useState<AlertState>();
 
-  const hasNavigated = useRef(false);
-
   useEffect(() => {
     getFavorites().then(setFavorites);
-
-    const onRouteChange = () => {
-      hasNavigated.current = true;
-    };
-
-    Router.events.on('routeChangeComplete', onRouteChange);
-    return () => Router.events.off('routeChangeComplete', onRouteChange);
   }, []);
 
   const setNotify: MyContextValues['setNotify'] = (item) => {
@@ -103,7 +85,6 @@ export const MyProvider = (props: { children: ReactNode }) => {
         setNotify: useCallback(setNotify, [notify, alert]),
         favorites,
         setFav: useCallback(setFav, [favorites, alert]),
-        hasNavigated,
         toastState,
         toast: useCallback(toast, []),
         alertState,

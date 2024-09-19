@@ -46,9 +46,11 @@ const ProdItemHorizontal = (props: {
             {item.images_names ? (
               <MyImage
                 thumbhash={item.thumbhash}
-                source={{ uri: getImageUrl('product', item.images_names[0]) }}
+                source={getImageUrl('product', item.images_names[0])}
                 alt=''
                 style={styles.image}
+                height={80}
+                width={80}
               />
             ) : (
               <MyIcon
@@ -82,9 +84,11 @@ const ProdItemHorizontal = (props: {
             {showsMarketLogo && (
               <MyImage
                 thumbhash={item.market_thumbhash}
-                source={{ uri: getImageUrl('market', item.market_id) }}
+                source={getImageUrl('market', item.market_id)}
                 alt=''
                 style={styles.marketImage}
+                height={34}
+                width={34}
               />
             )}
           </View>
@@ -120,36 +124,6 @@ const ProdItemHorizontal = (props: {
           </>
         )}
       </MotiView>
-      {/* <View
-        style={[
-          globalStyles.elevation4,
-          globalStyles.darkBorder,
-          styles.containerAdd,
-        ]}>
-        <IconButton
-          onPress={onPressAdd}
-          icon='plus'
-          style={[
-            styles.buttonAdd,
-            globalStyles.elevation4,
-            globalStyles.darkBorder,
-          ]}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 12 }}
-        />
-        <AnimatedText style={styles.centerNumText} distance={10} animateZero>
-          {quantity}
-        </AnimatedText>
-        <IconButton
-          onPress={onPressRemove}
-          icon='minus'
-          style={[
-            styles.buttonAdd,
-            globalStyles.elevation4,
-            globalStyles.darkBorder,
-          ]}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 12 }}
-        />
-      </View> */}
     </View>
   );
 };
@@ -165,7 +139,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flexDirection: 'row',
-    paddingLeft: 36,
+    paddingLeft: 16,
   },
 
   addBar: {
@@ -191,7 +165,7 @@ const styles = StyleSheet.create({
   },
   remove: {
     position: 'absolute',
-    [device.web ? 'right' : 'left']: 46,
+    right: 48,
   },
 
   containerAdd: {
@@ -208,11 +182,6 @@ const styles = StyleSheet.create({
     height: 26,
     backgroundColor: '#fff',
   },
-  /* centerNumText: {
-    fontSize: 17,
-    color: myColors.text3,
-    fontFamily: myFonts.Medium,
-  }, */
   containerImage: {
     marginLeft: -6,
     alignItems: 'center',
@@ -276,8 +245,8 @@ const styles = StyleSheet.create({
   },
   marketContainer: {
     position: 'absolute',
-    right: 12,
-    top: 48,
+    right: 6,
+    top: 56,
   },
   marketImage: {
     marginRight: 0,
