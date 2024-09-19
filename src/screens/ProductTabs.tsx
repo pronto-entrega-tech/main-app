@@ -7,12 +7,13 @@ import { ProductDetails } from '@pages/produto/[city]/[itemId]';
 import { MarketFeed } from '@pages/inicio/mercado/[city]/[marketId]';
 import ProductHeader from '~/components/ProductHeader';
 import useRouting from '~/hooks/useRouting';
+import { UseStore, useAtom } from '~/functions/stores';
 
 const Tab = createMaterialTopTabNavigator();
 
 const ProductTabs = () => {
   const { params } = useRouting();
-  const [marketId, setMarketId] = useState<string>();
+  const $marketId = useAtom<string>();
 
   return (
     <>
@@ -28,13 +29,17 @@ const ProductTabs = () => {
             name='ProductDetails'
             initialParams={params}
             options={{ tabBarLabel: 'Produto' }}>
-            {() => <ProductDetails setMarketId={setMarketId} />}
+            {() => <ProductDetails setMarketId={$marketId.set} />}
           </Tab.Screen>
           <Tab.Screen
             name='ProductMarket'
             initialParams={params}
             options={{ tabBarLabel: 'Mercado' }}>
-            {() => <MarketFeed marketId={marketId} />}
+            {() => (
+              <UseStore store={$marketId}>
+                {(marketId) => <MarketFeed marketId={marketId} />}
+              </UseStore>
+            )}
           </Tab.Screen>
         </Tab.Navigator>
       </View>

@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { createContext } from 'use-context-selector';
 import { getActiveAddress, saveActiveAddress } from '~/core/dataStorage';
 import { Address } from '~/core/models';
-import { createUseContext } from '~/functions/converter';
+import { createUseContext } from '~/contexts/createUseContext';
 import { api } from '~/services/api';
 
 type AddressContextValues = {

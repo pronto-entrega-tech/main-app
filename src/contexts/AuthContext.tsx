@@ -1,10 +1,7 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { createContext } from 'use-context-selector';
-import {
-  createUseContext,
-  fail,
-  getJwtExpiration,
-} from '~/functions/converter';
+import { fail, getJwtExpiration } from '~/functions/converter';
+import { createUseContext } from '~/contexts/createUseContext';
 import { saveRefreshToken, getRefreshToken } from '~/core/dataStorage';
 import { device } from '~/constants';
 import { useConnection } from '~/functions/connection';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { WithBottomNav } from '~/components/Layout';
 import { myColors, device, globalStyles, myFonts } from '~/constants';
@@ -14,6 +14,14 @@ import useRouting from '~/hooks/useRouting';
 import { Banner, Product } from '~/core/models';
 import { stringifyShortAddress } from '~/functions/converter';
 import { useAddressContext } from '~/contexts/AddressContext';
+import Animated, {
+  runOnUI,
+  setNativeProps,
+  useAnimatedProps,
+  useAnimatedRef,
+  useSharedValue,
+} from 'react-native-reanimated';
+import { TextInput } from 'react-native';
 
 const AddressButton = () => {
   const { address } = useAddressContext();

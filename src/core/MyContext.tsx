@@ -1,6 +1,6 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { createContext } from 'use-context-selector';
-import { createUseContext } from '~/functions/converter';
+import { createUseContext } from '~/contexts/createUseContext';
 import { saveNotifies, saveFavorites, getFavorites } from '~/core/dataStorage';
 import { Product } from './models';
 import { ToastState } from '~/components/MyToast';

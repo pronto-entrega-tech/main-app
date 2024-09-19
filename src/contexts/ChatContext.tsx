@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 import { createContext, useContextSelector } from 'use-context-selector';
 import { Urls } from '~/constants/urls';
 import { ChatMsg } from '~/core/models';
-import { createUseContext } from '~/functions/converter';
+import { createUseContext } from '~/contexts/createUseContext';
 import { transformCreatedAt } from '~/functions/transform';
 import { api } from '~/services/api';
 import { useAuthContext } from './AuthContext';

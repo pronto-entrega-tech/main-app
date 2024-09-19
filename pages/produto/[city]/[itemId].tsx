@@ -20,16 +20,21 @@ import CartBar from '~/components/CartBar';
 import { Product, SetState } from '~/core/models';
 import MyText from '~/components/MyText';
 import { api } from '~/services/api';
-import { useCartContext } from '~/contexts/CartContext';
+import { useCartContext, useCartContextSelector } from '~/contexts/CartContext';
+import { UseStore, useAtom } from '~/functions/stores';
 
-type ProductDetailsProps = { setMarketId?: SetState<string | undefined> };
+type ProductDetailsProps = { setMarketId?: (v: string) => void };
 
 const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
   const { params } = useRouting();
-  const { shoppingList, addProduct, removeProduct } = useCartContext();
   const [error, setError] = useState<MyErrors>(null);
   const [tryAgain, setTryAgain] = useState(false);
   const [product, setProduct] = useState<Product>();
+
+  const { addProduct, removeProduct } = useCartContext();
+  const quantity = useCartContextSelector(
+    (v) => product && v.shoppingList?.get(product.item_id)?.quantity,
+  );
 
   useEffect(() => {
     if (product?.item_id === params.itemId) return;
@@ -57,7 +62,6 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
 
   if (!product || product.item_id !== params.itemId) return <Loading />;
 
-  const quantity = shoppingList?.get(product.item_id)?.quantity;
   const { price, previous_price, discountText } = calcPrices(product);
 
   return (
@@ -174,7 +178,7 @@ const KitItems = ({ product }: { product: Product }) => {
 };
 
 const ProductTabs = () => {
-  const [marketId, setMarketId] = useState<string>();
+  const $marketId = useAtom<string>();
 
   return (
     <>
@@ -183,11 +187,15 @@ const ProductTabs = () => {
         tabs={[
           {
             title: 'Produto',
-            element: <ProductDetails {...{ setMarketId }} />,
+            element: <ProductDetails setMarketId={$marketId.set} />,
           },
           {
             title: 'Mercado',
-            element: <MarketFeed {...{ marketId }} />,
+            element: (
+              <UseStore store={$marketId}>
+                {(marketId) => <MarketFeed marketId={marketId} />}
+              </UseStore>
+            ),
           },
         ]}
       />

@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
 import { createContext } from 'use-context-selector';
-import { createUseContext } from '~/functions/converter';
+import { createUseContext } from '~/contexts/createUseContext';
 import { Router } from 'next/router';
 
 const useProviderValues = () => {

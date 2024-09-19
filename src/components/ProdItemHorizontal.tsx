@@ -12,12 +12,13 @@ import { Product } from '~/core/models';
 import MyText from './MyText';
 import { MotiView } from 'moti';
 import MyImage from './MyImage';
+import { useCartContextSelector } from '~/contexts/CartContext';
 
 const ProdItemHorizontal = (props: {
   item: Product;
   showsMarketLogo: boolean;
   isFavorite?: boolean;
-  quantity?: number;
+  /* quantity?: number; */
   onPressFav?: () => void;
   onPressAdd: () => void;
   onPressRemove: () => void;
@@ -25,11 +26,14 @@ const ProdItemHorizontal = (props: {
   const {
     item,
     showsMarketLogo,
-    quantity = 0,
+    /* quantity = 0, */
     onPressAdd,
     onPressRemove,
   } = props;
   const { price, previous_price, discountText } = calcPrices(item);
+  const quantity = useCartContextSelector(
+    (v) => v.shoppingList?.get(item.item_id)?.quantity ?? 0,
+  );
 
   const path = `/produto/${item.city_slug}/${item.item_id}`;
   const pathParam = objectConditional(!device.web)({ path }); // pathname inside tabs are undefined
@@ -156,7 +160,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: myColors.text3,
     fontFamily: myFonts.Medium,
-    left: 36,
+    left: 36 - 6,
     position: 'absolute',
   },
   add: {

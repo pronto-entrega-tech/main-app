@@ -11,7 +11,7 @@ import { Product } from '~/core/models';
 import { getLatLong, toCityState } from '~/functions/converter';
 import { useAddressContext } from '~/contexts/AddressContext';
 import { api } from '~/services/api';
-import { useCartContext } from '~/contexts/CartContext';
+import { useCartContext, useCartContextSelector } from '~/contexts/CartContext';
 import { useMediaQuery } from '~/hooks/useMediaQuery';
 
 const ProdList = (props: {
@@ -38,27 +38,24 @@ const ProdList = (props: {
     refreshLess = false,
     tryAgain,
   } = props;
-  const {
-    shoppingList: innerShoppingList,
-    addProduct,
-    removeProduct,
-  } = useCartContext();
+
+  const { addProduct, removeProduct } = useCartContext();
+  const shoppingListLoaded = useCartContextSelector(
+    (v) => v.shoppingList != null,
+  );
+
   const { address } = useAddressContext();
+  const city = address && toCityState(address);
+  const missingAddress = city === null ? 'missing_address' : undefined;
+
   const [innerData, setInnerData] = useState<Product[]>();
   const [serverErr, setServerErr] = useState<'server'>();
   const [refreshing, setRefreshing] = useState(false);
 
   const listData = data ?? innerData;
-  const shoppingList = data
-    ? innerShoppingList ?? new Map()
-    : innerShoppingList;
 
   const hasInternet = useConnection();
   const connectErr = hasInternet === false ? 'connection' : undefined;
-
-  const city = address && toCityState(address);
-
-  const missingAddress = city === null ? 'missing_address' : undefined;
 
   const nothingErr =
     listData && !listData.length
@@ -115,7 +112,7 @@ const ProdList = (props: {
       </>
     );
 
-  if (!listData || !shoppingList) return <Loading />;
+  if (!listData || !shoppingListLoaded) return <Loading />;
 
   if (!horizontalItems) {
     const margin = 1.5;
@@ -130,7 +127,6 @@ const ProdList = (props: {
         }}
         item={item}
         showsMarketLogo={!hideMarketLogo}
-        quantity={shoppingList.get(item.item_id)?.quantity}
         onPressAdd={() => addProduct(item)}
         onPressRemove={() => removeProduct(item)}
       />
@@ -177,7 +173,6 @@ const ProdList = (props: {
     <ProdItemHorizontal
       item={item}
       showsMarketLogo={!hideMarketLogo}
-      quantity={shoppingList.get(item.item_id)?.quantity}
       onPressAdd={() => addProduct(item)}
       onPressRemove={() => removeProduct(item)}
     />
@@ -185,7 +180,11 @@ const ProdList = (props: {
 
   return (
     <FlatList
-      getItemLayout={(_item, i) => ({ length: 112, offset: 112 * i, index: i })}
+      getItemLayout={(_item, i) => ({
+        length: 112,
+        offset: 112 * i,
+        index: i,
+      })}
       contentContainerStyle={[{ paddingBottom: 50 }, style]}
       showsVerticalScrollIndicator={false}
       data={listData}

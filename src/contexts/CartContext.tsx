@@ -1,9 +1,9 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { createContext } from 'use-context-selector';
 import useMyContext from '~/core/MyContext';
 import { calcSubtotal } from '~/functions/calcSubtotal';
-import { createUseContext, pick } from '~/functions/converter';
-import { money, Money } from '~/functions/money';
+import { pick } from '~/functions/converter';
+import { createContext } from '~/contexts/createUseContext';
+import { money } from '~/functions/money';
 import { api } from '~/services/api';
 import {
   getActiveMarketId,
@@ -18,43 +18,20 @@ import {
   OrderPayment,
   OrderSchedule,
   Product,
-  SetState,
   ShoppingList,
 } from '../core/models';
+import { useStateToRef } from '~/hooks/useStateToRef';
 
 type FullMarketId = { market_id?: string; city_slug?: string };
 
-type CartValue = {
-  subtotal: Money;
-  totalOff: Money;
-  total: Money;
-  shoppingList?: ShoppingList;
-  revalidateCart: () => Promise<void> | undefined;
-  cleanCart: () => void;
-  addProduct: (item: Product) => void;
-  removeProduct: (item: Product) => void;
-  payment?: OrderPayment | null;
-  setPayment: (v: OrderPayment | null) => void;
-  loadLastPayment: (token: string) => Promise<void>;
-  activeMarketId: FullMarketId;
-  activeMarket?: Market;
-  setActiveMarket: SetState<Market | undefined>;
-  activeSchedule: OrderSchedule | undefined;
-  setActiveSchedule: SetState<OrderSchedule | undefined>;
-  schedules: OrderSchedule[] | undefined;
-  setSchedules: SetState<OrderSchedule[] | undefined>;
-};
-
-const CartContext = createContext({} as CartValue);
-
-export const useCartContext = createUseContext(CartContext);
-
-export const CartProvider = (props: { children: ReactNode }) => {
+function useProviderValues() {
   const { alert } = useMyContext();
   const [subtotal, setSubtotal] = useState(money('0'));
   const [totalOff, setTotalOff] = useState(money('0'));
   const [shoppingList, _setShoppingList] = useState<ShoppingList>();
+  const shoppingListRef = useStateToRef(shoppingList);
   const [activeMarketId, _setActiveMarketId] = useState<FullMarketId>({});
+  const activeMarketIdRef = useStateToRef(activeMarketId.market_id);
   const [activeMarket, setActiveMarket] = useState<Market>();
   const [payment, _setPayment] = useState<OrderPayment | null>();
   const [activeSchedule, setActiveSchedule] = useState<OrderSchedule>();
@@ -104,9 +81,11 @@ export const CartProvider = (props: { children: ReactNode }) => {
   };
 
   const addProduct = (item: Product) => {
-    if (!activeMarketId.market_id) {
+    const shoppingList = shoppingListRef.current;
+
+    if (!activeMarketIdRef.current) {
       setActiveMarketId(item);
-    } else if (item.market_id !== activeMarketId.market_id)
+    } else if (item.market_id !== activeMarketIdRef.current)
       return alert(
         'O carrinho já possui itens de outro mercado',
         'Deseja limpar o carrinho?',
@@ -133,6 +112,8 @@ export const CartProvider = (props: { children: ReactNode }) => {
   };
 
   const removeProduct = (item: Product) => {
+    const shoppingList = shoppingListRef.current;
+
     const value = shoppingList?.get(item.item_id)?.quantity;
     if (!value) return alert('Erro ao remover produto');
 
@@ -155,7 +136,7 @@ export const CartProvider = (props: { children: ReactNode }) => {
     }
   };
 
-  const revalidateCart = useCallback(
+  const refetchCartItems = useCallback(
     async (list: ShoppingList) => {
       const { city_slug: city } = [...list][0]?.[1].item ?? {};
       if (!city) return;
@@ -177,49 +158,47 @@ export const CartProvider = (props: { children: ReactNode }) => {
   useEffect(() => {
     getActiveMarketId().then(_setActiveMarketId);
 
-    getShoppingList().then(async (list) => {
+    getShoppingList().then((list) => {
       _setShoppingList(list);
       updateTotal(list);
 
-      revalidateCart(list);
+      refetchCartItems(list);
     });
-  }, [setShoppingList, revalidateCart]);
+  }, [setShoppingList, refetchCartItems]);
 
-  return (
-    <CartContext.Provider
-      value={{
-        subtotal,
-        totalOff,
-        total,
-        shoppingList,
-        revalidateCart: useCallback(
-          () => shoppingList && revalidateCart(shoppingList),
-          [shoppingList, revalidateCart],
-        ),
-        cleanCart: useCallback(cleanCart, [setShoppingList]),
-        addProduct: useCallback(addProduct, [
-          activeMarketId.market_id,
-          shoppingList,
-          setShoppingList,
-          alert,
-        ]),
-        removeProduct: useCallback(removeProduct, [
-          shoppingList,
-          setShoppingList,
-          alert,
-        ]),
-        activeMarketId,
-        activeMarket,
-        setActiveMarket,
-        payment,
-        setPayment: useCallback(setPayment, []),
-        loadLastPayment: useCallback(loadLastPayment, [payment]),
-        activeSchedule,
-        setActiveSchedule,
-        schedules,
-        setSchedules,
-      }}
-      {...props}
-    />
-  );
-};
+  return {
+    subtotal,
+    totalOff,
+    total,
+    shoppingList,
+    revalidateCart: useCallback(
+      () => shoppingList && refetchCartItems(shoppingList),
+      [shoppingList, refetchCartItems],
+    ),
+    cleanCart: useCallback(cleanCart, [setShoppingList]),
+    addProduct: useCallback(addProduct, [
+      alert,
+      activeMarketIdRef,
+      shoppingListRef,
+      setShoppingList,
+    ]),
+    removeProduct: useCallback(removeProduct, [
+      shoppingListRef,
+      alert,
+      setShoppingList,
+    ]),
+    activeMarketId,
+    activeMarket,
+    setActiveMarket,
+    payment,
+    setPayment: useCallback(setPayment, []),
+    loadLastPayment: useCallback(loadLastPayment, [payment]),
+    activeSchedule,
+    setActiveSchedule,
+    schedules,
+    setSchedules,
+  };
+}
+
+export const [CartProvider, useCartContext, useCartContextSelector] =
+  createContext(useProviderValues);

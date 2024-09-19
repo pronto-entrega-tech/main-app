@@ -11,6 +11,7 @@ import MyIcon from './MyIcon';
 import { Product } from '~/core/models';
 import { MotiView } from 'moti';
 import MyImage from './MyImage';
+import { useCartContextSelector } from '~/contexts/CartContext';
 
 const ProdItem = (props: {
   item: Product;
@@ -24,13 +25,16 @@ const ProdItem = (props: {
 }) => {
   const {
     item,
-    quantity = 0,
+    /* quantity = 0, */
     style = {},
     showsMarketLogo,
     onPressAdd,
     onPressRemove,
   } = props;
   const { price, previous_price, discountText } = calcPrices(item);
+  const quantity = useCartContextSelector(
+    (v) => v.shoppingList?.get(item.item_id)?.quantity ?? 0,
+  );
 
   return (
     <View
@@ -168,7 +172,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: myColors.text3,
     fontFamily: myFonts.Bold,
-    left: 36,
+    left: 36 - 6,
     position: 'absolute',
   },
   add: {

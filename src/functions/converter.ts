@@ -9,7 +9,6 @@ import {
   Coords,
   PaymentCard,
 } from '~/core/models';
-import { useContextSelector, Context } from 'use-context-selector';
 import { screensPaths } from '~/constants/routes';
 import { objectConditional } from './conditionals';
 import { money } from './money';
@@ -39,7 +38,7 @@ export const validateMarket = (v: any): Market => ({
   max_time: +v.max_time,
   accept_scheduling: !!v.schedule_mins_interval,
   delivery_fee: money(v.delivery_fee),
-  order_min: v.order_min&&money(v.order_min),
+  order_min: v.order_min && money(v.order_min),
   rating: +v.rating,
   address: {
     street: v.address_street,
@@ -79,18 +78,6 @@ export const validateOrder = (v: any): Order => ({
     coords: { lat: v.address_latitude, lgn: v.address_longitude },
   },
 });
-
-export const createUseContext = <T extends Record<string | symbol, unknown>>(
-  context: Context<T>,
-) => {
-  return () =>
-    new Proxy({} as T, {
-      get: (_, name) => {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useContextSelector(context, (c) => c[name]);
-      },
-    });
-};
 
 export const pick = <T extends Record<string, unknown>, K extends keyof T>(
   obj: T,
