@@ -134,18 +134,12 @@ dependencies:
   react-native-web:
     specifier: ~0.19.12
     version: 0.19.12(react-dom@18.2.0)(react@18.2.0)
-  scheduler:
-    specifier: ^0.23.2
-    version: 0.23.2
   socket.io-client:
     specifier: ^4.7.5
     version: 4.7.5
   thumbhash:
     specifier: ^0.1.1
     version: 0.1.1
-  use-context-selector:
-    specifier: ^2.0.0
-    version: 2.0.0(react@18.2.0)(scheduler@0.23.2)
 
 devDependencies:
   '@babel/core':
@@ -11467,16 +11461,6 @@ packages:
       querystringify: 2.2.0
       requires-port: 1.0.0
     dev: true
-
-  /use-context-selector@2.0.0(react@18.2.0)(scheduler@0.23.2):
-    resolution: {integrity: sha512-owfuSmUNd3eNp3J9CdDl0kMgfidV+MkDvHPpvthN5ThqM+ibMccNE0k+Iq7TWC6JPFvGZqanqiGCuQx6DyV24g==}
-    peerDependencies:
-      react: '>=18.0.0'
-      scheduler: '>=0.19.0'
-    dependencies:
-      react: 18.2.0
-      scheduler: 0.23.2
-    dev: false
 
   /use-latest-callback@0.1.6(react@18.2.0):
     resolution: {integrity: sha512-VO/P91A/PmKH9bcN9a7O3duSuxe6M14ZoYXgA6a8dab8doWNdhiIHzEkX/jFeTTRBsX0Ubk6nG4q2NIjNsj+bg==}

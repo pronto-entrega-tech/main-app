@@ -1,16 +1,15 @@
-import React, { ReactNode, useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import * as Notifications from 'expo-notifications';
 import { io } from 'socket.io-client';
-import { createContext, useContextSelector } from 'use-context-selector';
 import { Urls } from '~/constants/urls';
 import { ChatMsg } from '~/core/models';
-import { createUseContext } from '~/contexts/createContext';
+import { createContext } from '~/contexts/createContext';
 import { transformCreatedAt } from '~/functions/transform';
 import { api } from '~/services/api';
 import { useAuthContext } from './AuthContext';
 import { useOrderContext } from './OrderContext';
 
-const useProviderValues = () => {
+const useChat = () => {
   const { accessToken } = useAuthContext();
   const { orders } = useOrderContext();
   const [allChats, setAllChats] = useState(
@@ -71,21 +70,12 @@ const useProviderValues = () => {
   return { allChats, loadChat, allIsLoaded };
 };
 
-type ChatContextValues = ReturnType<typeof useProviderValues>;
-
-const ChatContext = createContext({} as ChatContextValues);
-
-export const useChatContext = createUseContext(ChatContext);
+export const [ChatProvider, useChatContext, useChatContextSelector] =
+  createContext(useChat);
 
 export const useChatItemContext = (market_id: string) => ({
   msgs:
-    useContextSelector(ChatContext, (v) => v.allChats.get(market_id)) ??
+    useChatContextSelector((v) => v.allChats.get(market_id)) ??
     new Map<string, ChatMsg>(),
-  isLoaded: useContextSelector(ChatContext, (v) =>
-    v.allIsLoaded.get(market_id),
-  ),
+  isLoaded: useChatContextSelector((v) => v.allIsLoaded.get(market_id)),
 });
-
-export const ChatProvider = (props: { children: ReactNode }) => (
-  <ChatContext.Provider value={useProviderValues()} {...props} />
-);

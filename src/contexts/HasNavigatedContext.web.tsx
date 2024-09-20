@@ -1,9 +1,8 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
-import { createContext } from 'use-context-selector';
-import { createUseContext } from '~/contexts/createContext';
+import { useEffect, useRef } from 'react';
+import { createContext } from '~/contexts/createContext';
 import { Router } from 'next/router';
 
-const useProviderValues = () => {
+function useHasNavigated() {
   const hasNavigated = useRef(false);
 
   useEffect(() => {
@@ -16,14 +15,10 @@ const useProviderValues = () => {
   }, []);
 
   return { hasNavigated };
-};
+}
 
-const HasNavigatedContext = createContext(
-  {} as ReturnType<typeof useProviderValues>,
-);
-
-export const useHasNavigatedContext = createUseContext(HasNavigatedContext);
-
-export const HasNavigatedProvider = (props: { children: ReactNode }) => (
-  <HasNavigatedContext.Provider value={useProviderValues()} {...props} />
-);
+export const [
+  HasNavigatedProvider,
+  useHasNavigatedContext,
+  useHasNavigatedContextSelector,
+] = createContext(useHasNavigated);

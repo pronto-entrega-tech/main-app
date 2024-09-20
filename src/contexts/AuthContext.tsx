@@ -1,7 +1,6 @@
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { createContext } from 'use-context-selector';
+import { useCallback, useEffect, useState } from 'react';
+import { createContext } from '~/contexts/createContext';
 import { fail, getJwtExpiration } from '~/functions/converter';
-import { createUseContext } from '~/contexts/createContext';
 import { saveRefreshToken, getRefreshToken } from '~/core/dataStorage';
 import { device } from '~/constants';
 import { useConnection } from '~/functions/connection';
@@ -11,28 +10,11 @@ import { useAlertContext } from '~/contexts/AlertContext';
 
 type AuthToken = { accessToken?: string | null; refreshToken?: string | null };
 
-type AuthContextValues = {
-  accessToken?: string | null;
-  refreshToken?: string | null;
-  signIn: (v: AuthToken) => void;
-  signOut: () => Promise<void>;
-} & (
-  | { isAuth: undefined; accessToken: undefined }
-  | { isAuth: false; accessToken: null }
-  | { isAuth: true; accessToken: string }
-);
-
-const AuthContext = createContext({} as AuthContextValues);
-
-export const useAuthContext = createUseContext(AuthContext);
-
-export const AuthProvider = (props: { children: ReactNode }) => {
+function useAuth() {
   const { alert } = useAlertContext();
   const hasInternet = useConnection();
   const [accessToken, setAccessToken] = useState<string | null>();
   const [refreshToken, _setRefreshToken] = useState<string | null>();
-
-  const isAuth = accessToken === undefined ? undefined : !!accessToken;
 
   const setRefreshToken = (v?: string | null) => {
     _setRefreshToken(v);
@@ -100,15 +82,13 @@ export const AuthProvider = (props: { children: ReactNode }) => {
     return { isAuth: true as const, accessToken };
   })();
 
-  return (
-    <AuthContext.Provider
-      value={{
-        ...authValue,
-        refreshToken,
-        signIn: useCallback(signIn, []),
-        signOut: useCallback(signOut, [refreshToken]),
-      }}
-      {...props}
-    />
-  );
-};
+  return {
+    ...authValue,
+    refreshToken,
+    signIn: useCallback(signIn, []),
+    signOut: useCallback(signOut, [refreshToken]),
+  };
+}
+
+export const [AuthProvider, useAuthContext, useAuthContextSelector] =
+  createContext(useAuth);

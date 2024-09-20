@@ -1,25 +1,10 @@
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import { createContext } from 'use-context-selector';
+import { useCallback, useEffect, useState } from 'react';
 import { getActiveAddress, saveActiveAddress } from '~/core/dataStorage';
 import { Address } from '~/core/models';
-import { createUseContext } from '~/contexts/createContext';
+import { createContext } from '~/contexts/createContext';
 import { api } from '~/services/api';
 
-type AddressContextValues = {
-  address?: Address | null;
-  setAddress: (v: Address) => void;
-  addresses?: Address[];
-  loadAddresses: (token: string) => Promise<void>;
-  createAddress: (token: string, address: Address) => Promise<void>;
-  updateAddress: (token: string, address: Address) => Promise<void>;
-  deleteAddress: (token: string, id: Address['id']) => Promise<void>;
-};
-
-const AddressContext = createContext({} as AddressContextValues);
-
-export const useAddressContext = createUseContext(AddressContext);
-
-export const AddressProvider = (props: { children: ReactNode }) => {
+function useAddress() {
   const [address, _setAddress] = useState<Address | null>();
   const [addresses, setAddresses] = useState<Address[]>();
 
@@ -59,18 +44,16 @@ export const AddressProvider = (props: { children: ReactNode }) => {
     if (addresses) setAddresses(addresses.filter((a) => a.id !== id));
   };
 
-  return (
-    <AddressContext.Provider
-      value={{
-        address,
-        setAddress,
-        addresses,
-        loadAddresses: useCallback(loadAddresses, [addresses]),
-        createAddress: useCallback(createAddress, [addresses]),
-        updateAddress: useCallback(updateAddress, [addresses]),
-        deleteAddress: useCallback(deleteAddress, [addresses]),
-      }}
-      {...props}
-    />
-  );
-};
+  return {
+    address,
+    setAddress,
+    addresses,
+    loadAddresses: useCallback(loadAddresses, [addresses]),
+    createAddress: useCallback(createAddress, [addresses]),
+    updateAddress: useCallback(updateAddress, [addresses]),
+    deleteAddress: useCallback(deleteAddress, [addresses]),
+  };
+}
+
+export const [AddressProvider, useAddressContext, useAddressContextSelector] =
+  createContext(useAddress);

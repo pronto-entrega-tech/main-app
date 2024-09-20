@@ -1,11 +1,15 @@
-import React, { ReactNode, createContext } from 'react';
-import { createUseContext } from '~/contexts/createContext';
+import { useRef } from 'react';
+import { createContext } from '~/contexts/createContext';
 
-const HasNavigatedContext = createContext(
-  {} as { hasNavigated: React.MutableRefObject<boolean> },
-);
+// noop on mobile
 
-export const useHasNavigatedContext = createUseContext(HasNavigatedContext);
+function useHasNavigated() {
+  const hasNavigated = useRef(false);
+  return { hasNavigated };
+}
 
-export const HasNavigatedProvider = (props: { children: ReactNode }) =>
-  props.children;
+export const [
+  HasNavigatedProvider,
+  useHasNavigatedContext,
+  useHasNavigatedContextSelector,
+] = createContext(useHasNavigated);

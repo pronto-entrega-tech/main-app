@@ -1,10 +1,9 @@
-import React, { ReactNode, useCallback, useState } from 'react';
-import { createContext } from 'use-context-selector';
+import { useState, useCallback } from 'react';
+import { createContext } from '~/contexts/createContext';
 import { CreateOrder, Order } from '~/core/models';
-import { createUseContext } from '~/contexts/createContext';
 import { api } from '~/services/api';
 
-const useProviderValues = () => {
+function useOrder() {
   const [orders, setOrders] = useState<Order[]>();
 
   const loadOrders = async (token: string) => {
@@ -26,14 +25,7 @@ const useProviderValues = () => {
     loadOrders: useCallback(loadOrders, [orders]),
     createOrder: useCallback(createOrder, [orders]),
   };
-};
+}
 
-type OrderContextValues = ReturnType<typeof useProviderValues>;
-
-const OrderContext = createContext({} as OrderContextValues);
-
-export const useOrderContext = createUseContext(OrderContext);
-
-export const OrderProvider = (props: { children: ReactNode }) => (
-  <OrderContext.Provider value={useProviderValues()} {...props} />
-);
+export const [OrderProvider, useOrderContext, useOrderContextSelector] =
+  createContext(useOrder);

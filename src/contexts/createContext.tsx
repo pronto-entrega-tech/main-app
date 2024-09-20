@@ -6,20 +6,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
-import { Context, useContextSelector } from 'use-context-selector';
 import { fail } from '~/functions/converter';
-
-export const createUseContext = <T extends Record<string | symbol, unknown>>(
-  context: Context<T>,
-) => {
-  return () =>
-    new Proxy({} as T, {
-      get: (_, name) => {
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        return useContextSelector(context, (c) => c[name]);
-      },
-    });
-};
 
 type Store<T> = {
   value: T;
