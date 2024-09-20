@@ -13,7 +13,7 @@ import MyText from '~/components/MyText';
 import { myColors, myFonts, globalStyles } from '~/constants';
 import { useAuthContext } from '~/contexts/AuthContext';
 import { CancelReason, Order, SetState } from '~/core/models';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
 import { api } from '~/services/api';
 
 const OrderCancel = ({
@@ -33,7 +33,7 @@ const CancelPageBody = ({
   order: Order;
   onNavigate: (page: OrderPages) => void;
 }) => {
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const { accessToken } = useAuthContext();
   const [isLoading, setLoading] = useState(false);
   const [reason, setReason] = useState<CancelReason>();

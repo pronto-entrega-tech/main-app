@@ -9,17 +9,17 @@ import {
 import { getStateCode } from '~/functions/converter';
 import { Address } from '~/core/models';
 import { api } from '~/services/api';
-import { MyContextValues } from '~/core/MyContext';
+import { ShowAlert } from '~/contexts/AlertContext';
 import { saveActiveAddress } from '~/core/dataStorage';
 
-export const updateAddress = async (alert: MyContextValues['alert']) => {
+export const updateAddress = async (showAlert: ShowAlert) => {
   const { status } = await getForegroundPermissionsAsync();
   if (status !== 'granted') return false;
 
   const enabled = await hasServicesEnabledAsync();
   if (!enabled) return false;
 
-  const address = await getAddress(alert);
+  const address = await getAddress(showAlert);
 
   if (!address) return false;
 
@@ -28,11 +28,11 @@ export const updateAddress = async (alert: MyContextValues['alert']) => {
 };
 
 export const getAddress = async (
-  alert: MyContextValues['alert'],
+  showAlert: ShowAlert,
 ): Promise<Address | undefined> => {
   if (device.web) {
     if (!navigator.geolocation) {
-      alert('Não é possível obter localização!');
+      showAlert('Não é possível obter localização!');
       return;
     }
 
@@ -47,7 +47,7 @@ export const getAddress = async (
     ).catch(() => undefined);
 
     if (!location) {
-      alert('Erro ao obter localização!');
+      showAlert('Erro ao obter localização!');
       return;
     }
 
@@ -69,7 +69,7 @@ export const getAddress = async (
   }).catch(() => undefined);
 
   if (!location) {
-    alert('Erro ao obter localização!');
+    showAlert('Erro ao obter localização!');
     return;
   }
 

@@ -2,7 +2,7 @@ import React, { createRef, useEffect, useState } from 'react';
 import MyHeader from '~/components/MyHeader';
 import { KeyboardAvoidingView, TextInput } from 'react-native';
 import { myColors, device, globalStyles } from '~/constants';
-import useMyContext from '~/core/MyContext';
+import { useToastContext } from '~/contexts/ToastContext';
 import Loading from '~/components/Loading';
 import MyButton from '~/components/MyButton';
 import useRouting from '~/hooks/useRouting';
@@ -54,7 +54,7 @@ const phoneMask = (raw: string) =>
 
 const MyProfile = () => {
   const { navigate, goBack } = useRouting();
-  const { toast } = useMyContext();
+  const { toast } = useToastContext();
   const { isAuth, accessToken } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState<string>();

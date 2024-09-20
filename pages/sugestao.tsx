@@ -3,7 +3,7 @@ import { TextInput } from 'react-native';
 import MyHeader from '~/components/MyHeader';
 import MyButton from '~/components/MyButton';
 import { myColors, globalStyles } from '~/constants';
-import useMyContext from '~/core/MyContext';
+import { useToastContext } from '~/contexts/ToastContext';
 import { reduceErrors } from '~/functions/reduceErrors';
 import useRouting from '~/hooks/useRouting';
 import FormContainer from '~/components/FormContainer';
@@ -11,7 +11,7 @@ import MyInput from '~/components/MyInput';
 
 const Suggestion = () => {
   const routing = useRouting();
-  const { toast } = useMyContext();
+  const { toast } = useToastContext();
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState(false);
   const [city, setCity] = useState('');

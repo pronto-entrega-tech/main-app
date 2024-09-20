@@ -49,7 +49,7 @@ import { appOrSite } from '~/constants/device';
 import { WithToast } from '~/components/Layout';
 import { range } from '~/functions/range';
 import HeaderContainer from '~/components/HeaderContainer';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
 import { minute, hour } from '~/constants/time';
 
 type OrderDto = {
@@ -249,7 +249,7 @@ const Cart = () => {
     setSchedules,
   } = useCartContext();
   const { createOrder } = useOrderContext();
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const [buyTooList, setBuyTooList] = useState<Product[]>();
   const [marketTime, setMarketTime] = useState<MarketTime>();
   const [isDelivery, setIsDelivery] = useState(true);

@@ -7,7 +7,7 @@ import MyInput from '~/components/MyInput';
 import MyText from '~/components/MyText';
 import { globalStyles, myColors } from '~/constants';
 import { useAuthContext } from '~/contexts/AuthContext';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
 import { range } from '~/functions/range';
 import useRouting from '~/hooks/useRouting';
 import { api } from '~/services/api';
@@ -15,7 +15,7 @@ import { api } from '~/services/api';
 const EmailSignIn = () => {
   const { navigate } = useRouting();
   const { signIn } = useAuthContext();
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const [isLoading, setLoading] = useState(false);
   const [stage, setStage] = useState(0);
   const [input, setInput] = useState('');

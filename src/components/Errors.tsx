@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { globalStyles, myColors } from '~/constants';
-import { MyContextValues } from '~/core/MyContext';
+import { ShowAlert } from '~/contexts/AlertContext';
 import MyButton from './MyButton';
 import MyText from './MyText';
 
-export const serverError = (alert: MyContextValues['alert']) =>
-  alert('Erro ao se conectar com o servidor', 'Tente novamente mais tarde');
+export const serverError = (showAlert: ShowAlert) =>
+  showAlert('Erro ao se conectar com o servidor', 'Tente novamente mais tarde');
 
 const Connection = () => (
   <View style={globalStyles.centralizer}>
@@ -108,7 +108,7 @@ const Errors = ({
     nothing_market: () => NothingMarket(),
     nothing_search: () => NothingSearch(),
     nothing_order: () => NothingOrder(),
-  }[error ?? 'server']());
+  })[error ?? 'server']();
 
 const styles = StyleSheet.create({
   title: {

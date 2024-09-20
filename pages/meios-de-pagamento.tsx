@@ -16,7 +16,7 @@ import { formatCardBrand } from '~/functions/converter';
 import { useCartContext } from '~/contexts/CartContext';
 import Portal from '~/core/Portal';
 import MyInput from '~/components/MyInput';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
 import CenterModal from '~/components/CenterModal';
 import MyIcon from '~/components/MyIcon';
 
@@ -43,7 +43,7 @@ export const PaymentMethodsBody = ({
   onAddCard?: () => void;
   showPix?: boolean;
 }) => {
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const { accessToken } = useAuthContext();
   const { payment, setPayment } = useCartContext();
   const {

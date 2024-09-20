@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
 import { calcSubtotal } from '~/functions/calcSubtotal';
 import { pick } from '~/functions/converter';
 import { createContext } from '~/contexts/createContext';
@@ -25,7 +25,7 @@ import { useStateToRef } from '~/hooks/useStateToRef';
 type FullMarketId = { market_id?: string; city_slug?: string };
 
 function useCart() {
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const [subtotal, setSubtotal] = useState(money('0'));
   const [totalOff, setTotalOff] = useState(money('0'));
   const [shoppingList, _setShoppingList] = useState<ShoppingList>();

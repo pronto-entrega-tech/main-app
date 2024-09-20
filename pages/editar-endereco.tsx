@@ -5,7 +5,7 @@ import Loading from '~/components/Loading';
 import MyButton from '~/components/MyButton';
 import MyPicker from '~/components/MyPicker';
 import { myColors, device, myFonts, globalStyles } from '~/constants';
-import useMyContext from '~/core/MyContext';
+import { useToastContext } from '~/contexts/ToastContext';
 import useRouting from '~/hooks/useRouting';
 import { reduceErrors } from '~/functions/reduceErrors';
 import { Address } from '~/core/models';
@@ -26,7 +26,7 @@ const blankAddress = (): Address => ({
 });
 
 const NewAddress = () => {
-  const { toast } = useMyContext();
+  const { toast } = useToastContext();
   const { params, navigate, goBack } = useRouting();
   const { isAuth, accessToken } = useAuthContext();
   const { addresses, loadAddresses, createAddress, updateAddress } =

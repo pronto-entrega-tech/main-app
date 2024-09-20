@@ -1,5 +1,6 @@
 import React, { ReactNode, ComponentType } from 'react';
-import { MyProvider } from './MyContext';
+import { ToastProvider } from '~/contexts/ToastContext';
+import { AlertProvider } from '../contexts/AlertContext';
 import { AddressProvider } from '~/contexts/AddressContext';
 import { AuthProvider } from '~/contexts/AuthContext';
 import { FavoritesProvider } from '~/contexts/FavoritesContext';
@@ -11,7 +12,8 @@ import { HasNavigatedProvider } from '~/contexts/HasNavigatedContext';
 
 export const AppContexts = (p: { children: ReactNode }) =>
   nestComponents(p.children, [
-    MyProvider,
+    ToastProvider,
+    AlertProvider,
     HasNavigatedProvider,
     AddressProvider,
     AuthProvider,

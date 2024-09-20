@@ -17,13 +17,13 @@ import { useAuthContext } from '~/contexts/AuthContext';
 import { objectConditional } from '~/functions/conditionals';
 import { api } from '~/services/api';
 import { useUpdateAddress } from '~/hooks/useAddress';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
 
 WebBrowser.maybeCompleteAuthSession();
 
 const SignIn = () => {
   const routing = useRouting();
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const { isAuth, signIn } = useAuthContext();
   const updateAddress = useUpdateAddress();
   const [isLoading, setIsLoading] = useState(false);

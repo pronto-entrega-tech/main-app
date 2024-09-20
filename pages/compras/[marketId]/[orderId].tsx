@@ -46,7 +46,8 @@ import MyTouchable from '~/components/MyTouchable';
 import IconButton from '~/components/IconButton';
 import QRCode from 'react-native-qrcode-svg';
 import * as Clipboard from 'expo-clipboard';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
+import { useToastContext } from '~/contexts/ToastContext';
 import { getConfirmationTokens } from '~/core/dataStorage';
 import { appOrSite } from '~/constants/device';
 import MyButton from '~/components/MyButton';
@@ -443,7 +444,7 @@ const PageModal = ({
 };
 
 const PixModal = ({ payment }: { payment: Order['payment'] }) => {
-  const { toast } = useMyContext();
+  const { toast } = useToastContext();
 
   if (!payment.pix_code || !payment.pix_expires_at) return null;
   const { pix_code, pix_expires_at } = payment;
@@ -497,7 +498,7 @@ const PaymentModal = ({
   order: Order;
   state: ModalState;
 }) => {
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const { accessToken } = useAuthContext();
   const [isLoading, setLoading] = useState(false);
   const [selectedPage, setSelectedPage] = useState(0);
@@ -601,7 +602,7 @@ const ReviewModal = ({
   order: Order;
   onDismiss: (review: Review) => void;
 }) => {
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const { accessToken } = useAuthContext();
   const [isLoading, setLoading] = useState(false);
   const [rating, setRating] = useState(0);

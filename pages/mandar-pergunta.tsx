@@ -3,7 +3,8 @@ import { StyleSheet, View, TextInput } from 'react-native';
 import { getDocumentAsync, DocumentPickerAsset } from 'expo-document-picker';
 import Loading from '~/components/Loading';
 import { device, globalStyles, myColors, myFonts } from '~/constants';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
+import { useToastContext } from '~/contexts/ToastContext';
 import IconButton from '~/components/IconButton';
 import MyButton from '~/components/MyButton';
 import MyDivider from '~/components/MyDivider';
@@ -30,7 +31,8 @@ const UploadQuestion = () => (
 
 const UploadQuestionBody = () => {
   const routing = useRouting();
-  const { toast, alert } = useMyContext();
+  const { alert } = useAlertContext();
+  const { toast } = useToastContext();
   const { isAuth, accessToken } = useAuthContext();
   const [email, setEmail] = useState<string>();
   const [emailError, setEmailError] = useState(false);

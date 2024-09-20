@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
 import { myColors, myFonts } from '~/constants';
 import CenterModal from './CenterModal';
 import MyButton from './MyButton';
@@ -16,12 +16,7 @@ export type AlertState = {
 };
 
 const MyAlert = () => {
-  const { alertState: _state, dismissAlert } = useMyContext();
-  const [alertState, setAlertState] = useState(_state);
-
-  useEffect(() => {
-    if (_state) setAlertState(_state);
-  }, [_state]);
+  const { alertState, dismissAlert } = useAlertContext();
 
   const closeAnd = (fn?: () => void) => () => {
     fn?.();
@@ -53,7 +48,8 @@ const MyAlert = () => {
   );
 
   return (
-    <CenterModal state={{ isVisible: !!_state, onDismiss: closeAnd(cancel) }}>
+    <CenterModal
+      state={{ isVisible: alertState != null, onDismiss: closeAnd(cancel) }}>
       <View>
         <MyText style={styles.title}>{alertState?.title}</MyText>
         <MyText style={styles.subtitle}>{alertState?.subtitle}</MyText>

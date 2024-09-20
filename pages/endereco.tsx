@@ -22,12 +22,12 @@ import { useAddressContext } from '~/contexts/AddressContext';
 import { useAuthContext } from '~/contexts/AuthContext';
 import Loading from '~/components/Loading';
 import Errors from '~/components/Errors';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
 import { useGetAddress } from '~/hooks/useAddress';
 
 const Addresses = () => {
   const routing = useRouting();
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const { setAddress } = useAddressContext();
   const getAddress = useGetAddress();
   const [statusText, setStatusText] = useState('Usar localização atual');
@@ -165,7 +165,7 @@ const AddressesList = (props: {
   const { activeId, setActiveId, goBack } = props;
 
   const routing = useRouting();
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const { accessToken } = useAuthContext();
   const { addresses, setAddress, loadAddresses, deleteAddress } =
     useAddressContext();

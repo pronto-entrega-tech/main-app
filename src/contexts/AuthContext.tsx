@@ -7,7 +7,7 @@ import { device } from '~/constants';
 import { useConnection } from '~/functions/connection';
 import { api } from '~/services/api';
 import { withMutex } from '~/services/mutex';
-import useMyContext from '~/core/MyContext';
+import { useAlertContext } from '~/contexts/AlertContext';
 
 type AuthToken = { accessToken?: string | null; refreshToken?: string | null };
 
@@ -27,7 +27,7 @@ const AuthContext = createContext({} as AuthContextValues);
 export const useAuthContext = createUseContext(AuthContext);
 
 export const AuthProvider = (props: { children: ReactNode }) => {
-  const { alert } = useMyContext();
+  const { alert } = useAlertContext();
   const hasInternet = useConnection();
   const [accessToken, setAccessToken] = useState<string | null>();
   const [refreshToken, _setRefreshToken] = useState<string | null>();

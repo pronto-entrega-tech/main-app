@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { device, globalStyles } from '~/constants';
 import { zIndex } from '~/constants/zIndex';
-import useMyContext from '~/core/MyContext';
+import { useToastContext } from '~/contexts/ToastContext';
 import MyIcon, { IconNames } from './MyIcon';
 import MyText from './MyText';
 import { AnimatePresence, MotiView } from 'moti';
@@ -14,7 +14,7 @@ export type ToastState = {
 };
 
 const MyToast = () => {
-  const { toastState } = useMyContext();
+  const { toastState } = useToastContext();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
