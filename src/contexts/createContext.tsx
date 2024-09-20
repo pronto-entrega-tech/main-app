@@ -51,6 +51,7 @@ export const createContext = <Value extends object>(useValue: () => Value) => {
         return useSyncExternalStore(
           store.subscribe,
           () => store.value[name as keyof Value],
+          () => store.value[name as keyof Value],
         );
       },
     });
@@ -61,7 +62,11 @@ export const createContext = <Value extends object>(useValue: () => Value) => {
   ) => {
     const store =
       useContextOrig(context) ?? fail(`Missing provider for ${useValue.name}`);
-    return useSyncExternalStore(store.subscribe, () => selector(store.value));
+    return useSyncExternalStore(
+      store.subscribe,
+      () => selector(store.value),
+      () => selector(store.value),
+    );
   };
 
   return [Provider, useContext, useContextSelector] as const;

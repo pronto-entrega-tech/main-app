@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { TextInput } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Text, TextInput, TextProps } from 'react-native';
 import { StyleProp, TextStyle } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -7,12 +7,16 @@ import Animated, {
   withTiming,
   useAnimatedProps,
   cancelAnimation,
+  SharedValue,
+  AnimatedProps,
+  useAnimatedReaction,
 } from 'react-native-reanimated';
-import { myFonts } from '~/constants';
+import { device, myFonts } from '~/constants';
 import { Money, money } from '~/functions/money';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 Animated.addWhitelistedNativeProps({ text: true });
+
 const AnimatedText = ({
   children: value,
   style,
@@ -28,10 +32,6 @@ const AnimatedText = ({
 }) => {
   const previousValue = useRef(value);
   const sharedText = useSharedValue(format(value));
-
-  const scaleAnimatedProps = useAnimatedProps(() => {
-    return { text: sharedText.value, defaultValue: sharedText.value };
-  });
 
   const translateY = useSharedValue(0);
   const opacity = useSharedValue(1);
@@ -70,23 +70,59 @@ const AnimatedText = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  return (
-    <AnimatedTextInput
-      underlineColorAndroid='transparent'
-      editable={false}
-      animatedProps={scaleAnimatedProps}
+  const animatedProps = useAnimatedProps(() => {
+    return { text: sharedText.value, defaultValue: sharedText.value };
+  }, [sharedText]);
+
+  return device.web ? (
+    <WebAnimatedText
+      sharedText={sharedText}
       style={[
         {
           fontFamily: myFonts.Regular,
           opacity,
           transform: [{ translateY }],
-          textAlign: 'center',
+        },
+        style,
+      ]}
+    />
+  ) : (
+    <AnimatedTextInput
+      underlineColorAndroid='transparent'
+      readOnly
+      animatedProps={animatedProps}
+      style={[
+        {
+          fontFamily: myFonts.Regular,
+          opacity,
+          transform: [{ translateY }],
         },
         style,
       ]}
     />
   );
 };
+
+function WebAnimatedText({
+  sharedText,
+  ...props
+}: { sharedText: SharedValue<string> } & AnimatedProps<TextProps>) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useAnimatedReaction(
+    () => sharedText.value,
+    (currentValue) => {
+      if (ref.current) ref.current.textContent = currentValue;
+    },
+    [sharedText],
+  );
+
+  return (
+    <Animated.Text ref={ref as any} {...props}>
+      {sharedText.value}
+    </Animated.Text>
+  );
+}
 
 function format(value: number | Money) {
   return typeof value === 'number' ? `${value}` : money.toString(value, 'R$');

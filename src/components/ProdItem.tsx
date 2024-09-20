@@ -173,8 +173,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: myColors.text3,
     fontFamily: myFonts.Bold,
-    left: 36 - 6,
+    left: device.web ? 34 : 30,
     position: 'absolute',
+    textAlign: 'center',
   },
   add: {
     width: 32,
