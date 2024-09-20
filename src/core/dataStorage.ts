@@ -1,34 +1,34 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Address, OrderPayment, Product, ShoppingList } from '~/core/models';
-import { getJwtExpiration } from '~/functions/converter';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Address, OrderPayment, Product, ShoppingList } from "~/core/models";
+import { getJwtExpiration } from "~/functions/converter";
 
-const prefix = '@prontoentrega:';
+const prefix = "@prontoentrega:";
 
 const key = {
-  isNewUser: prefix + 'isNewUser',
-  refreshToken: prefix + 'refreshToken',
-  activeAddressId: prefix + 'activeAddressId',
-  activeAddress: prefix + 'activeAddress',
-  notifies: prefix + 'notifies',
-  favorites: prefix + 'favorites',
-  shoppingList: prefix + 'shoppingList',
-  activeMarketId: prefix + 'activeMarketId',
-  activeMarket: prefix + 'activeMarket',
-  notifConfig: prefix + 'notifConfig',
-  lastPayment: prefix + 'lastPayment',
-  confirmationTokens: prefix + 'confirmationTokens',
+  isNewUser: prefix + "isNewUser",
+  refreshToken: prefix + "refreshToken",
+  activeAddressId: prefix + "activeAddressId",
+  activeAddress: prefix + "activeAddress",
+  notifies: prefix + "notifies",
+  favorites: prefix + "favorites",
+  shoppingList: prefix + "shoppingList",
+  activeMarketId: prefix + "activeMarketId",
+  activeMarket: prefix + "activeMarket",
+  notifConfig: prefix + "notifConfig",
+  lastPayment: prefix + "lastPayment",
+  confirmationTokens: prefix + "confirmationTokens",
 };
 
 // isNewUser
 export const saveIsNewUser = async (isNewUser: boolean) => {
   !isNewUser
-    ? await AsyncStorage.setItem(key.isNewUser, 'false')
+    ? await AsyncStorage.setItem(key.isNewUser, "false")
     : await AsyncStorage.removeItem(key.isNewUser);
 };
 
 export const getIsNewUser = async () => {
   const value = await AsyncStorage.getItem(key.isNewUser);
-  return value !== 'false';
+  return value !== "false";
 };
 
 // refreshToken
@@ -111,7 +111,7 @@ export const saveActiveMarketId = async (
 
 export const getActiveMarketId = async () => {
   const stringValue = await AsyncStorage.getItem(key.activeMarketId);
-  return JSON.parse(stringValue ?? '{}') as {
+  return JSON.parse(stringValue ?? "{}") as {
     market_id?: string;
     city_slug?: string;
   };
@@ -127,7 +127,7 @@ export const saveNotifConfig = async (value: Map<string, boolean>) => {
 
 export const getNotifConfig = async () => {
   const stringValue = await AsyncStorage.getItem(key.notifConfig);
-  return new Map<string, boolean>(JSON.parse(stringValue ?? '[]'));
+  return new Map<string, boolean>(JSON.parse(stringValue ?? "[]"));
 };
 
 // lastPayment

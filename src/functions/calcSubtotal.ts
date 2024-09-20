@@ -1,10 +1,10 @@
-import { Product, ShoppingList } from '~/core/models';
-import { money, calcPrices } from './money';
+import { Product, ShoppingList } from "~/core/models";
+import { money, calcPrices } from "./money";
 
 export const calcSubtotal = (shoppingList: ShoppingList) => {
   const initial = {
-    subtotal: money('0'),
-    totalOff: money('0'),
+    subtotal: money("0"),
+    totalOff: money("0"),
   };
 
   return [...shoppingList.values()].reduce((p, { item, quantity }) => {
@@ -23,7 +23,7 @@ const calcItemTotalWithOff = (item: Product, quantity: number) => {
     return quantity < maxQuantity ? quantity : maxQuantity;
   };
 
-  if (item.discount?.type === 'DISCOUNT_PERCENT_ON_SECOND') {
+  if (item.discount?.type === "DISCOUNT_PERCENT_ON_SECOND") {
     const minQuantity = item.discount.value_2 ?? 2;
 
     if (quantity < minQuantity)
@@ -44,10 +44,10 @@ const calcItemTotalWithOff = (item: Product, quantity: number) => {
       total: money.plus(totalWithoutOff, totalWithOff),
       off: money.times(
         money.minus(item.price, newPrice),
-        quantity - (minQuantity - 1)
+        quantity - (minQuantity - 1),
       ),
     };
-  } else if (item.discount?.type === 'ONE_FREE') {
+  } else if (item.discount?.type === "ONE_FREE") {
     const minQuantity = item.discount.value_1;
 
     if (quantity < minQuantity)

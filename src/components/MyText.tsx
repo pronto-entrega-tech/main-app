@@ -1,13 +1,13 @@
-import React from 'react';
-import { Text, TextProps } from 'react-native';
-import { myColors } from '~/constants';
+import React from "react";
+import { Text, TextProps } from "react-native";
+import { myColors } from "~/constants";
 
 const MyText = ({ style, ...props }: TextProps) => (
   <Text
     style={[
       {
         color: myColors.text7,
-        pointerEvents: 'none',
+        pointerEvents: "none",
       },
       style,
     ]}

@@ -1,24 +1,24 @@
-import { Money } from '~/functions/money';
+import { Money } from "~/functions/money";
 
 export type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export const weekDayNames = [
-  'Domingo',
-  'Segunda',
-  'Terça',
-  'Quarta',
-  'Quinta',
-  'Sexta',
-  'Sábado',
+  "Domingo",
+  "Segunda",
+  "Terça",
+  "Quarta",
+  "Quinta",
+  "Sexta",
+  "Sábado",
 ] as const;
 export const weekDayArray = [
-  'SUN',
-  'MON',
-  'TUE',
-  'WED',
-  'THU',
-  'FRI',
-  'SAT',
+  "SUN",
+  "MON",
+  "TUE",
+  "WED",
+  "THU",
+  "FRI",
+  "SAT",
 ] as const;
 export type WeekDay = (typeof weekDayArray)[number];
 
@@ -78,7 +78,7 @@ export type CreatePaymentCard = {
   cvv: string;
 };
 
-export type UpdatePaymentCard = Pick<PaymentCard, 'id' | 'nickname'>;
+export type UpdatePaymentCard = Pick<PaymentCard, "id" | "nickname">;
 
 export type Banner = {
   name: string;
@@ -119,10 +119,10 @@ export type Market = {
 };
 
 export enum ItemOrderBy {
-  Default = 'DEFAULT',
-  Rating = 'RATING',
-  DeliveryTime = 'DELIVERY_TIME',
-  Distance = 'DISTANCE',
+  Default = "DEFAULT",
+  Rating = "RATING",
+  DeliveryTime = "DELIVERY_TIME",
+  Distance = "DISTANCE",
 }
 
 export type Product = {
@@ -143,9 +143,9 @@ export type Product = {
     quantity: number;
   }[];
   discount?: (
-    | { type: 'DISCOUNT_VALUE'; value_1: Money }
+    | { type: "DISCOUNT_VALUE"; value_1: Money }
     | {
-        type: 'DISCOUNT_PERCENT' | 'DISCOUNT_PERCENT_ON_SECOND' | 'ONE_FREE';
+        type: "DISCOUNT_PERCENT" | "DISCOUNT_PERCENT_ON_SECOND" | "ONE_FREE";
         value_1: number;
       }
   ) & { value_2?: number; max_per_client: number };
@@ -178,19 +178,19 @@ export type CreateOrder = {
 };
 
 export type RetryPayment =
-  | { payment_method: 'PIX' }
-  | { payment_method: 'CARD'; card_id: string };
+  | { payment_method: "PIX" }
+  | { payment_method: "CARD"; card_id: string };
 
 export type CancelReason =
-  | 'WRONG_PRODUCT'
-  | 'WRONG_ADDRESS'
-  | 'WRONG_PAYMENT_METHOD'
-  | 'FORGOT_COUPON'
-  | 'ORDER_BY_MISTAKE'
-  | 'CANT_TAKE'
-  | 'DELIVERY_TOO_LATE'
-  | 'ORDER_IS_LATE'
-  | 'OTHER';
+  | "WRONG_PRODUCT"
+  | "WRONG_ADDRESS"
+  | "WRONG_PAYMENT_METHOD"
+  | "FORGOT_COUPON"
+  | "ORDER_BY_MISTAKE"
+  | "CANT_TAKE"
+  | "DELIVERY_TOO_LATE"
+  | "ORDER_IS_LATE"
+  | "OTHER";
 
 export type CancelOrder = {
   reason?: CancelReason;
@@ -214,7 +214,7 @@ export type Review = {
 
 export type MarketRating = Pick<
   Market,
-  'rating' | 'reviews_count_lately' | 'reviews_count_total'
+  "rating" | "reviews_count_lately" | "reviews_count_total"
 > & {
   reviews: (Review & {
     order_id: string;
@@ -224,18 +224,18 @@ export type MarketRating = Pick<
 };
 
 type OrderStatus =
-  | 'PAYMENT_PROCESSING'
-  | 'PAYMENT_FAILED'
-  | 'PAYMENT_REQUIRE_ACTION'
-  | 'APPROVAL_PENDING'
-  | 'PROCESSING'
-  | 'DELIVERY_PENDING'
-  | 'COMPLETING'
-  | 'COMPLETED'
-  | 'CANCELING'
-  | 'CANCELED';
+  | "PAYMENT_PROCESSING"
+  | "PAYMENT_FAILED"
+  | "PAYMENT_REQUIRE_ACTION"
+  | "APPROVAL_PENDING"
+  | "PROCESSING"
+  | "DELIVERY_PENDING"
+  | "COMPLETING"
+  | "COMPLETED"
+  | "CANCELING"
+  | "CANCELED";
 
-export type Order = Omit<CreateOrder, 'items' | 'card_id'> & {
+export type Order = Omit<CreateOrder, "items" | "card_id"> & {
   order_id: string;
   market_order_id: string;
   customer_id: string;
@@ -321,9 +321,9 @@ export type OrderSchedule = {
   scheduled: boolean;
 };
 
-type PaymentMethod = 'CASH' | 'CARD' | 'PIX';
+type PaymentMethod = "CASH" | "CARD" | "PIX";
 
-type ChatMessageAuthor = 'CUSTOMER' | 'MARKET';
+type ChatMessageAuthor = "CUSTOMER" | "MARKET";
 
 export type ChatMsg = {
   id: string;
@@ -338,5 +338,5 @@ export type ChatMsg = {
 
 export type CreateChatMsgDto = Pick<
   ChatMsg,
-  'market_id' | 'order_id' | 'message'
+  "market_id" | "order_id" | "message"
 >;

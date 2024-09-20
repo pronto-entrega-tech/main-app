@@ -1,8 +1,8 @@
-import React from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
-import Icon from '@expo/vector-icons/MaterialCommunityIcons';
-import icons from '~/constants/svgPaths';
-import myColors from '~/constants/myColors';
+import React from "react";
+import { StyleProp, ViewStyle } from "react-native";
+import Icon from "@expo/vector-icons/MaterialCommunityIcons";
+import icons from "~/constants/svgPaths";
+import myColors from "~/constants/myColors";
 
 export type IconNames = keyof typeof icons;
 

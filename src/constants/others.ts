@@ -1,8 +1,8 @@
 import {
   StackNavigationOptions,
   TransitionPresets,
-} from '@react-navigation/stack';
-import { myTitle } from '~/constants';
+} from "@react-navigation/stack";
+import { myTitle } from "~/constants";
 
 export const myScreenOptions: StackNavigationOptions = {
   title: myTitle,

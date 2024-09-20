@@ -1,31 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
-import { Image } from 'react-native-elements/dist/image/Image';
-import MyHeader from '~/components/MyHeader';
-import { myColors, globalStyles, myFonts, images } from '~/constants';
-import MyText from '~/components/MyText';
-import Errors from '~/components/Errors';
-import Loading from '~/components/Loading';
-import { useAuthContext } from '~/contexts/AuthContext';
-import MyButton from '~/components/MyButton';
-import { usePaymentCardContext } from '~/contexts/PaymentCardContext';
-import { PaymentCard } from '~/core/models';
-import MyTouchable from '~/components/MyTouchable';
-import IconButton from '~/components/IconButton';
-import { formatCardBrand } from '~/functions/converter';
-import { useCartContext } from '~/contexts/CartContext';
-import Portal from '~/core/Portal';
-import MyInput from '~/components/MyInput';
-import { useAlertContext } from '~/contexts/AlertContext';
-import CenterModal from '~/components/CenterModal';
-import MyIcon from '~/components/MyIcon';
+import React, { useEffect, useState } from "react";
+import { FlatList, StyleSheet, View } from "react-native";
+import { Image } from "react-native-elements/dist/image/Image";
+import MyHeader from "~/components/MyHeader";
+import { myColors, globalStyles, myFonts, images } from "~/constants";
+import MyText from "~/components/MyText";
+import Errors from "~/components/Errors";
+import Loading from "~/components/Loading";
+import { useAuthContext } from "~/contexts/AuthContext";
+import MyButton from "~/components/MyButton";
+import { usePaymentCardContext } from "~/contexts/PaymentCardContext";
+import { PaymentCard } from "~/core/models";
+import MyTouchable from "~/components/MyTouchable";
+import IconButton from "~/components/IconButton";
+import { formatCardBrand } from "~/functions/converter";
+import { useCartContext } from "~/contexts/CartContext";
+import Portal from "~/core/Portal";
+import MyInput from "~/components/MyInput";
+import { useAlertContext } from "~/contexts/AlertContext";
+import CenterModal from "~/components/CenterModal";
+import MyIcon from "~/components/MyIcon";
 
 const Nothing = () => (
   <View
-    style={[
-      globalStyles.centralizer,
-      { backgroundColor: myColors.background },
-    ]}>
+    style={[globalStyles.centralizer, { backgroundColor: myColors.background }]}
+  >
     <MyText style={{ fontSize: 15, color: myColors.text2 }}>
       Nenhum cartão de crédito salvo ainda
     </MyText>
@@ -53,8 +51,8 @@ export const PaymentMethodsBody = ({
     deletePaymentCard,
   } = usePaymentCardContext();
   const [isLoading, setLoading] = useState(false);
-  const [modalCardId, setModalCardId] = useState('');
-  const [newNickname, setNewNickname] = useState('');
+  const [modalCardId, setModalCardId] = useState("");
+  const [newNickname, setNewNickname] = useState("");
 
   useEffect(() => {
     if (accessToken) loadPaymentCards(accessToken);
@@ -62,7 +60,7 @@ export const PaymentMethodsBody = ({
 
   if (accessToken === null)
     return (
-      <Errors title='Entre para ver seus cartões salvos' error='missing_auth' />
+      <Errors title="Entre para ver seus cartões salvos" error="missing_auth" />
     );
 
   if (isLoading || !paymentCards || !accessToken) return <Loading />;
@@ -82,7 +80,7 @@ export const PaymentMethodsBody = ({
       if (payment?.cardId === card.id) setPayment(null);
 
       alert(
-        'Apagar cartão',
+        "Apagar cartão",
         `Tem certeza que deseja apagar o cartão "${name}"?`,
         { onConfirm: () => deletePaymentCard(accessToken, card.id) },
       );
@@ -90,21 +88,23 @@ export const PaymentMethodsBody = ({
 
     return (
       <View
-        style={[globalStyles.elevation3, globalStyles.darkBorder, styles.card]}>
+        style={[globalStyles.elevation3, globalStyles.darkBorder, styles.card]}
+      >
         <MyTouchable
           style={{ flex: 1 }}
-          onPress={onCardPress && (() => onCardPress(card))}>
+          onPress={onCardPress && (() => onCardPress(card))}
+        >
           <View style={styles.cardNameContainer}>
             {cardIcon ? (
               <Image
                 {...cardIcon}
-                alt=''
-                resizeMode='contain'
+                alt=""
+                resizeMode="contain"
                 containerStyle={{ width: 34, height: 34 }}
               />
             ) : (
               <MyIcon
-                name='credit-card-outline'
+                name="credit-card-outline"
                 size={34}
                 color={myColors.primaryColor}
               />
@@ -117,13 +117,13 @@ export const PaymentMethodsBody = ({
         </MyTouchable>
         <View style={styles.itemButtonsContainer}>
           <IconButton
-            icon='pencil'
+            icon="pencil"
             color={myColors.grey3}
             style={styles.itemButton}
             onPress={() => setModalCardId(card.id)}
           />
           <IconButton
-            icon='delete'
+            icon="delete"
             color={myColors.grey3}
             style={[styles.itemButton, { top: -8 }]}
             onPress={removeCard}
@@ -135,8 +135,8 @@ export const PaymentMethodsBody = ({
 
   const saveCardUpdate = async () => {
     setLoading(true);
-    setModalCardId('');
-    setNewNickname('');
+    setModalCardId("");
+    setNewNickname("");
 
     await updatePaymentCard(accessToken, {
       id: modalCardId,
@@ -147,22 +147,24 @@ export const PaymentMethodsBody = ({
   };
 
   const cancelUpdate = () => {
-    setModalCardId('');
-    setNewNickname('');
+    setModalCardId("");
+    setNewNickname("");
   };
 
   const updateModal = (
     <CenterModal
       state={{ isVisible: !!modalCardId, onDismiss: cancelUpdate }}
-      style={{ padding: 24, alignItems: 'center' }}>
+      style={{ padding: 24, alignItems: "center" }}
+    >
       <MyText
         style={{
           fontSize: 20,
           color: myColors.text4_5,
           fontFamily: myFonts.Medium,
           marginBottom: 16,
-          textAlign: 'center',
-        }}>
+          textAlign: "center",
+        }}
+      >
         Como quer chamar esse cartão?
       </MyText>
       <MyInput
@@ -177,15 +179,15 @@ export const PaymentMethodsBody = ({
         onChangeText={setNewNickname}
         onSubmitEditing={saveCardUpdate}
       />
-      <View style={{ flexDirection: 'row' }}>
+      <View style={{ flexDirection: "row" }}>
         <MyButton
-          title='Cancelar'
-          type='outline'
+          title="Cancelar"
+          type="outline"
           buttonStyle={{ borderWidth: 2, padding: 6, width: 106 }}
           onPress={cancelUpdate}
         />
         <MyButton
-          title='Confirmar'
+          title="Confirmar"
           disabled={!newNickname}
           buttonStyle={{ marginLeft: 16, width: 106 }}
           onPress={saveCardUpdate}
@@ -202,12 +204,13 @@ export const PaymentMethodsBody = ({
         styles.card,
         { marginBottom: 14 },
       ]}
-      onPress={onPixPress && (() => onPixPress())}>
+      onPress={onPixPress && (() => onPixPress())}
+    >
       <View style={styles.cardNameContainer}>
         <Image
           {...images.pix}
-          alt=''
-          resizeMode='contain'
+          alt=""
+          resizeMode="contain"
           containerStyle={{ height: 34, width: 34 }}
         />
         <MyText style={[styles.cardSubContainer, styles.cardName]}>Pix</MyText>
@@ -223,7 +226,7 @@ export const PaymentMethodsBody = ({
           <Nothing />
         ) : (
           <FlatList
-            style={{ overflow: 'visible' }}
+            style={{ overflow: "visible" }}
             showsVerticalScrollIndicator={false}
             data={paymentCards}
             keyExtractor={(v) => v.id}
@@ -232,9 +235,9 @@ export const PaymentMethodsBody = ({
         )}
       </View>
       <MyButton
-        title='Adicionar cartão de crédito'
-        {...(onAddCard ? { onPress: onAddCard } : { screen: 'PaymentCard' })}
-        type='outline'
+        title="Adicionar cartão de crédito"
+        {...(onAddCard ? { onPress: onAddCard } : { screen: "PaymentCard" })}
+        type="outline"
         buttonStyle={globalStyles.bottomButton}
       />
       <Portal>{updateModal}</Portal>
@@ -244,20 +247,20 @@ export const PaymentMethodsBody = ({
 
 const PaymentMethods = () => (
   <>
-    <MyHeader title='Meios de pagamento' />
+    <MyHeader title="Meios de pagamento" />
     <PaymentMethodsBody showPix />
   </>
 );
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     marginTop: 16,
   },
   cardNameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 18,
   },
   cardSubContainer: {
@@ -274,7 +277,7 @@ const styles = StyleSheet.create({
     color: myColors.text2,
   },
   itemButtonsContainer: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
     top: -2,
   },

@@ -1,13 +1,13 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { Image } from 'react-native-elements/dist/image/Image';
-import { MotiView } from 'moti';
-import MyTouchable from '~/components/MyTouchable';
-import MyButton from '~/components/MyButton';
-import ProdList from '~/components/ProdList';
-import ProdListHorizontal from '~/components/ProdListHorizontal';
-import { myColors, device, globalStyles, myFonts } from '~/constants';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { Image } from "react-native-elements/dist/image/Image";
+import { MotiView } from "moti";
+import MyTouchable from "~/components/MyTouchable";
+import MyButton from "~/components/MyButton";
+import ProdList from "~/components/ProdList";
+import ProdListHorizontal from "~/components/ProdListHorizontal";
+import { myColors, device, globalStyles, myFonts } from "~/constants";
 import {
   Address,
   Coords,
@@ -19,38 +19,38 @@ import {
   SetState,
   ShoppingList,
   weekDayNames,
-} from '~/core/models';
-import MyText from '~/components/MyText';
-import MyHeader, { GoBackButton } from '~/components/MyHeader';
+} from "~/core/models";
+import MyText from "~/components/MyText";
+import MyHeader, { GoBackButton } from "~/components/MyHeader";
 import {
   getImageUrl,
   addToArray,
   stringifyShortAddress,
   isScheduleEqual,
   omit,
-} from '~/functions/converter';
-import { isMarketOpen } from '~/functions/marketOpenness';
-import { Money, money } from '~/functions/money';
-import Loading from '~/components/Loading';
-import Errors, { MyErrors } from '~/components/Errors';
-import useRouting from '~/hooks/useRouting';
-import MyDivider from '~/components/MyDivider';
-import { useConnection } from '~/functions/connection';
-import MyIcon from '~/components/MyIcon';
-import AnimatedText from '~/components/AnimatedText';
-import { useCartContext } from '~/contexts/CartContext';
-import { useAuthContext } from '~/contexts/AuthContext';
-import { useAddressContext } from '~/contexts/AddressContext';
-import { useOrderContext } from '~/contexts/OrderContext';
-import { ChangeModal } from '~/screens/PaymentOnDelivery';
-import { saveConfirmationToken } from '~/core/dataStorage';
-import { api } from '~/services/api';
-import { appOrSite } from '~/constants/device';
-import { WithToast } from '~/components/Layout';
-import { range } from '~/functions/range';
-import HeaderContainer from '~/components/HeaderContainer';
-import { useAlertContext } from '~/contexts/AlertContext';
-import { minute, hour } from '~/constants/time';
+} from "~/functions/converter";
+import { isMarketOpen } from "~/functions/marketOpenness";
+import { Money, money } from "~/functions/money";
+import Loading from "~/components/Loading";
+import Errors, { MyErrors } from "~/components/Errors";
+import useRouting from "~/hooks/useRouting";
+import MyDivider from "~/components/MyDivider";
+import { useConnection } from "~/functions/connection";
+import MyIcon from "~/components/MyIcon";
+import AnimatedText from "~/components/AnimatedText";
+import { useCartContext } from "~/contexts/CartContext";
+import { useAuthContext } from "~/contexts/AuthContext";
+import { useAddressContext } from "~/contexts/AddressContext";
+import { useOrderContext } from "~/contexts/OrderContext";
+import { ChangeModal } from "~/screens/PaymentOnDelivery";
+import { saveConfirmationToken } from "~/core/dataStorage";
+import { api } from "~/services/api";
+import { appOrSite } from "~/constants/device";
+import { WithToast } from "~/components/Layout";
+import { range } from "~/functions/range";
+import HeaderContainer from "~/components/HeaderContainer";
+import { useAlertContext } from "~/contexts/AlertContext";
+import { minute, hour } from "~/constants/time";
 
 type OrderDto = {
   accessToken: string;
@@ -85,14 +85,15 @@ const CartHeader = ({
 
   return (
     <HeaderContainer
-      style={[globalStyles.notch, { backgroundColor: myColors.background }]}>
+      style={[globalStyles.notch, { backgroundColor: myColors.background }]}
+    >
       <View style={styles.headerContainer}>
         <GoBackButton />
         <View style={styles.headerButtonsContainer}>
           <MyButton
             onPress={() => setIsDelivery(true)}
-            title='Entregar'
-            type='clear'
+            title="Entregar"
+            type="clear"
             titleStyle={{
               color: isDelivery ? myColors.primaryColor : myColors.grey,
             }}
@@ -100,8 +101,8 @@ const CartHeader = ({
           />
           <MyButton
             onPress={() => setIsDelivery(false)}
-            title='Retirar'
-            type='clear'
+            title="Retirar"
+            type="clear"
             titleStyle={{
               color: !isDelivery ? myColors.primaryColor : myColors.grey,
             }}
@@ -111,13 +112,13 @@ const CartHeader = ({
         <MyButton
           onPress={emptyCard}
           titleStyle={{ color: myColors.primaryColor }}
-          title='Esvaziar'
-          type='clear'
+          title="Esvaziar"
+          type="clear"
         />
       </View>
       <MyDivider style={{ marginTop: -1 }} />
       <MotiView
-        transition={{ type: 'timing', duration: 175 }}
+        transition={{ type: "timing", duration: 175 }}
         animate={{
           translateX: isDelivery ? 0 : 80 + extraWidth,
           width: (isDelivery ? 80 : 70) + extraWidth,
@@ -128,7 +129,7 @@ const CartHeader = ({
   );
 };
 
-type MarketTime = ReturnType<typeof getUpdatedSchedule>['marketTime'];
+type MarketTime = ReturnType<typeof getUpdatedSchedule>["marketTime"];
 
 const getUpdatedSchedule = ({
   business_hours,
@@ -151,11 +152,11 @@ const getUpdatedSchedule = ({
     if (!isOpen) return;
 
     const [{ close_time }] = intervals;
-    const closeHour = +close_time.split(':')[0];
+    const closeHour = +close_time.split(":")[0];
     const isToday = hoursNow < closeHour;
 
     const schedule: OrderSchedule = {
-      dayText: isToday ? 'Hoje' : 'Amanhã',
+      dayText: isToday ? "Hoje" : "Amanhã",
       dayNumber: isToday ? today : (today + 1) % 7,
       hours: `${min_time} - ${max_time} min`,
       scheduled: false,
@@ -167,11 +168,11 @@ const getUpdatedSchedule = ({
     if (!schedule_mins_interval) return;
 
     const toMins = (time: string) => {
-      const [hours, mins] = time.split(':');
+      const [hours, mins] = time.split(":");
       return +hours * 60 + +mins;
     };
     const formatMin = (mins: number) =>
-      `${Math.trunc(mins / 60)}:${`${mins % 60}`.padStart(2, '0')}`;
+      `${Math.trunc(mins / 60)}:${`${mins % 60}`.padStart(2, "0")}`;
 
     const delay = 60;
     const step = schedule_mins_interval;
@@ -200,8 +201,8 @@ const getUpdatedSchedule = ({
 
           const dayText =
             {
-              [today]: 'Hoje',
-              [(today + 1) % 7]: 'Amanhã',
+              [today]: "Hoje",
+              [(today + 1) % 7]: "Amanhã",
             }[day] ?? weekDayNames[day];
 
           return list.concat({
@@ -224,7 +225,7 @@ const getUpdatedSchedule = ({
   };
 };
 
-const marketAddress = (a: Market['address']) => `${a.street}, ${a.number}`;
+const marketAddress = (a: Market["address"]) => `${a.street}, ${a.number}`;
 
 const Cart = () => {
   const routing = useRouting();
@@ -265,7 +266,7 @@ const Cart = () => {
     shoppingList && [...shoppingList.values()].map((v) => v.item);
 
   const hasInternet = useConnection();
-  const connectErr = hasInternet === false ? 'connection' : undefined;
+  const connectErr = hasInternet === false ? "connection" : undefined;
 
   useEffect(() => {
     if (accessToken) {
@@ -285,7 +286,7 @@ const Cart = () => {
       setError(null);
 
       const market = await api.markets.findOne(citySlug, marketId);
-      if (!market) return setError('nothing_market');
+      if (!market) return setError("nothing_market");
 
       setActiveMarket(market);
 
@@ -323,7 +324,7 @@ const Cart = () => {
         );
       };
       updateSchedulesTask();
-    })().catch(() => setError('server'));
+    })().catch(() => setError("server"));
 
     return () => {
       canceled = true;
@@ -354,7 +355,8 @@ const Cart = () => {
           style={[
             globalStyles.centralizer,
             { backgroundColor: myColors.background },
-          ]}>
+          ]}
+        >
           <MyText style={{ fontSize: 15, color: myColors.text2 }}>
             Carrinho vazio
           </MyText>
@@ -366,31 +368,31 @@ const Cart = () => {
   if (!shoppingList) return null;
 
   const needDocument =
-    payment?.method === 'PIX' && payment?.inApp && !profile?.document;
+    payment?.method === "PIX" && payment?.inApp && !profile?.document;
 
   const [buttonText, dto] = ((): [string, OrderDto?] => {
     const isTotalBelowMin = money.isLess(subtotal ?? 0, market.order_min);
-    const orderMin = money.toString(market.order_min, 'R$');
+    const orderMin = money.toString(market.order_min, "R$");
 
-    if (!schedules?.length) return ['Fechado'];
+    if (!schedules?.length) return ["Fechado"];
 
-    if (!activeSchedule) return ['Escolha um agendamento'];
+    if (!activeSchedule) return ["Escolha um agendamento"];
 
-    if (accessToken == null) return ['Entre ou cadastre-se'];
+    if (accessToken == null) return ["Entre ou cadastre-se"];
 
     if (isTotalBelowMin) return [`Subtotal mínimo de ${orderMin}`];
 
-    if (!address?.street) return ['Escolha um endereço'];
+    if (!address?.street) return ["Escolha um endereço"];
 
-    if (!address.number) return ['Endereço falta o numero'];
-    if (!address.district) return ['Endereço falta o bairro'];
-    if (!address.city) return ['Endereço falta a cidade'];
-    if (!address.state) return ['Endereço falta o estado'];
-    if (!address.coords) return ['Endereço falta coordenadas'];
+    if (!address.number) return ["Endereço falta o numero"];
+    if (!address.district) return ["Endereço falta o bairro"];
+    if (!address.city) return ["Endereço falta a cidade"];
+    if (!address.state) return ["Endereço falta o estado"];
+    if (!address.coords) return ["Endereço falta coordenadas"];
 
-    if (!payment) return ['Escolha um meio de pagamento'];
+    if (!payment) return ["Escolha um meio de pagamento"];
 
-    if (needDocument) return ['Salve seu CPF'];
+    if (needDocument) return ["Salve seu CPF"];
 
     const dto = {
       accessToken,
@@ -401,10 +403,10 @@ const Cart = () => {
       shoppingList,
       activeSchedule,
     };
-    return ['Fazer pedido', dto];
+    return ["Fazer pedido", dto];
   })();
 
-  const MissingInfo = ({ title = '', buttonTitle = '', screen = '' }) => (
+  const MissingInfo = ({ title = "", buttonTitle = "", screen = "" }) => (
     <>
       <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
         <MyText
@@ -412,7 +414,8 @@ const Cart = () => {
             color: myColors.text2,
             fontSize: 20,
             fontFamily: myFonts.Medium,
-          }}>
+          }}
+        >
           Falta pouco!
         </MyText>
         <MyText style={{ marginTop: 8, color: myColors.text, fontSize: 16 }}>
@@ -432,38 +435,39 @@ const Cart = () => {
     <View>
       {!isAuth && (
         <MissingInfo
-          title='Para concluir o pedido, precisamos que você se identifique primeiro.'
-          buttonTitle='Entrar ou cadastrar-se'
-          screen='SignIn'
+          title="Para concluir o pedido, precisamos que você se identifique primeiro."
+          buttonTitle="Entrar ou cadastrar-se"
+          screen="SignIn"
         />
       )}
 
       {needDocument && (
         <MissingInfo
           title={`Para pagar com Pix pelo ${appOrSite}, salve seu CPF primeiro.`}
-          buttonTitle='Salvar CPF'
-          screen='MyProfile'
+          buttonTitle="Salvar CPF"
+          screen="MyProfile"
         />
       )}
 
       <MyTouchable
         disabled={!isDelivery}
-        screen='Addresses'
-        style={styles.addressContainer}>
+        screen="Addresses"
+        style={styles.addressContainer}
+      >
         <MyIcon
-          name={isDelivery ? 'home-map-marker' : 'map-marker-radius'}
+          name={isDelivery ? "home-map-marker" : "map-marker-radius"}
           size={28}
           style={{ marginLeft: -2 }}
         />
         <View style={{ marginLeft: 8 }}>
           <MyText style={styles.topText}>
-            {isDelivery ? 'Entregar' : 'Retirar'} em
+            {isDelivery ? "Entregar" : "Retirar"} em
           </MyText>
           <MyText style={styles.addressText}>
             {isDelivery
               ? !address
-                ? 'Carregando...'
-                : stringifyShortAddress(address) || 'Escolha um endereço' // `||` filter empty strings
+                ? "Carregando..."
+                : stringifyShortAddress(address) || "Escolha um endereço" // `||` filter empty strings
               : marketAddress(market?.address)}
           </MyText>
           {
@@ -474,7 +478,7 @@ const Cart = () => {
         </View>
         {isDelivery && (
           <MyIcon
-            name='chevron-right'
+            name="chevron-right"
             size={36}
             color={myColors.grey2}
             style={styles.rightIcon}
@@ -486,27 +490,27 @@ const Cart = () => {
 
       {isAuth && (
         <>
-          <MyTouchable screen='Payment' style={styles.addressContainer}>
-            <MyIcon name='credit-card-outline' size={28} />
+          <MyTouchable screen="Payment" style={styles.addressContainer}>
+            <MyIcon name="credit-card-outline" size={28} />
             <View style={{ marginLeft: 8 }}>
               <MyText style={styles.topText}>Meio de pagamento</MyText>
               <MyText style={styles.addressText}>
-                {payment?.description ?? 'Escolha um meio de pagamento'}
+                {payment?.description ?? "Escolha um meio de pagamento"}
               </MyText>
               {payment && (
                 <MyText style={styles.addressSubtext}>
-                  {payment.method === 'CASH'
+                  {payment.method === "CASH"
                     ? payment.change
-                      ? `Troco para ${money.toString(payment.change, 'R$')}`
-                      : 'Sem Troco'
+                      ? `Troco para ${money.toString(payment.change, "R$")}`
+                      : "Sem Troco"
                     : payment.inApp
-                    ? `Pelo ${appOrSite}`
-                    : 'Na entrega'}
+                      ? `Pelo ${appOrSite}`
+                      : "Na entrega"}
                 </MyText>
               )}
             </View>
             <MyIcon
-              name='chevron-right'
+              name="chevron-right"
               size={36}
               color={myColors.grey2}
               style={styles.rightIcon}
@@ -518,22 +522,23 @@ const Cart = () => {
 
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <MyText style={styles.scheduleText}>
           {activeSchedule
             ? `${activeSchedule.dayText}, ${activeSchedule.hours}`
             : schedules?.length
-            ? 'Escolha um agendamento'
-            : ''}
+              ? "Escolha um agendamento"
+              : ""}
         </MyText>
         {!!schedules?.length && (
           <MyButton
-            title='Ver horários'
-            type='clear'
-            screen='Schedule'
+            title="Ver horários"
+            type="clear"
+            screen="Schedule"
             titleStyle={{ color: myColors.primaryColor }}
             buttonStyle={{
               minHeight: 0,
@@ -548,7 +553,8 @@ const Cart = () => {
       <ScrollView
         contentContainerStyle={styles.scheduleContainer}
         showsHorizontalScrollIndicator={false}
-        horizontal>
+        horizontal
+      >
         {!marketTime.isOpen && (
           <View
             style={[
@@ -556,13 +562,15 @@ const Cart = () => {
               styles.scheduleCardBase,
               styles.scheduleCardInactive,
               globalStyles.elevation1,
-            ]}>
+            ]}
+          >
             <>
               <MyText
                 style={{
                   color: myColors.text2,
                   fontFamily: myFonts.Bold,
-                }}>
+                }}
+              >
                 Fechado
               </MyText>
               <MyText
@@ -570,7 +578,8 @@ const Cart = () => {
                   color: myColors.text4,
                   fontSize: 15,
                   paddingVertical: 4,
-                }}>
+                }}
+              >
                 {marketTime.open_time &&
                   `Abre amanhã ás ${marketTime.open_time}`}
               </MyText>
@@ -589,14 +598,16 @@ const Cart = () => {
                     ? styles.scheduleCardActive
                     : styles.scheduleCardInactive,
                   active ? globalStyles.elevation4 : globalStyles.elevation1,
-                ]}>
+                ]}
+              >
                 <>
                   <MyText
                     style={{
                       color: active ? myColors.primaryColor : myColors.text2,
                       fontFamily: myFonts.Bold,
-                    }}>
-                    {item.scheduled ? 'Agendar' : 'Padrão'}
+                    }}
+                  >
+                    {item.scheduled ? "Agendar" : "Padrão"}
                   </MyText>
                   <MyText style={{ color: myColors.text4, fontSize: 15 }}>
                     {item.dayText}
@@ -612,7 +623,7 @@ const Cart = () => {
       </ScrollView>
 
       <MyDivider style={styles.divider} />
-      <View style={{ minHeight: 231, backgroundColor: '#FCFCFC' }}>
+      <View style={{ minHeight: 231, backgroundColor: "#FCFCFC" }}>
         <MyText style={styles.orderTooText}>Peça também</MyText>
         {!buyTooList ? (
           <Loading />
@@ -637,25 +648,27 @@ const Cart = () => {
       <View style={styles.priceContainer}>
         <MyText style={styles.priceText}>Economizado</MyText>
         <AnimatedText
-          style={[styles.priceText, { color: '#E00000' }]}
-          distance={10}>
+          style={[styles.priceText, { color: "#E00000" }]}
+          distance={10}
+        >
           {totalOff}
         </AnimatedText>
       </View>
       <View style={styles.priceContainer}>
         <MyText style={styles.priceText}>
-          {isDelivery ? 'Taxa de entrega' : 'Retirada'}
+          {isDelivery ? "Taxa de entrega" : "Retirada"}
         </MyText>
         <MyText
           style={[
             styles.priceText,
             (money.isEqual(market.delivery_fee, 0) || !isDelivery) && {
-              color: '#109c00',
+              color: "#109c00",
             },
-          ]}>
+          ]}
+        >
           {money.isEqual(market.delivery_fee, 0) || !isDelivery
-            ? 'Grátis'
-            : money.toString(market.delivery_fee, 'R$')}
+            ? "Grátis"
+            : money.toString(market.delivery_fee, "R$")}
         </MyText>
       </View>
       <MyDivider
@@ -666,14 +679,14 @@ const Cart = () => {
         <AnimatedText style={styles.priceTotalText}>{total}</AnimatedText>
       </View>
       <MyDivider style={[styles.divider, { marginTop: 4 }]} />
-      <MyTouchable screen='Cupons' style={styles.cupomContainer}>
-        <MyIcon name='ticket-percent' size={48} />
+      <MyTouchable screen="Cupons" style={styles.cupomContainer}>
+        <MyIcon name="ticket-percent" size={48} />
         <View style={styles.cupomTextContainer}>
           <MyText style={{ color: myColors.text5, fontSize: 16 }}>Cupom</MyText>
           <MyText style={{ color: myColors.text4 }}>Insira um código</MyText>
         </View>
         <MyIcon
-          name='chevron-right'
+          name="chevron-right"
           size={36}
           color={myColors.grey2}
           style={styles.rightIcon}
@@ -683,8 +696,8 @@ const Cart = () => {
       <View style={styles.prodListTopBar}>
         <Image
           style={{ height: 48, width: 48, borderRadius: 48 }}
-          source={{ uri: getImageUrl('market', market.market_id) }}
-          alt=''
+          source={{ uri: getImageUrl("market", market.market_id) }}
+          alt=""
         />
         <MyText style={styles.marketName}>{market.name}</MyText>
       </View>
@@ -715,7 +728,7 @@ const Cart = () => {
       })),
       is_scheduled: dto.activeSchedule.scheduled,
       //schedule_hours: dto.activeSchedule.hours,
-      client_total: money.toValue(total) ?? '',
+      client_total: money.toValue(total) ?? "",
     })
       .then(async (order) => {
         saveConfirmationToken({
@@ -724,9 +737,9 @@ const Cart = () => {
         });
 
         cleanCart();
-        if (dto.payment.change) setPayment(omit(dto.payment, 'change'));
+        if (dto.payment.change) setPayment(omit(dto.payment, "change"));
 
-        routing.replace('OrderDetails', {
+        routing.replace("OrderDetails", {
           marketId: order.market_id,
           orderId: order.order_id,
         });
@@ -737,12 +750,12 @@ const Cart = () => {
 
         if (total)
           return alert(
-            `Valor da compra mudou para ${money.toString(total, 'R$')}`,
-            'O mercado atualizou preço dos produtos',
+            `Valor da compra mudou para ${money.toString(total, "R$")}`,
+            "O mercado atualizou preço dos produtos",
             {
-              confirmTitle: 'Continuar',
+              confirmTitle: "Continuar",
               onConfirm: () => makeOrder(money(total), dto),
-              cancelTitle: 'Voltar',
+              cancelTitle: "Voltar",
               onCancel: async () => {
                 await revalidateCart();
                 setIsExiting(false);
@@ -750,7 +763,7 @@ const Cart = () => {
             },
           );
 
-        alert('Error ao fazer o pedido');
+        alert("Error ao fazer o pedido");
         setIsExiting(false);
       });
   };
@@ -775,7 +788,7 @@ const Cart = () => {
         onPress={dto ? () => makeOrder(total, dto) : undefined}
       />
       <ChangeModal
-        valuePrefix='Valor da compra aumentou para'
+        valuePrefix="Valor da compra aumentou para"
         state={{ isVisible: !!insufficientChange }}
       />
     </View>
@@ -784,14 +797,14 @@ const Cart = () => {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerButtonsContainer: {
-    position: 'absolute',
-    flexDirection: 'row',
-    alignItems: 'center',
+    position: "absolute",
+    flexDirection: "row",
+    alignItems: "center",
     marginLeft: 52,
   },
   indicator: {
@@ -803,12 +816,12 @@ const styles = StyleSheet.create({
   headerButtons1: {
     height: 56,
     width: 80 + extraWidth,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   headerButtons2: {
     height: 56,
     width: 70 + extraWidth,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   divider: {
     height: 2,
@@ -818,8 +831,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   addressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 14,
     paddingLeft: 12,
   },
@@ -861,7 +874,7 @@ const styles = StyleSheet.create({
   },
   scheduleCardActive: {
     borderColor: myColors.primaryColor,
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     borderWidth: 1.5,
   },
   scheduleCardInactive: {
@@ -877,14 +890,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   priceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginHorizontal: 16,
     marginVertical: 6,
   },
   priceTotalContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginHorizontal: 16,
     marginVertical: 8,
   },
@@ -898,21 +911,21 @@ const styles = StyleSheet.create({
   },
   cupomContainer: {
     padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   cupomTextContainer: {
     marginLeft: 8,
   },
   rightIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
   },
   prodListTopBar: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 10,
     marginHorizontal: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   marketName: {
     color: myColors.text4,
@@ -921,10 +934,10 @@ const styles = StyleSheet.create({
     fontFamily: myFonts.Medium,
   },
   buttonContainer: {
-    width: '95%',
-    position: device.web ? 'fixed' : 'absolute',
+    width: "95%",
+    position: device.web ? "fixed" : "absolute",
     bottom: device.iOS ? 36 : 6,
-    alignSelf: 'center',
+    alignSelf: "center",
     height: 58,
   },
 });

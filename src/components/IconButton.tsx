@@ -1,8 +1,8 @@
-import React from 'react';
-import { Insets, StyleProp, StyleSheet, ViewStyle } from 'react-native';
-import { myColors } from '~/constants';
-import MyTouchable, { ButtonOrLink } from './MyTouchable';
-import MyIcon, { IconNames } from './MyIcon';
+import React from "react";
+import { Insets, StyleProp, StyleSheet, ViewStyle } from "react-native";
+import { myColors } from "~/constants";
+import MyTouchable, { ButtonOrLink } from "./MyTouchable";
+import MyIcon, { IconNames } from "./MyIcon";
 
 type IconButtonBase = {
   icon: IconNames;
@@ -43,11 +43,12 @@ const IconButton = ({
       style={[
         styles.base,
         style,
-        disabled ? disabledStyle ?? { opacity: 0.4 } : {},
+        disabled ? (disabledStyle ?? { opacity: 0.4 }) : {},
       ]}
       hoverStyle={hoverStyle}
       disabled={disabled}
-      {...props}>
+      {...props}
+    >
       <MyIcon name={icon} size={size} color={color} />
     </MyTouchable>
   );
@@ -55,8 +56,8 @@ const IconButton = ({
 
 const styles = StyleSheet.create({
   base: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 999,
     width: 44,
     height: 44,

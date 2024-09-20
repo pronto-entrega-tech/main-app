@@ -1,13 +1,13 @@
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import React from 'react';
-import { KeyboardAvoidingView, View } from 'react-native';
-import MyHeader from '~/components/MyHeader';
-import { device, myColors, myTitle } from '~/constants';
-import { PaymentOnApp } from '@pages/pagamento';
-import Portal from '~/core/Portal';
-import PaymentOnDelivery from './PaymentOnDelivery';
-import { appOrSite, notchHeight } from '~/constants/device';
-import useRouting from '~/hooks/useRouting';
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import React from "react";
+import { KeyboardAvoidingView, View } from "react-native";
+import MyHeader from "~/components/MyHeader";
+import { device, myColors, myTitle } from "~/constants";
+import { PaymentOnApp } from "@pages/pagamento";
+import Portal from "~/core/Portal";
+import PaymentOnDelivery from "./PaymentOnDelivery";
+import { appOrSite, notchHeight } from "~/constants/device";
+import useRouting from "~/hooks/useRouting";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -22,23 +22,24 @@ const PaymentTabs = () => {
           backgroundColor: myColors.background,
         }}
       />
-      <MyHeader title='Pagamento' dividerLess notchLess />
+      <MyHeader title="Pagamento" dividerLess notchLess />
       <View style={{ flex: 1 }}>
         <Tab.Navigator
           screenOptions={{
             title: myTitle,
             tabBarActiveTintColor: myColors.text3,
             tabBarIndicatorStyle: { backgroundColor: myColors.primaryColor },
-          }}>
+          }}
+        >
           <Tab.Screen
-            name='PaymentInApp'
+            name="PaymentInApp"
             options={{ tabBarLabel: `Pagar pelo ${appOrSite}` }}
             component={PaymentOnApp}
             initialParams={params.params}
           />
           <Tab.Screen
-            name='PaymentOnDelivery'
-            options={{ tabBarLabel: 'Pagar na entrega' }}
+            name="PaymentOnDelivery"
+            options={{ tabBarLabel: "Pagar na entrega" }}
             component={PaymentOnDelivery}
             initialParams={params.params}
           />
@@ -49,7 +50,7 @@ const PaymentTabs = () => {
 
   if (device.iOS)
     return (
-      <KeyboardAvoidingView behavior='height' style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
         {paymentTabs}
       </KeyboardAvoidingView>
     );

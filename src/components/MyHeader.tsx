@@ -1,11 +1,11 @@
-import React, { ReactNode } from 'react';
-import { View, StyleSheet } from 'react-native';
-import useRouting from '~/hooks/useRouting';
-import { myColors, globalStyles, myFonts } from '~/constants';
-import IconButton from './IconButton';
-import MyDivider from './MyDivider';
-import MyText from './MyText';
-import HeaderContainer from './HeaderContainer';
+import React, { ReactNode } from "react";
+import { View, StyleSheet } from "react-native";
+import useRouting from "~/hooks/useRouting";
+import { myColors, globalStyles, myFonts } from "~/constants";
+import IconButton from "./IconButton";
+import MyDivider from "./MyDivider";
+import MyText from "./MyText";
+import HeaderContainer from "./HeaderContainer";
 
 const MyHeader = ({
   title,
@@ -46,7 +46,7 @@ export const GoBackButton = (p: { onGoBack?: () => void }) => {
   return (
     <IconButton
       onPress={() => goBack()}
-      icon='arrow-left'
+      icon="arrow-left"
       style={{
         width: 56,
         height: 56,
@@ -58,18 +58,18 @@ export const GoBackButton = (p: { onGoBack?: () => void }) => {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: myColors.background,
-    justifyContent: 'center',
+    justifyContent: "center",
     height: 56,
   },
   textHeader: {
     color: myColors.primaryColor,
     fontSize: 20,
     fontFamily: myFonts.Bold,
-    position: 'absolute',
-    alignSelf: 'center',
+    position: "absolute",
+    alignSelf: "center",
   },
   rightIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
   },
   divider: {

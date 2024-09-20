@@ -1,5 +1,5 @@
-import { UrlObject } from 'url';
-import { Urls } from '~/constants/urls';
+import { UrlObject } from "url";
+import { Urls } from "~/constants/urls";
 import {
   Market,
   Product,
@@ -8,13 +8,13 @@ import {
   Address,
   Coords,
   PaymentCard,
-} from '~/core/models';
-import { screensPaths } from '~/constants/routes';
-import { objectConditional } from './conditionals';
-import { money } from './money';
-import { Buffer } from 'buffer';
-import { lightFormat } from 'date-fns';
-import { Params } from '~/hooks/useRouting';
+} from "~/core/models";
+import { screensPaths } from "~/constants/routes";
+import { objectConditional } from "./conditionals";
+import { money } from "./money";
+import { Buffer } from "buffer";
+import { lightFormat } from "date-fns";
+import { Params } from "~/hooks/useRouting";
 
 export const validateProduct = (v: any): Product => ({
   ...v,
@@ -23,7 +23,7 @@ export const validateProduct = (v: any): Product => ({
     discount: {
       type: v.discount_type,
       value_1:
-        v.discount_type === 'DISCOUNT_VALUE'
+        v.discount_type === "DISCOUNT_VALUE"
           ? money(v.discount_value_1)
           : +v.discount_value_1,
       value_2: v.discount_value_2,
@@ -100,7 +100,7 @@ export const omit = <T extends Record<string, unknown>, K extends keyof T>(
     { ...obj },
   );
 
-type FalsyValue = undefined | null | false | 0 | '';
+type FalsyValue = undefined | null | false | 0 | "";
 type Truly<T> = T extends FalsyValue ? never : T;
 type Falsy<T> = T extends FalsyValue ? T : never;
 
@@ -118,12 +118,12 @@ export const capitalize = (v: string) =>
   `${v[0]?.toUpperCase()}${v.slice(1).toLowerCase()}`;
 
 export const formatCardBrand = (card: PaymentCard) =>
-  capitalize(card.brand.replace('UNKNOWN', 'Desconhecido'));
+  capitalize(card.brand.replace("UNKNOWN", "Desconhecido"));
 
 export const digitsMask = (raw: string, data: [number, string][]) =>
   data.reduce(
     (v, [n, s]) => (v.length > n ? v.slice(0, n) + s + v.slice(n) : v),
-    raw.replace(/\D/g, ''),
+    raw.replace(/\D/g, ""),
   );
 
 export const documentMask = (doc: string) => {
@@ -154,12 +154,12 @@ export const computeDistance = (coords1: Coords, coords2: Coords) => {
     )
   )
     .toFixed(1)
-    .replace('.', ',');
+    .replace(".", ",");
 };
 
 export const getJwtExpiration = (jwt: string) => {
-  const [, rawPayload] = jwt.split('.');
-  const payload = JSON.parse(Buffer.from(rawPayload, 'base64').toString());
+  const [, rawPayload] = jwt.split(".");
+  const payload = JSON.parse(Buffer.from(rawPayload, "base64").toString());
 
   return payload.exp * 1000;
 };
@@ -177,7 +177,7 @@ export const canReview = (o: Order) => {
 };
 
 export const formatDeliveryTime = (order: Order) => {
-  const toString = (d: Date) => lightFormat(d, 'HH:mm');
+  const toString = (d: Date) => lightFormat(d, "HH:mm");
 
   const min = toString(order.delivery_min_time);
   const max = toString(order.delivery_max_time);
@@ -229,7 +229,7 @@ export const urlFrom = (screen: string, params?: Params) => {
 export const screenFrom = (path: string) =>
   [...screensPaths.entries()].find(([, p]) => p === path)?.[0];
 
-type ImageDir = 'main' | 'market' | 'product' | 'banners';
+type ImageDir = "main" | "market" | "product" | "banners";
 export const getImageUrl = (dir: ImageDir, image: string) =>
   `${Urls.STATIC}/${dir}/${image}.webp`;
 
@@ -239,50 +239,50 @@ export const stringifyShortAddress = (a: Address) => {
   return `${a.street}, ${a.number}`;
 };
 
-export const stringifyAddress = (a: Omit<Address, 'id'>) => {
-  const district = a.district ? ` - ${a.district}` : '';
-  const number = a.number ? `, ${a.number}` : '';
+export const stringifyAddress = (a: Omit<Address, "id">) => {
+  const district = a.district ? ` - ${a.district}` : "";
+  const number = a.number ? `, ${a.number}` : "";
 
   return `${a.street}${number}${district}, ${a.city} - ${a.state}`;
 };
 
-export const toCityState = (address: Pick<Address, 'city' | 'state'>) =>
+export const toCityState = (address: Pick<Address, "city" | "state">) =>
   `${removeAccents(address.city)}-${address.state?.toLowerCase()}`;
 
 export const removeAccents = (text?: string) =>
   text
     ?.toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/ /g, '-') ?? '';
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ /g, "-") ?? "";
 
 export const getStateCode = (region: string) =>
   ({
-    acre: 'AC',
-    alagoas: 'AL',
-    amapa: 'AP',
-    amazonas: 'AM',
-    bahia: 'BA',
-    ceara: 'CE',
-    'distrito-federal': 'DF',
-    'espirito-santo': 'ES',
-    goias: 'GO',
-    maranhao: 'MA',
-    'mato-grosso': 'MT',
-    'mato-grosso-do-sul': 'MS',
-    'minas-gerais': 'MG',
-    para: 'PA',
-    paraiba: 'PB',
-    parana: 'PR',
-    pernambuco: 'PE',
-    piaui: 'PI',
-    'rio-de-janeiro': 'RJ',
-    'rio-grande-do-norte': 'RN',
-    'rio-grande-do-sul': 'RS',
-    rondonia: 'RO',
-    roraima: 'RR',
-    'santa-catarina': 'SC',
-    'sao-paulo': 'SP',
-    sergipe: 'SE',
-    tocantins: 'TO',
+    acre: "AC",
+    alagoas: "AL",
+    amapa: "AP",
+    amazonas: "AM",
+    bahia: "BA",
+    ceara: "CE",
+    "distrito-federal": "DF",
+    "espirito-santo": "ES",
+    goias: "GO",
+    maranhao: "MA",
+    "mato-grosso": "MT",
+    "mato-grosso-do-sul": "MS",
+    "minas-gerais": "MG",
+    para: "PA",
+    paraiba: "PB",
+    parana: "PR",
+    pernambuco: "PE",
+    piaui: "PI",
+    "rio-de-janeiro": "RJ",
+    "rio-grande-do-norte": "RN",
+    "rio-grande-do-sul": "RS",
+    rondonia: "RO",
+    roraima: "RR",
+    "santa-catarina": "SC",
+    "sao-paulo": "SP",
+    sergipe: "SE",
+    tocantins: "TO",
   })[removeAccents(region)] ?? region;

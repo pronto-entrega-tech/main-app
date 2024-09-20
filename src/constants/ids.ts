@@ -1,5 +1,5 @@
 export const GoogleClientId = {
-  android: 'todo',
-  ios: 'todo',
-  web: 'todo',
+  android: "todo",
+  ios: "todo",
+  web: "todo",
 };

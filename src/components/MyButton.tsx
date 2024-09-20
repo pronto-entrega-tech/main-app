@@ -1,12 +1,12 @@
-import React, { ReactNode } from 'react';
-import { StyleProp, ViewStyle, TextStyle } from 'react-native';
-import myColors from '~/constants/myColors';
-import myFonts from '~/constants/myFonts';
-import device from '~/constants/device';
-import MyText from './MyText';
-import MyTouchable, { ButtonOrLink } from './MyTouchable';
-import useHover from '~/hooks/useHover';
-import MyIcon, { IconNames, MyIconProps } from './MyIcon';
+import React, { ReactNode } from "react";
+import { StyleProp, ViewStyle, TextStyle } from "react-native";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
+import device from "~/constants/device";
+import MyText from "./MyText";
+import MyTouchable, { ButtonOrLink } from "./MyTouchable";
+import useHover from "~/hooks/useHover";
+import MyIcon, { IconNames, MyIconProps } from "./MyIcon";
 
 type MyButtonBase = {
   title: string;
@@ -14,7 +14,7 @@ type MyButtonBase = {
   image?: ReactNode;
   iconRight?: boolean;
   disabled?: boolean;
-  type?: 'solid' | 'outline' | 'clear';
+  type?: "solid" | "outline" | "clear";
   buttonStyle?: StyleProp<ViewStyle>;
   disabledStyle?: StyleProp<ViewStyle>;
   /**
@@ -35,7 +35,7 @@ const MyButton = ({
   icon,
   iconRight = false,
   disabled = false,
-  type = 'solid',
+  type = "solid",
   buttonStyle,
   disabledStyle,
   hoverStyle,
@@ -46,15 +46,15 @@ const MyButton = ({
     borderRadius: 4,
     minHeight: 44,
     minWidth: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: iconRight ? 'row-reverse' : 'row',
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: iconRight ? "row-reverse" : "row",
     // `padding` overwrite other paddings
     paddingTop: 8,
     paddingRight: 8,
     paddingBottom: 8,
     paddingLeft: 8,
-    ...{ transitionDuration: '200ms' },
+    ...{ transitionDuration: "200ms" },
   };
 
   const _useHover = useHover();
@@ -62,11 +62,11 @@ const MyButton = ({
 
   const isHovered = hovered && (screen || !disabled); // should be a link or a button not disabled
 
-  const hoverColor = !isHovered ? myColors.primaryColor : '#48a2eb';
+  const hoverColor = !isHovered ? myColors.primaryColor : "#48a2eb";
 
-  const solidTextColor = !disabled ? 'white' : '#99a1a8';
-  const textColor = !disabled ? hoverColor : '#9CA3AA';
-  const backgroundColor = !disabled ? hoverColor : '#E3E6E8';
+  const solidTextColor = !disabled ? "white" : "#99a1a8";
+  const textColor = !disabled ? hoverColor : "#9CA3AA";
+  const backgroundColor = !disabled ? hoverColor : "#E3E6E8";
 
   const typeStyle = {
     solid: {
@@ -81,25 +81,27 @@ const MyButton = ({
 
   return (
     <MyTouchable
-      solid={type === 'solid'}
+      solid={type === "solid"}
       disabled={disabled}
       style={[baseStyle, typeStyle, buttonStyle]}
       hoverStyle={hoverStyle}
       useHover={_useHover}
-      {...props}>
+      {...props}
+    >
       {image}
       {icon && (
-        <MyIcon {...(typeof icon === 'string' ? { name: icon } : icon)} />
+        <MyIcon {...(typeof icon === "string" ? { name: icon } : icon)} />
       )}
       <MyText
         style={[
           {
-            color: type === 'solid' ? solidTextColor : textColor,
+            color: type === "solid" ? solidTextColor : textColor,
             fontFamily: device.android ? myFonts.Medium : myFonts.Regular,
             fontSize: 16,
           },
           titleStyle,
-        ]}>
+        ]}
+      >
         {title}
       </MyText>
     </MyTouchable>

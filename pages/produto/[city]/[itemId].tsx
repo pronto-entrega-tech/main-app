@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Image } from 'react-native-elements/dist/image/Image';
-import IconButton from '~/components/IconButton';
-import ProdListHorizontal from '~/components/ProdListHorizontal';
-import { myColors, device, myFonts, globalStyles } from '~/constants';
-import { getImageUrl } from '~/functions/converter';
-import { calcPrices, money } from '~/functions/money';
-import MyIcon from '~/components/MyIcon';
-import MyDivider from '~/components/MyDivider';
-import useRouting from '~/hooks/useRouting';
-import Loading from '~/components/Loading';
-import Errors, { MyErrors } from '~/components/Errors';
-import { GetStaticPaths, GetStaticProps } from 'next';
-import AnimatedText from '~/components/AnimatedText';
-import { MarketFeed } from '@pages/inicio/mercado/[city]/[marketId]';
-import ProductHeader from '~/components/ProductHeader';
-import { SinglePageTabs } from '~/components/SinglePageTabs';
-import CartBar from '~/components/CartBar';
-import { Product, SetState } from '~/core/models';
-import MyText from '~/components/MyText';
-import { api } from '~/services/api';
-import { useCartContext, useCartContextSelector } from '~/contexts/CartContext';
-import { UseStore, useAtom } from '~/functions/stores';
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet } from "react-native";
+import { Image } from "react-native-elements/dist/image/Image";
+import IconButton from "~/components/IconButton";
+import ProdListHorizontal from "~/components/ProdListHorizontal";
+import { myColors, device, myFonts, globalStyles } from "~/constants";
+import { getImageUrl } from "~/functions/converter";
+import { calcPrices, money } from "~/functions/money";
+import MyIcon from "~/components/MyIcon";
+import MyDivider from "~/components/MyDivider";
+import useRouting from "~/hooks/useRouting";
+import Loading from "~/components/Loading";
+import Errors, { MyErrors } from "~/components/Errors";
+import { GetStaticPaths, GetStaticProps } from "next";
+import AnimatedText from "~/components/AnimatedText";
+import { MarketFeed } from "@pages/inicio/mercado/[city]/[marketId]";
+import ProductHeader from "~/components/ProductHeader";
+import { SinglePageTabs } from "~/components/SinglePageTabs";
+import CartBar from "~/components/CartBar";
+import { Product, SetState } from "~/core/models";
+import MyText from "~/components/MyText";
+import { api } from "~/services/api";
+import { useCartContext, useCartContextSelector } from "~/contexts/CartContext";
+import { UseStore, useAtom } from "~/functions/stores";
 
 type ProductDetailsProps = { setMarketId?: (v: string) => void };
 
@@ -40,19 +40,19 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
     if (product?.item_id === params.itemId) return;
 
     const { city, itemId } = params;
-    if (!city || !itemId) return setError('nothing_product');
+    if (!city || !itemId) return setError("nothing_product");
 
     (async () => {
       try {
         setError(null);
 
         const prod = await api.products.findOne(city, itemId);
-        if (!prod) return setError('nothing_product');
+        if (!prod) return setError("nothing_product");
 
         setProduct(prod);
         setMarketId?.(prod.market_id);
       } catch {
-        setError('server');
+        setError("server");
       }
     })();
   }, [tryAgain, product, params, setMarketId]);
@@ -68,12 +68,13 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
     <>
       <View
         style={{
-          flexDirection: 'row',
+          flexDirection: "row",
           paddingHorizontal: 13,
           paddingTop: 6,
           paddingBottom: 10,
-        }}>
-        <View style={{ flex: 1, flexDirection: 'column' }}>
+        }}
+      >
+        <View style={{ flex: 1, flexDirection: "column" }}>
           <MyText numberOfLines={3} style={styles.prodText}>
             {product.name} {product.brand}
           </MyText>
@@ -83,12 +84,12 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
                 <MyText style={styles.offText}>{discountText}</MyText>
               </View>
               <MyText style={styles.oldPriceText}>
-                {money.toString(previous_price, 'R$')}
+                {money.toString(previous_price, "R$")}
               </MyText>
             </View>
           )}
           <MyText style={styles.priceText}>
-            {money.toString(price, 'R$')}
+            {money.toString(price, "R$")}
           </MyText>
           <MyText style={styles.quantityText}>{product.quantity}</MyText>
         </View>
@@ -96,18 +97,18 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
         <View>
           {product.images_names ? (
             <Image
-              placeholderStyle={{ backgroundColor: 'white' }}
+              placeholderStyle={{ backgroundColor: "white" }}
               PlaceholderContent={
-                <MyIcon name='cart-outline' color={myColors.grey2} size={140} />
+                <MyIcon name="cart-outline" color={myColors.grey2} size={140} />
               }
-              source={{ uri: getImageUrl('product', product.images_names[0]) }}
-              alt=''
-              resizeMode='contain'
+              source={{ uri: getImageUrl("product", product.images_names[0]) }}
+              alt=""
+              resizeMode="contain"
               style={styles.image}
             />
           ) : (
             <MyIcon
-              name='cart-outline'
+              name="cart-outline"
               color={myColors.grey2}
               size={140}
               style={styles.image}
@@ -118,7 +119,7 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
             <IconButton
               onPress={() => removeProduct(product)}
               disabled={!quantity}
-              icon='minus'
+              icon="minus"
               style={[
                 styles.buttonAdd,
                 globalStyles.elevation4,
@@ -131,7 +132,7 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
             </AnimatedText>
             <IconButton
               onPress={() => addProduct(product)}
-              icon='plus'
+              icon="plus"
               style={[
                 styles.buttonAdd,
                 globalStyles.elevation4,
@@ -164,7 +165,8 @@ const KitItems = ({ product }: { product: Product }) => {
         paddingVertical: 10,
         paddingHorizontal: 14,
         color: myColors.text4,
-      }}>
+      }}
+    >
       {quantity}x {name}
     </MyText>
   ));
@@ -186,11 +188,11 @@ const ProductTabs = () => {
         header={<ProductHeader />}
         tabs={[
           {
-            title: 'Produto',
+            title: "Produto",
             element: <ProductDetails setMarketId={$marketId.set} />,
           },
           {
-            title: 'Mercado',
+            title: "Mercado",
             element: (
               <UseStore store={$marketId}>
                 {(marketId) => <MarketFeed marketId={marketId} />}
@@ -207,7 +209,7 @@ const ProductTabs = () => {
 const textLinePad = device.android ? -2 : 1;
 const styles = StyleSheet.create({
   placeholderColor: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   image: {
     marginTop: 10,
@@ -221,16 +223,16 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 8,
     fontFamily: myFonts.Condensed,
-    position: 'absolute',
+    position: "absolute",
   },
   oldPriceContainer: {
-    flexDirection: 'row',
-    position: 'absolute',
-    alignItems: 'center',
+    flexDirection: "row",
+    position: "absolute",
+    alignItems: "center",
     marginTop: 80,
   },
   oldPriceText: {
-    textDecorationLine: 'line-through',
+    textDecorationLine: "line-through",
     color: myColors.grey2,
     fontSize: 18,
     fontFamily: myFonts.Regular,
@@ -243,7 +245,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   offText: {
-    color: '#FFF',
+    color: "#FFF",
     fontFamily: myFonts.Bold,
     fontSize: 15,
   },
@@ -265,16 +267,16 @@ const styles = StyleSheet.create({
     fontSize: 19,
   },
   containerAdd: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: 6,
     paddingHorizontal: 14,
   },
   buttonAdd: {
     width: 34,
     height: 30,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   centerNumText: {
     fontSize: 17,

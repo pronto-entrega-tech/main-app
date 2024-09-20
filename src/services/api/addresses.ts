@@ -1,5 +1,5 @@
-import { Address } from '~/core/models';
-import Utils from './utils';
+import { Address } from "~/core/models";
+import Utils from "./utils";
 
 const { ApiClient, authHeader } = Utils;
 
@@ -34,7 +34,7 @@ const update = async (token: string, address: Address) => {
   );
 };
 
-const remove = async (token: string, id: Address['id']) => {
+const remove = async (token: string, id: Address["id"]) => {
   await ApiClient.delete(`/customers/addresses/${id}`, authHeader(token));
 };
 

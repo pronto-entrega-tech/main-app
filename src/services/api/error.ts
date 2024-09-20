@@ -1,5 +1,5 @@
-import axios from 'axios';
-type ApiError = 'Unauthorized' | 'NotFound' | 'Server';
+import axios from "axios";
+type ApiError = "Unauthorized" | "NotFound" | "Server";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {

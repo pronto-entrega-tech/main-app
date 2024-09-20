@@ -1,33 +1,33 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { Image } from 'react-native-elements/dist/image/Image';
-import MyHeader from '~/components/MyHeader';
-import { WithBottomNav } from '~/components/Layout';
-import Loading from '~/components/Loading';
-import MyDivider from '~/components/MyDivider';
-import MyText from '~/components/MyText';
-import MyTouchable from '~/components/MyTouchable';
-import { myColors, globalStyles, myFonts } from '~/constants';
+import React, { useEffect } from "react";
+import { View, StyleSheet, FlatList } from "react-native";
+import { Image } from "react-native-elements/dist/image/Image";
+import MyHeader from "~/components/MyHeader";
+import { WithBottomNav } from "~/components/Layout";
+import Loading from "~/components/Loading";
+import MyDivider from "~/components/MyDivider";
+import MyText from "~/components/MyText";
+import MyTouchable from "~/components/MyTouchable";
+import { myColors, globalStyles, myFonts } from "~/constants";
 import {
   canReview,
   fail,
   formatDeliveryTime,
   getImageUrl,
   validateOrder,
-} from '~/functions/converter';
-import { Order } from '~/core/models';
-import { useOrderContext } from '~/contexts/OrderContext';
-import { useAuthContext } from '~/contexts/AuthContext';
-import { io } from 'socket.io-client';
-import Rating from '~/components/Rating';
-import Errors from '~/components/Errors';
-import { Urls } from '~/constants/urls';
-import { lightFormat } from 'date-fns';
+} from "~/functions/converter";
+import { Order } from "~/core/models";
+import { useOrderContext } from "~/contexts/OrderContext";
+import { useAuthContext } from "~/contexts/AuthContext";
+import { io } from "socket.io-client";
+import Rating from "~/components/Rating";
+import Errors from "~/components/Errors";
+import { Urls } from "~/constants/urls";
+import { lightFormat } from "date-fns";
 
 const isCompleted = (order: Order) =>
-  ['COMPLETING', 'COMPLETED'].includes(order.status);
+  ["COMPLETING", "COMPLETED"].includes(order.status);
 const isCanceled = (order: Order) =>
-  ['CANCELING', 'CANCELED'].includes(order.status);
+  ["CANCELING", "CANCELED"].includes(order.status);
 
 const OrdersBody = () => {
   const { accessToken } = useAuthContext();
@@ -44,23 +44,20 @@ const OrdersBody = () => {
     if (!accessToken || !activeOrders?.length) return;
 
     const socket = io(Urls.API_WS, {
-      transports: ['websocket'],
+      transports: ["websocket"],
       auth: { token: accessToken },
     });
 
-    socket.on('orders', (newOrder: Partial<Order>) => {
+    socket.on("orders", (newOrder: Partial<Order>) => {
       const getNew = (o: Order) => validateOrder({ ...(o ?? {}), ...newOrder });
 
-      setOrders(
-        (orders) =>
-          orders?.map((o) =>
-            o.order_id === newOrder.order_id ? getNew(o) : o,
-          ),
+      setOrders((orders) =>
+        orders?.map((o) => (o.order_id === newOrder.order_id ? getNew(o) : o)),
       );
     });
 
     activeOrders.forEach(({ order_id, market_id }) => {
-      socket.emit('orders', { order_id, market_id });
+      socket.emit("orders", { order_id, market_id });
     });
 
     return () => {
@@ -70,46 +67,47 @@ const OrdersBody = () => {
   }, [accessToken, !orders, setOrders]);
 
   if (accessToken === null)
-    return <Errors error='missing_auth' title='Entre para ver seus pedidos' />;
+    return <Errors error="missing_auth" title="Entre para ver seus pedidos" />;
 
   if (!orders) return <Loading />;
 
   const OrderItem = ({ item }: { item: Order }) => {
     const statusMsg = isCompleted(item)
-      ? 'Pedido concluído'
+      ? "Pedido concluído"
       : isCanceled(item)
-      ? 'Pedido cancelado'
-      : 'Pedido em andamento';
+        ? "Pedido cancelado"
+        : "Pedido em andamento";
 
     const timeMsg = isCompleted(item)
-      ? 'Concluído em'
+      ? "Concluído em"
       : isCanceled(item)
-      ? 'Cancelado em'
-      : item.is_scheduled
-      ? 'Agendado para'
-      : 'Previsão de entrega';
+        ? "Cancelado em"
+        : item.is_scheduled
+          ? "Agendado para"
+          : "Previsão de entrega";
 
     const time =
       isCompleted(item) || isCanceled(item)
-        ? lightFormat(item.finished_at ?? fail(), 'dd/MM/yy')
+        ? lightFormat(item.finished_at ?? fail(), "dd/MM/yy")
         : formatDeliveryTime(item);
 
     return (
       <MyTouchable
-        screen='OrderDetails'
+        screen="OrderDetails"
         params={{ marketId: item.market_id, orderId: item.order_id }}
-        style={[styles.card, globalStyles.elevation3, globalStyles.darkBorder]}>
-        <View style={{ flexDirection: 'row' }}>
+        style={[styles.card, globalStyles.elevation3, globalStyles.darkBorder]}
+      >
+        <View style={{ flexDirection: "row" }}>
           <Image
-            source={{ uri: getImageUrl('market', item.market_id) }}
-            alt=''
-            placeholderStyle={{ backgroundColor: 'white' }}
+            source={{ uri: getImageUrl("market", item.market_id) }}
+            alt=""
+            placeholderStyle={{ backgroundColor: "white" }}
             containerStyle={{ borderRadius: 8, height: 50, width: 50 }}
           />
           <View style={{ marginLeft: 16 }}>
             <MyText style={styles.marketName}>{item.market.name}</MyText>
             <MyText style={styles.orderText}>
-              {statusMsg} • {item.market_order_id.padStart(3, '0')}
+              {statusMsg} • {item.market_order_id.padStart(3, "0")}
             </MyText>
             {item.review ? (
               <Rating value={item.review.rating} />
@@ -123,10 +121,11 @@ const OrdersBody = () => {
         />
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <MyText style={styles.previsionText}>{timeMsg}</MyText>
           <MyText style={styles.previsionTime}>{time}</MyText>
         </View>
@@ -135,7 +134,7 @@ const OrdersBody = () => {
   };
 
   return !orders.length ? (
-    <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+    <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
       <MyText style={{ fontSize: 15, color: myColors.text2 }}>
         Nenhum pedido realizado ainda
       </MyText>
@@ -153,22 +152,22 @@ const OrdersBody = () => {
 
 const Orders = () => (
   <>
-    <MyHeader title='Compras' goBackLess smallDivider />
+    <MyHeader title="Compras" goBackLess smallDivider />
     <OrdersBody />
   </>
 );
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#aaa',
-    justifyContent: 'center',
+    backgroundColor: "#aaa",
+    justifyContent: "center",
     height: 48,
   },
   textHeader: {
     color: myColors.primaryColor,
     fontSize: 18,
-    alignSelf: 'center',
-    position: 'absolute',
+    alignSelf: "center",
+    position: "absolute",
     fontFamily: myFonts.Regular,
   },
   headerDivider: {
@@ -183,7 +182,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 10,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
   },
   marketName: {

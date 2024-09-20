@@ -1,14 +1,14 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Image } from 'react-native-elements/dist/image/Image';
-import { Coords, Market } from '~/core/models';
-import { myColors, device, globalStyles, myFonts } from '~/constants';
-import { computeDistance, getImageUrl } from '~/functions/converter';
-import { marketOpenness } from '~/functions/marketOpenness';
-import { money } from '~/functions/money';
-import MyText from './MyText';
-import MyTouchable from './MyTouchable';
-import Rating from './Rating';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { Image } from "react-native-elements/dist/image/Image";
+import { Coords, Market } from "~/core/models";
+import { myColors, device, globalStyles, myFonts } from "~/constants";
+import { computeDistance, getImageUrl } from "~/functions/converter";
+import { marketOpenness } from "~/functions/marketOpenness";
+import { money } from "~/functions/money";
+import MyText from "./MyText";
+import MyTouchable from "./MyTouchable";
+import Rating from "./Rating";
 
 const MarketItem = (props: { market: Market; coords?: Coords }) => {
   const { market, coords } = props;
@@ -18,21 +18,22 @@ const MarketItem = (props: { market: Market; coords?: Coords }) => {
   return (
     <MyTouchable
       style={[styles.card, globalStyles.elevation4, globalStyles.darkBorder]}
-      screen='Market'
-      params={{ city: market.city_slug, marketId: market.market_id }}>
+      screen="Market"
+      params={{ city: market.city_slug, marketId: market.market_id }}
+    >
       <Image
-        source={{ uri: getImageUrl('market', market.market_id) }}
-        alt=''
+        source={{ uri: getImageUrl("market", market.market_id) }}
+        alt=""
         containerStyle={styles.image}
       />
-      <View style={{ marginLeft: 10, marginTop: -5, justifyContent: 'center' }}>
-        <View style={{ flexDirection: 'row' }}>
+      <View style={{ marginLeft: 10, marginTop: -5, justifyContent: "center" }}>
+        <View style={{ flexDirection: "row" }}>
           <MyText style={styles.title}>{market.name}</MyText>
           {market.rating ? (
             <Rating
               value={market.rating}
-              size='small'
-              style={{ alignSelf: 'center' }}
+              size="small"
+              style={{ alignSelf: "center" }}
             />
           ) : (
             <MyText style={styles.new}>Novo!</MyText>
@@ -42,7 +43,7 @@ const MarketItem = (props: { market: Market; coords?: Coords }) => {
         <MyText style={styles.text2}>
           {distance && `Á ${distance}km • `}
           {`${market.min_time}-${market.max_time}min • `}
-          {money.toString(market.delivery_fee, 'R$')}
+          {money.toString(market.delivery_fee, "R$")}
         </MyText>
       </View>
     </MyTouchable>
@@ -51,8 +52,8 @@ const MarketItem = (props: { market: Market; coords?: Coords }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
-    flexDirection: 'row',
+    backgroundColor: "#fff",
+    flexDirection: "row",
     height: 90,
     borderRadius: 8,
     marginTop: 16,
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     color: myColors.text6,
   },
   new: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     fontSize: 13,
     marginBottom: 1,
     marginLeft: 4,

@@ -1,34 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import * as Notifications from 'expo-notifications';
-import { Avatar } from 'react-native-elements/dist/avatar/Avatar';
-import Errors from '~/components/Errors';
-import IconButton from '~/components/IconButton';
-import Loading from '~/components/Loading';
-import MyInput from '~/components/MyInput';
-import MyHeader from '~/components/MyHeader';
-import MyText from '~/components/MyText';
-import IOSKeyboardAvoidingView from '~/components/IOSKeyboardAvoidingView';
-import { useAuthContext } from '~/contexts/AuthContext';
-import { useOrderContext } from '~/contexts/OrderContext';
-import { ChatMsg } from '~/core/models';
-import { getImageUrl } from '~/functions/converter';
-import useRouting from '~/hooks/useRouting';
-import { api } from '~/services/api';
-import globalStyles from '~/constants/globalStyles';
-import { zIndex } from '~/constants/zIndex';
-import { formatTime } from '~/functions/format';
-import { useChatContext, useChatItemContext } from '~/contexts/ChatContext';
-import { ScrollView, StyleSheet } from 'react-native';
-import { View } from 'react-native';
+import React, { useEffect, useState } from "react";
+import * as Notifications from "expo-notifications";
+import { Avatar } from "react-native-elements/dist/avatar/Avatar";
+import Errors from "~/components/Errors";
+import IconButton from "~/components/IconButton";
+import Loading from "~/components/Loading";
+import MyInput from "~/components/MyInput";
+import MyHeader from "~/components/MyHeader";
+import MyText from "~/components/MyText";
+import IOSKeyboardAvoidingView from "~/components/IOSKeyboardAvoidingView";
+import { useAuthContext } from "~/contexts/AuthContext";
+import { useOrderContext } from "~/contexts/OrderContext";
+import { ChatMsg } from "~/core/models";
+import { getImageUrl } from "~/functions/converter";
+import useRouting from "~/hooks/useRouting";
+import { api } from "~/services/api";
+import globalStyles from "~/constants/globalStyles";
+import { zIndex } from "~/constants/zIndex";
+import { formatTime } from "~/functions/format";
+import { useChatContext, useChatItemContext } from "~/contexts/ChatContext";
+import { ScrollView, StyleSheet } from "react-native";
+import { View } from "react-native";
 
 const Chat = () => {
   const { isAuth } = useAuthContext();
 
-  if (isAuth === false) return <Errors error='missing_auth' />;
+  if (isAuth === false) return <Errors error="missing_auth" />;
 
   return (
     <IOSKeyboardAvoidingView>
-      <MyHeader title='Conversa' />
+      <MyHeader title="Conversa" />
       <Header />
       <MsgsList />
       <SendMsgInput />
@@ -45,11 +45,11 @@ const Header = () => {
   return (
     <View style={[globalStyles.elevation3, styles.headerContainer]}>
       <Avatar
-        source={{ uri: order && getImageUrl('market', order.market_id) }}
-        size='medium'
+        source={{ uri: order && getImageUrl("market", order.market_id) }}
+        size="medium"
         rounded
       />
-      <MyText style={styles.name}>{order?.market.name ?? 'Mercado'}</MyText>
+      <MyText style={styles.name}>{order?.market.name ?? "Mercado"}</MyText>
     </View>
   );
 };
@@ -75,8 +75,9 @@ const MsgsList = () => {
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      style={{ transform: 'scaleY(-1)' }}
-      contentContainerStyle={{ padding: 16 }}>
+      style={{ transform: "scaleY(-1)" }}
+      contentContainerStyle={{ padding: 16 }}
+    >
       {[...msgs.values()].reverse().map((msg, index, allMsgs) => (
         <MsgItem key={msg.id} {...{ msg, index, allMsgs }} />
       ))}
@@ -93,18 +94,19 @@ const MsgItem = ({
   index: number;
   allMsgs: ChatMsg[];
 }) => {
-  const direction = msg.author === 'CUSTOMER' ? 'right' : 'left';
+  const direction = msg.author === "CUSTOMER" ? "right" : "left";
   const pad = allMsgs[index - 1]?.author !== msg.author;
 
   return (
     <View
       style={[
         { marginTop: pad ? 8 : 4 },
-        direction === 'left' ? styles.leftMsg : styles.rightMsg,
-      ]}>
+        direction === "left" ? styles.leftMsg : styles.rightMsg,
+      ]}
+    >
       <MyText style={styles.msgBody}>
         {msg.message}
-        {' '.repeat(12)}
+        {" ".repeat(12)}
       </MyText>
       <MyText style={styles.msgTime}>{formatTime(msg.created_at)}</MyText>
     </View>
@@ -116,13 +118,13 @@ const SendMsgInput = () => {
     params: { marketId: market_id, orderId: order_id },
   } = useRouting();
   const { accessToken } = useAuthContext();
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
 
   const sendMsg = () => {
     if (!accessToken || !input) return;
 
     api.chats.create(accessToken, { market_id, order_id, message: input });
-    setInput('');
+    setInput("");
   };
 
   return (
@@ -131,22 +133,22 @@ const SendMsgInput = () => {
         value={input}
         onChangeText={setInput}
         onSubmitEditing={sendMsg}
-        placeholder='Digite uma mensagem'
+        placeholder="Digite uma mensagem"
         maxLength={300}
         multiline
-        enterKeyHint='send'
+        enterKeyHint="send"
         containerStyle={{ flex: 1 }}
       />
-      <IconButton disabled={!accessToken} onPress={sendMsg} icon='send' />
+      <IconButton disabled={!accessToken} onPress={sendMsg} icon="send" />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   headerContainer: {
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: "white",
+    flexDirection: "row",
+    alignItems: "center",
     zIndex: zIndex.Header,
     padding: 16,
   },
@@ -155,25 +157,25 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   msgItemContainer: {
-    transform: 'scaleY(-1)',
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end',
+    transform: "scaleY(-1)",
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
     padding: 10,
     borderRadius: 16,
-    maxWidth: '75%',
+    maxWidth: "75%",
   },
   leftMsg: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     borderBottomLeftRadius: 0,
-    borderColor: '#eee',
-    borderStyle: 'solid',
+    borderColor: "#eee",
+    borderStyle: "solid",
     borderWidth: 2,
   },
   rightMsg: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     borderBottomRightRadius: 0,
-    backgroundColor: '#eee',
+    backgroundColor: "#eee",
   },
   msgBody: {
     flexShrink: 1,
@@ -181,14 +183,14 @@ const styles = StyleSheet.create({
   },
   msgTime: {
     fontSize: 12,
-    position: 'absolute',
-    alignSelf: 'flex-end',
+    position: "absolute",
+    alignSelf: "flex-end",
     bottom: 6,
     right: 12,
   },
   row: {
-    backgroundColor: 'white',
-    flexDirection: 'row',
+    backgroundColor: "white",
+    flexDirection: "row",
     padding: 8,
     paddingTop: 12,
     paddingBottom: 0,

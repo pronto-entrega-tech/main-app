@@ -1,4 +1,4 @@
-import { Product } from '~/core/models';
+import { Product } from "~/core/models";
 
 export type Money = {
   /**
@@ -9,15 +9,15 @@ export type Money = {
 const createMoney = (raw: unknown): Money => {
   if ((raw as Money).dangerousInnerValue) return raw as Money;
 
-  const _raw = `${raw}`.replace(/,/g, '.').replace(/(?![\.])\D/g, '');
-  const [v1, v2 = ''] = _raw.split('.');
+  const _raw = `${raw}`.replace(/,/g, ".").replace(/(?![\.])\D/g, "");
+  const [v1, v2 = ""] = _raw.split(".");
 
-  return { dangerousInnerValue: +`${v1}${v2.padEnd(2, '0')}` };
+  return { dangerousInnerValue: +`${v1}${v2.padEnd(2, "0")}` };
 };
 
 type MoneyValue = Money | number;
 const moneyInnerValue = (v: MoneyValue) =>
-  typeof v === 'number' ? v : v.dangerousInnerValue;
+  typeof v === "number" ? v : v.dangerousInnerValue;
 
 const plus = (v1: MoneyValue, v2: MoneyValue): Money => ({
   dangerousInnerValue: Math.round(moneyInnerValue(v1) + moneyInnerValue(v2)),
@@ -44,19 +44,19 @@ const isLess = (v1: MoneyValue, v2: MoneyValue) =>
 const isGreater = (v1: MoneyValue, v2: MoneyValue) =>
   moneyInnerValue(v1) > moneyInnerValue(v2);
 
-const toString = (money?: MoneyValue, prefix = '', separator = ',') => {
-  if (!money) return '';
+const toString = (money?: MoneyValue, prefix = "", separator = ",") => {
+  if (!money) return "";
 
   const value =
-    typeof money === 'number'
-      ? `${money}`.replace(/\D/g, '')
-      : `${money.dangerousInnerValue}`.padStart(3, '0');
+    typeof money === "number"
+      ? `${money}`.replace(/\D/g, "")
+      : `${money.dangerousInnerValue}`.padStart(3, "0");
 
   return `${prefix}${value.slice(0, -2)}${separator}${value.slice(-2)}`;
 };
 
 const toValue = (money?: MoneyValue) =>
-  money ? toString(money, '', '.') : undefined;
+  money ? toString(money, "", ".") : undefined;
 
 export const money = Object.assign(createMoney, {
   plus,
@@ -73,7 +73,7 @@ export const money = Object.assign(createMoney, {
 export const calcPrices = (product: Product) => {
   const { price, discount } = product;
 
-  if (discount?.type === 'DISCOUNT_VALUE') {
+  if (discount?.type === "DISCOUNT_VALUE") {
     const diff = moneyInnerValue(discount.value_1) / moneyInnerValue(price);
     const off = Math.trunc((1 - diff) * 100);
 
@@ -84,7 +84,7 @@ export const calcPrices = (product: Product) => {
     };
   }
 
-  if (discount?.type === 'DISCOUNT_PERCENT') {
+  if (discount?.type === "DISCOUNT_PERCENT") {
     const off = discount.value_1;
     const newPricePercent = 1 - off / 100;
 
@@ -95,7 +95,7 @@ export const calcPrices = (product: Product) => {
     };
   }
 
-  if (discount?.type === 'DISCOUNT_PERCENT_ON_SECOND') {
+  if (discount?.type === "DISCOUNT_PERCENT_ON_SECOND") {
     const percent = discount.value_1;
     const min = discount.value_2 ?? 2;
 
@@ -105,7 +105,7 @@ export const calcPrices = (product: Product) => {
     };
   }
 
-  if (discount?.type === 'ONE_FREE') {
+  if (discount?.type === "ONE_FREE") {
     const take = discount.value_1;
     const pay = discount.value_1 - (discount.value_2 ?? 1);
 

@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useAlertContext } from '~/contexts/AlertContext';
-import { calcSubtotal } from '~/functions/calcSubtotal';
-import { pick } from '~/functions/converter';
-import { createContext } from '~/contexts/createContext';
-import { money } from '~/functions/money';
-import { api } from '~/services/api';
+import { useCallback, useEffect, useState } from "react";
+import { useAlertContext } from "~/contexts/AlertContext";
+import { calcSubtotal } from "~/functions/calcSubtotal";
+import { pick } from "~/functions/converter";
+import { createContext } from "~/contexts/createContext";
+import { money } from "~/functions/money";
+import { api } from "~/services/api";
 import {
   getActiveMarketId,
   getLastPayment,
@@ -12,22 +12,22 @@ import {
   saveActiveMarketId,
   saveLastPayment,
   saveShoppingList,
-} from '../core/dataStorage';
+} from "../core/dataStorage";
 import {
   Market,
   OrderPayment,
   OrderSchedule,
   Product,
   ShoppingList,
-} from '../core/models';
-import { useStateToRef } from '~/hooks/useStateToRef';
+} from "../core/models";
+import { useStateToRef } from "~/hooks/useStateToRef";
 
 type FullMarketId = { market_id?: string; city_slug?: string };
 
 function useCart() {
   const { alert } = useAlertContext();
-  const [subtotal, setSubtotal] = useState(money('0'));
-  const [totalOff, setTotalOff] = useState(money('0'));
+  const [subtotal, setSubtotal] = useState(money("0"));
+  const [totalOff, setTotalOff] = useState(money("0"));
   const [shoppingList, _setShoppingList] = useState<ShoppingList>();
   const shoppingListRef = useStateToRef(shoppingList);
   const [activeMarketId, _setActiveMarketId] = useState<FullMarketId>({});
@@ -52,7 +52,7 @@ function useCart() {
   }, []);
 
   const setActiveMarketId = (v: FullMarketId) => {
-    _setActiveMarketId(pick(v, 'market_id', 'city_slug'));
+    _setActiveMarketId(pick(v, "market_id", "city_slug"));
     saveActiveMarketId(v.market_id, v.city_slug);
   };
 
@@ -87,8 +87,8 @@ function useCart() {
       setActiveMarketId(item);
     } else if (item.market_id !== activeMarketIdRef.current)
       return alert(
-        'O carrinho já possui itens de outro mercado',
-        'Deseja limpar o carrinho?',
+        "O carrinho já possui itens de outro mercado",
+        "Deseja limpar o carrinho?",
         {
           onConfirm: () => {
             setActiveMarketId(item);
@@ -102,7 +102,7 @@ function useCart() {
 
     const value = shoppingList?.get(item.item_id)?.quantity ?? 0;
 
-    if (value >= 99) return alert('Quantidade máxima permitida de 99');
+    if (value >= 99) return alert("Quantidade máxima permitida de 99");
 
     const newShoppingList = new Map(shoppingList).set(item.item_id, {
       quantity: value + 1,
@@ -115,7 +115,7 @@ function useCart() {
     const shoppingList = shoppingListRef.current;
 
     const value = shoppingList?.get(item.item_id)?.quantity;
-    if (!value) return alert('Erro ao remover produto');
+    if (!value) return alert("Erro ao remover produto");
 
     if (value > 1) {
       const newShoppingList = new Map(shoppingList).set(item.item_id, {
@@ -128,7 +128,7 @@ function useCart() {
       const newShoppingList = new Map(shoppingList);
 
       if (!newShoppingList.delete(item.item_id))
-        return alert('Erro ao remover produto');
+        return alert("Erro ao remover produto");
 
       if (!newShoppingList.size) setActiveMarketId({});
 

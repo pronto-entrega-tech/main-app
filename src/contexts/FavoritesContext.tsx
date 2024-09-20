@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
-import { createContext } from '~/contexts/createContext';
-import { saveFavorites, getFavorites } from '~/core/dataStorage';
-import { useStateToRef } from '~/hooks/useStateToRef';
+import { useCallback, useEffect, useState } from "react";
+import { createContext } from "~/contexts/createContext";
+import { saveFavorites, getFavorites } from "~/core/dataStorage";
+import { useStateToRef } from "~/hooks/useStateToRef";
 
 function useFavorites() {
   const [favorites, setFavorites] = useState(new Set<string>());

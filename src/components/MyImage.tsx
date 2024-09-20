@@ -1,7 +1,7 @@
-import React from 'react';
-import { Image, ImageProps } from 'expo-image';
+import React from "react";
+import { Image, ImageProps } from "expo-image";
 
-interface Props extends Omit<ImageProps, 'source'> {
+interface Props extends Omit<ImageProps, "source"> {
   source: string;
   thumbhash?: string;
   height: number;

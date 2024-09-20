@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
-import { createContext } from '~/contexts/createContext';
-import { CreateOrder, Order } from '~/core/models';
-import { api } from '~/services/api';
+import { useState, useCallback } from "react";
+import { createContext } from "~/contexts/createContext";
+import { CreateOrder, Order } from "~/core/models";
+import { api } from "~/services/api";
 
 function useOrder() {
   const [orders, setOrders] = useState<Order[]>();

@@ -1,8 +1,8 @@
-import React from 'react';
-import { View } from 'react-native';
-import { MyIconProps } from './MyIcon';
-import icons from '~/constants/svgPaths';
-import myColors from '~/constants/myColors';
+import React from "react";
+import { View } from "react-native";
+import { MyIconProps } from "./MyIcon";
+import icons from "~/constants/svgPaths";
+import myColors from "~/constants/myColors";
 
 const MyIcon = ({
   name,
@@ -11,7 +11,7 @@ const MyIcon = ({
   style,
 }: MyIconProps) => (
   <View style={style}>
-    <svg width={size} height={size} viewBox='0 0 24 24'>
+    <svg width={size} height={size} viewBox="0 0 24 24">
       <path fill={color} d={icons[name]} />
     </svg>
   </View>

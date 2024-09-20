@@ -1,15 +1,15 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { myColors, globalStyles, AppInfo, myFonts } from '~/constants';
-import MyButton from '~/components/MyButton';
-import MyDivider from '~/components/MyDivider';
-import MyIcon from '~/components/MyIcon';
-import useRouting from '~/hooks/useRouting';
-import MyHeader from '~/components/MyHeader';
-import { WithBottomNav } from '~/components/Layout';
-import { arrayConditional } from '~/functions/conditionals';
-import MyText from '~/components/MyText';
-import { useAuthContext } from '~/contexts/AuthContext';
+import React from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { myColors, globalStyles, AppInfo, myFonts } from "~/constants";
+import MyButton from "~/components/MyButton";
+import MyDivider from "~/components/MyDivider";
+import MyIcon from "~/components/MyIcon";
+import useRouting from "~/hooks/useRouting";
+import MyHeader from "~/components/MyHeader";
+import { WithBottomNav } from "~/components/Layout";
+import { arrayConditional } from "~/functions/conditionals";
+import MyText from "~/components/MyText";
+import { useAuthContext } from "~/contexts/AuthContext";
 
 const Config = () => {
   const { replace } = useRouting();
@@ -17,15 +17,15 @@ const Config = () => {
 
   const signOutAndLeave = async () => {
     await signOut();
-    replace('SignIn');
+    replace("SignIn");
   };
 
   const options = [
-    { title: 'Gerenciar notificações', screen: 'NotifConfig' },
-    { title: 'Políticas de privacidade' },
-    { title: 'Termos de uso' },
+    { title: "Gerenciar notificações", screen: "NotifConfig" },
+    { title: "Políticas de privacidade" },
+    { title: "Termos de uso" },
     ...arrayConditional(isAuth)({
-      title: 'Sair da conta',
+      title: "Sair da conta",
       onPress: signOutAndLeave,
     }),
   ];
@@ -33,10 +33,10 @@ const Config = () => {
   const optionItems = options.map((option, index) => (
     <View key={index}>
       {index !== 0 && <MyDivider style={styles.divider} />}
-      <View style={{ justifyContent: 'center' }}>
+      <View style={{ justifyContent: "center" }}>
         <MyIcon
-          style={{ position: 'absolute', alignSelf: 'flex-end' }}
-          name='chevron-right'
+          style={{ position: "absolute", alignSelf: "flex-end" }}
+          name="chevron-right"
           size={32}
           color={myColors.grey2}
         />
@@ -46,11 +46,11 @@ const Config = () => {
             index === 0
               ? styles.top
               : index === options.length - 1
-              ? styles.bottom
-              : { borderRadius: 0 }
+                ? styles.bottom
+                : { borderRadius: 0 }
           }
           titleStyle={{ color: myColors.text, fontSize: 17 }}
-          type='clear'
+          type="clear"
         />
       </View>
     </View>
@@ -58,16 +58,18 @@ const Config = () => {
 
   return (
     <>
-      <MyHeader title='Configurações' />
+      <MyHeader title="Configurações" />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 58 }}>
+        contentContainerStyle={{ paddingBottom: 58 }}
+      >
         <View
           style={[
             styles.card,
             globalStyles.elevation3,
             globalStyles.darkBorder,
-          ]}>
+          ]}
+        >
           {optionItems}
         </View>
         <MyText style={styles.versionText}>
@@ -80,7 +82,7 @@ const Config = () => {
 
 const styles = StyleSheet.create({
   header: {
-    justifyContent: 'center',
+    justifyContent: "center",
     height: 48,
   },
   headerDivider: {
@@ -90,7 +92,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     margin: 16,
     borderRadius: 8,
   },
@@ -103,8 +105,8 @@ const styles = StyleSheet.create({
     color: myColors.primaryColor,
     fontSize: 20,
     fontFamily: myFonts.Bold,
-    alignSelf: 'center',
-    position: 'absolute',
+    alignSelf: "center",
+    position: "absolute",
   },
   versionText: {
     marginLeft: 16,

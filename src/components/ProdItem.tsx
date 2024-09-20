@@ -1,17 +1,17 @@
-import React from 'react';
-import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
-import { myColors, device, globalStyles, myFonts } from '~/constants';
-import { getImageUrl } from '~/functions/converter';
-import { calcPrices, money } from '~/functions/money';
-import IconButton from './IconButton';
-import MyTouchable from './MyTouchable';
-import MyText from './MyText';
-import AnimatedText from './AnimatedText';
-import MyIcon from './MyIcon';
-import { Product } from '~/core/models';
-import { MotiView } from 'moti';
-import MyImage from './MyImage';
-import { useCartContextSelector } from '~/contexts/CartContext';
+import React from "react";
+import { View, StyleSheet, ViewStyle, StyleProp } from "react-native";
+import { myColors, device, globalStyles, myFonts } from "~/constants";
+import { getImageUrl } from "~/functions/converter";
+import { calcPrices, money } from "~/functions/money";
+import IconButton from "./IconButton";
+import MyTouchable from "./MyTouchable";
+import MyText from "./MyText";
+import AnimatedText from "./AnimatedText";
+import MyIcon from "./MyIcon";
+import { Product } from "~/core/models";
+import { MotiView } from "moti";
+import MyImage from "./MyImage";
+import { useCartContextSelector } from "~/contexts/CartContext";
 
 const ProdItem = (props: {
   item: Product;
@@ -43,24 +43,26 @@ const ProdItem = (props: {
         globalStyles.elevation4,
         globalStyles.darkBorder,
         style,
-      ]}>
+      ]}
+    >
       <MyTouchable
         style={{ flex: 1 }}
-        screen='Product'
-        params={{ city: item.city_slug, itemId: item.item_id }}>
+        screen="Product"
+        params={{ city: item.city_slug, itemId: item.item_id }}
+      >
         <View style={styles.top}>
           {item.images_names ? (
             <MyImage
               thumbhash={item.thumbhash}
-              source={getImageUrl('product', item.images_names[0])}
-              alt=''
+              source={getImageUrl("product", item.images_names[0])}
+              alt=""
               style={styles.image}
               height={70}
               width={70}
             />
           ) : (
             <MyIcon
-              name='cart-outline'
+              name="cart-outline"
               color={myColors.grey2}
               size={70}
               style={styles.image}
@@ -70,8 +72,8 @@ const ProdItem = (props: {
             <View style={styles.marketLogoContainer}>
               <MyImage
                 thumbhash={item.market_thumbhash}
-                source={getImageUrl('market', item.market_id)}
-                alt=''
+                source={getImageUrl("market", item.market_id)}
+                alt=""
                 /* contentFit='contain' */
                 style={styles.marketLogo}
                 height={28}
@@ -82,7 +84,7 @@ const ProdItem = (props: {
         </View>
         <View style={styles.container}>
           <MyText style={styles.priceText}>
-            {money.toString(price, 'R$')}
+            {money.toString(price, "R$")}
           </MyText>
           {discountText && (
             <View style={styles.oldPriceRow}>
@@ -90,7 +92,7 @@ const ProdItem = (props: {
                 <MyText style={styles.offText}>{discountText}</MyText>
               </View>
               <MyText style={styles.oldPriceText}>
-                {money.toString(previous_price, 'R$')}
+                {money.toString(previous_price, "R$")}
               </MyText>
             </View>
           )}
@@ -103,17 +105,18 @@ const ProdItem = (props: {
         </View>
       </MyTouchable>
       <MotiView
-        transition={{ type: 'timing', duration: 200 }}
+        transition={{ type: "timing", duration: 200 }}
         animate={{ width: quantity === 0 ? 32 : 32 * 2 + 16 }}
         style={[
           globalStyles.elevation4,
           globalStyles.darkBorder,
           styles.addBar,
           { height: 32 },
-        ]}>
+        ]}
+      >
         <IconButton
           onPress={onPressAdd}
-          icon='plus'
+          icon="plus"
           style={styles.add}
           hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
         />
@@ -124,7 +127,7 @@ const ProdItem = (props: {
             </AnimatedText>
             <IconButton
               onPress={onPressRemove}
-              icon='minus'
+              icon="minus"
               style={[styles.add, styles.remove]}
               hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
             />
@@ -137,22 +140,22 @@ const ProdItem = (props: {
 
 const styles = StyleSheet.create({
   card: {
-    overflow: 'hidden',
+    overflow: "hidden",
     height: 185,
     borderRadius: 10,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   top: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   placeholderColor: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   marketLogoContainer: {
     top: 8,
     left: 6,
-    position: 'absolute',
-    alignSelf: 'flex-end',
+    position: "absolute",
+    alignSelf: "flex-end",
   },
   marketLogo: {
     height: 28,
@@ -160,29 +163,29 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   addBar: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 30,
-    position: 'absolute',
+    position: "absolute",
     top: 6,
     right: 6,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    overflow: 'hidden',
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    overflow: "hidden",
   },
   centerNumText: {
     fontSize: 15,
     color: myColors.text3,
     fontFamily: myFonts.Bold,
     left: device.web ? 34 : 30,
-    position: 'absolute',
-    textAlign: 'center',
+    position: "absolute",
+    textAlign: "center",
   },
   add: {
     width: 32,
     height: 32,
   },
   remove: {
-    position: 'absolute',
+    position: "absolute",
     right: 48,
   },
   image: {
@@ -204,8 +207,8 @@ const styles = StyleSheet.create({
   },
   oldPriceRow: {
     marginTop: -1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   offTextBox: {
     paddingVertical: device.web ? 2 : 1,
@@ -215,11 +218,11 @@ const styles = StyleSheet.create({
   },
   offText: {
     fontSize: 11,
-    color: 'white',
+    color: "white",
     fontFamily: myFonts.Bold,
   },
   oldPriceText: {
-    textDecorationLine: 'line-through',
+    textDecorationLine: "line-through",
     color: myColors.grey2,
     fontSize: 13,
     marginLeft: 4,

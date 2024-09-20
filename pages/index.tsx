@@ -1,27 +1,27 @@
-import React from 'react';
-import { View, StyleSheet, Image } from 'react-native';
-import { myColors, globalStyles, images, myFonts } from '~/constants';
-import MyButton from '~/components/MyButton';
-import MyText from '~/components/MyText';
-import useRouting from '~/hooks/useRouting';
-import { saveActiveAddress, saveActiveAddressId } from '~/core/dataStorage';
-import { Address } from '~/core/models';
-import { useMediaQuery } from '~/hooks/useMediaQuery';
+import React from "react";
+import { View, StyleSheet, Image } from "react-native";
+import { myColors, globalStyles, images, myFonts } from "~/constants";
+import MyButton from "~/components/MyButton";
+import MyText from "~/components/MyText";
+import useRouting from "~/hooks/useRouting";
+import { saveActiveAddress, saveActiveAddressId } from "~/core/dataStorage";
+import { Address } from "~/core/models";
+import { useMediaQuery } from "~/hooks/useMediaQuery";
 
 const saveCity = async (p: { city: string; state: string }) => {
   const address: Address = {
-    id: '',
-    nickname: '',
-    street: '',
-    number: '',
-    district: '',
+    id: "",
+    nickname: "",
+    street: "",
+    number: "",
+    district: "",
     city: p.city,
     state: p.state,
   };
   await Promise.all([saveActiveAddressId(null), saveActiveAddress(address)]);
 };
 
-const cities = [{ city: 'Jataí', state: 'GO' }];
+const cities = [{ city: "Jataí", state: "GO" }];
 
 const Main = () => {
   const routing = useRouting();
@@ -33,21 +33,21 @@ const Main = () => {
 
   return (
     <View style={{ backgroundColor: myColors.background }}>
-      <View style={{ backgroundColor: '#f8f8f8' }}>
+      <View style={{ backgroundColor: "#f8f8f8" }}>
         <MyButton
-          title='Entrar'
-          type='clear'
+          title="Entrar"
+          type="clear"
           titleStyle={titleSize}
           buttonStyle={styles.loginButton}
-          screen='SignIn'
+          screen="SignIn"
         />
-        <Image {...images.pineapple} style={styles.pineapple} alt='' />
-        <Image {...images.tomato} style={styles.tomato} alt='' />
-        <Image {...images.broccoli} style={styles.broccoli} alt='' />
+        <Image {...images.pineapple} style={styles.pineapple} alt="" />
+        <Image {...images.tomato} style={styles.tomato} alt="" />
+        <Image {...images.broccoli} style={styles.broccoli} alt="" />
         <Image
           {...images.logo}
           style={styles.logo}
-          alt='Logo do ProntoEntrega'
+          alt="Logo do ProntoEntrega"
         />
         <MyText style={[styles.title, title]}>
           Faça suas compras sem sair de casa
@@ -56,15 +56,15 @@ const Main = () => {
           Veja mercados perto de você
         </MyText>
         <MyButton
-          title='Insira seu endereço'
+          title="Insira seu endereço"
           titleStyle={titleSize}
           buttonStyle={[styles.button, globalStyles.elevation4]}
           icon={{
-            name: 'map-marker',
+            name: "map-marker",
             color: myColors.background,
             style: { marginRight: 3 },
           }}
-          screen='SelectAddress'
+          screen="SelectAddress"
         />
       </View>
       <MyText style={[styles.cityText, titleSize]}>Escolha uma cidade</MyText>
@@ -72,12 +72,12 @@ const Main = () => {
         <MyButton
           key={item.city}
           title={item.city}
-          type='clear'
+          type="clear"
           titleStyle={titleSize}
           buttonStyle={styles.cityButton}
           onPress={async () => {
             await saveCity(item);
-            routing.navigate('Home');
+            routing.navigate("Home");
           }}
         />
       ))}
@@ -93,35 +93,35 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   loginButton: {
-    position: 'absolute',
-    alignSelf: 'flex-end',
+    position: "absolute",
+    alignSelf: "flex-end",
     marginRight: 8,
     marginTop: 8,
   },
   pineapple: {
-    position: 'absolute',
-    alignSelf: 'flex-start',
+    position: "absolute",
+    alignSelf: "flex-start",
     marginLeft: 25,
     top: -50,
     width: 170,
     height: 160,
   },
   tomato: {
-    alignSelf: 'flex-end',
-    position: 'absolute',
+    alignSelf: "flex-end",
+    position: "absolute",
     marginTop: 50,
     width: 60,
     height: 120,
   },
   broccoli: {
-    position: 'absolute',
+    position: "absolute",
     left: -65,
     marginTop: 180,
     width: 130,
     height: 130,
   },
   logo: {
-    alignSelf: 'center',
+    alignSelf: "center",
     marginTop: 120,
     width: 160,
     height: 160,
@@ -129,8 +129,8 @@ const styles = StyleSheet.create({
   title: {
     minHeight: 50,
     marginTop: 28,
-    alignSelf: 'center',
-    textAlign: 'center',
+    alignSelf: "center",
+    textAlign: "center",
     color: myColors.text4,
     marginHorizontal: 36,
     lineHeight: 34,
@@ -138,14 +138,14 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     marginTop: 14,
-    alignSelf: 'center',
-    textAlign: 'center',
+    alignSelf: "center",
+    textAlign: "center",
     color: myColors.text4,
     marginHorizontal: 32,
   },
   button: {
-    alignSelf: 'center',
-    width: '90%',
+    alignSelf: "center",
+    width: "90%",
     maxWidth: 600,
     height: 52,
     marginTop: 30,
@@ -153,14 +153,14 @@ const styles = StyleSheet.create({
   },
   cityText: {
     marginTop: 16,
-    marginLeft: '5%',
-    fontWeight: '500',
+    marginLeft: "5%",
+    fontWeight: "500",
     color: myColors.text4,
   },
   cityButton: {
     left: -8,
-    marginLeft: '5%',
-    alignSelf: 'flex-start',
+    marginLeft: "5%",
+    alignSelf: "flex-start",
   },
 });
 

@@ -1,44 +1,44 @@
-import React, { ReactNode } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { WithBottomNav } from '~/components/Layout';
-import { myColors, device, globalStyles, myFonts } from '~/constants';
-import Banners from '~/components/Banners';
-import IconButtonText from '~/components/IconButtonText';
-import ProdList from '~/components/ProdList';
-import MyDivider from '~/components/MyDivider';
-import MySearchBar from '~/components/MySearchBar';
-import MyButton from '~/components/MyButton';
-import MyText from '~/components/MyText';
-import MyIcon from '~/components/MyIcon';
-import useRouting from '~/hooks/useRouting';
-import { Banner, Product } from '~/core/models';
-import { stringifyShortAddress } from '~/functions/converter';
-import { useAddressContext } from '~/contexts/AddressContext';
+import React, { ReactNode } from "react";
+import { View, StyleSheet } from "react-native";
+import { WithBottomNav } from "~/components/Layout";
+import { myColors, device, globalStyles, myFonts } from "~/constants";
+import Banners from "~/components/Banners";
+import IconButtonText from "~/components/IconButtonText";
+import ProdList from "~/components/ProdList";
+import MyDivider from "~/components/MyDivider";
+import MySearchBar from "~/components/MySearchBar";
+import MyButton from "~/components/MyButton";
+import MyText from "~/components/MyText";
+import MyIcon from "~/components/MyIcon";
+import useRouting from "~/hooks/useRouting";
+import { Banner, Product } from "~/core/models";
+import { stringifyShortAddress } from "~/functions/converter";
+import { useAddressContext } from "~/contexts/AddressContext";
 import Animated, {
   runOnUI,
   setNativeProps,
   useAnimatedProps,
   useAnimatedRef,
   useSharedValue,
-} from 'react-native-reanimated';
-import { TextInput } from 'react-native';
+} from "react-native-reanimated";
+import { TextInput } from "react-native";
 
 const AddressButton = () => {
   const { address } = useAddressContext();
   const shortAddress = address
     ? stringifyShortAddress(address)
     : address === null
-    ? 'Escolha um endereço'
-    : 'Carregando endereço...';
+      ? "Escolha um endereço"
+      : "Carregando endereço...";
 
   return (
     <MyButton
       title={shortAddress}
-      screen='Addresses'
-      type='clear'
+      screen="Addresses"
+      type="clear"
       titleStyle={styles.headerTitle}
       iconRight
-      icon={{ name: 'chevron-right', color: myColors.text5 }}
+      icon={{ name: "chevron-right", color: myColors.text5 }}
     />
   );
 };
@@ -50,35 +50,35 @@ const HomeHeader = () => {
     <View style={[styles.headerContainer, globalStyles.notch]}>
       <MyText style={styles.text}>Mostrando ofertas próximas à</MyText>
       <View style={styles.icon}>
-        <MyIcon name='map-marker' size={30} color={myColors.primaryColor} />
+        <MyIcon name="map-marker" size={30} color={myColors.primaryColor} />
         <AddressButton />
       </View>
       <View style={{ marginHorizontal: 16 }}>
         <MyDivider style={styles.headerDivider} />
-        <MySearchBar onSubmit={(query) => navigate('Search', { query })} />
+        <MySearchBar onSubmit={(query) => navigate("Search", { query })} />
       </View>
     </View>
   );
 };
 
 export const ListHeader = ({
-  title = 'Ofertas',
+  title = "Ofertas",
   barless = false,
 }: {
   title?: string;
   barless?: boolean;
 }) => (
-  <View style={{ width: '100%', height: 48, elevation: 10, zIndex: 10 }}>
+  <View style={{ width: "100%", height: 48, elevation: 10, zIndex: 10 }}>
     {!barless && <MyDivider style={{ height: 2 }} />}
     <View style={styles.line2}>
       <MyText style={styles.ofertasText}>{title}</MyText>
       <View style={styles.filerButton}>
         <MyButton
-          type='clear'
-          title='Filtros'
+          type="clear"
+          title="Filtros"
           titleStyle={{ color: myColors.grey2 }}
-          icon={{ name: 'tune', color: myColors.grey2 }}
-          screen='Filter'
+          icon={{ name: "tune", color: myColors.grey2 }}
+          screen="Filter"
         />
       </View>
     </View>
@@ -103,19 +103,19 @@ const Home = (p: HomeProps) => {
 
               <View style={styles.buttons}>
                 <IconButtonText
-                  icon='basket'
-                  text='Mercados'
-                  screen='MarketList'
+                  icon="basket"
+                  text="Mercados"
+                  screen="MarketList"
                 />
                 <IconButtonText
-                  icon='ticket-percent'
-                  text='Cupons'
-                  screen='Cupons'
+                  icon="ticket-percent"
+                  text="Cupons"
+                  screen="Cupons"
                 />
                 <IconButtonText
-                  icon='heart'
-                  text='Favoritos'
-                  screen='Favorites'
+                  icon="heart"
+                  text="Favoritos"
+                  screen="Favorites"
                 />
               </View>
               <ListHeader />
@@ -132,7 +132,7 @@ const iconTop = device.android ? -12 : -8;
 const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: myColors.background,
-    width: '100%',
+    width: "100%",
     paddingTop: 4,
     paddingBottom: 12,
   },
@@ -152,21 +152,21 @@ const styles = StyleSheet.create({
     color: myColors.text2,
   },
   icon: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: iconTop,
     marginStart: 40,
   },
   buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     paddingHorizontal: 16,
     paddingBottom: 6,
   },
   line2: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: myColors.background,
-    width: '100%',
+    width: "100%",
     height: 44,
     paddingLeft: 16,
     paddingRight: 8,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     fontFamily: myFonts.Bold,
   },
   filerButton: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
     flex: 1,
   },
 });

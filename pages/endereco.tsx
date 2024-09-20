@@ -1,36 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import IconButton from '~/components/IconButton';
-import MyButton from '~/components/MyButton';
-import MyTouchable from '~/components/MyTouchable';
-import { myColors, device, globalStyles } from '~/constants';
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, FlatList } from "react-native";
+import IconButton from "~/components/IconButton";
+import MyButton from "~/components/MyButton";
+import MyTouchable from "~/components/MyTouchable";
+import { myColors, device, globalStyles } from "~/constants";
 import {
   requestForegroundPermissionsAsync,
   enableNetworkProviderAsync,
   getForegroundPermissionsAsync,
   hasServicesEnabledAsync,
-} from 'expo-location';
-import { getActiveAddressId, saveActiveAddressId } from '~/core/dataStorage';
-import { stringifyAddress } from '~/functions/converter';
-import MyIcon from '~/components/MyIcon';
-import MyDivider from '~/components/MyDivider';
-import useRouting from '~/hooks/useRouting';
-import MyHeader from '~/components/MyHeader';
-import { Address } from '~/core/models';
-import MyText from '~/components/MyText';
-import { useAddressContext } from '~/contexts/AddressContext';
-import { useAuthContext } from '~/contexts/AuthContext';
-import Loading from '~/components/Loading';
-import Errors from '~/components/Errors';
-import { useAlertContext } from '~/contexts/AlertContext';
-import { useGetAddress } from '~/hooks/useAddress';
+} from "expo-location";
+import { getActiveAddressId, saveActiveAddressId } from "~/core/dataStorage";
+import { stringifyAddress } from "~/functions/converter";
+import MyIcon from "~/components/MyIcon";
+import MyDivider from "~/components/MyDivider";
+import useRouting from "~/hooks/useRouting";
+import MyHeader from "~/components/MyHeader";
+import { Address } from "~/core/models";
+import MyText from "~/components/MyText";
+import { useAddressContext } from "~/contexts/AddressContext";
+import { useAuthContext } from "~/contexts/AuthContext";
+import Loading from "~/components/Loading";
+import Errors from "~/components/Errors";
+import { useAlertContext } from "~/contexts/AlertContext";
+import { useGetAddress } from "~/hooks/useAddress";
 
 const Addresses = () => {
   const routing = useRouting();
   const { alert } = useAlertContext();
   const { setAddress } = useAddressContext();
   const getAddress = useGetAddress();
-  const [statusText, setStatusText] = useState('Usar localização atual');
+  const [statusText, setStatusText] = useState("Usar localização atual");
   const [activeId, _setActiveId] = useState<string | null>();
   const [gpsAddress, setGpsAddress] = useState<Address>();
   const [disabled, setDisabled] = useState(false);
@@ -46,14 +46,14 @@ const Addresses = () => {
     let canceled = false;
     const tryGetLocation = async () => {
       const { status } = await getForegroundPermissionsAsync();
-      if (status !== 'granted') {
+      if (status !== "granted") {
         if (!canceled) setGpsAddress(undefined);
         return;
       }
 
       const enabled = await hasServicesEnabledAsync();
       if (!enabled) {
-        alert('Serviço de localização está desativado');
+        alert("Serviço de localização está desativado");
         return;
       }
 
@@ -71,20 +71,20 @@ const Addresses = () => {
   }, [alert, getAddress]);
 
   const goBack = () => {
-    routing.screen === 'SelectAddress'
-      ? routing.navigate('Home')
-      : routing.goBack('Home');
+    routing.screen === "SelectAddress"
+      ? routing.navigate("Home")
+      : routing.goBack("Home");
   };
 
   const getLocation = async () => {
-    setStatusText('Carregando...');
+    setStatusText("Carregando...");
 
     if (!device.web) {
       const { status } = await requestForegroundPermissionsAsync();
 
-      if (status !== 'granted') {
-        alert('Permissão de acesso à localização foi negada');
-        setStatusText('Usar localização atual');
+      if (status !== "granted") {
+        alert("Permissão de acesso à localização foi negada");
+        setStatusText("Usar localização atual");
         setDisabled(false);
         return;
       }
@@ -92,8 +92,8 @@ const Addresses = () => {
       try {
         await enableNetworkProviderAsync();
       } catch {
-        alert('Serviço de localização está desativado');
-        setStatusText('Usar localização atual');
+        alert("Serviço de localização está desativado");
+        setStatusText("Usar localização atual");
         setDisabled(false);
         return;
       }
@@ -101,11 +101,11 @@ const Addresses = () => {
 
     setActiveId(null);
 
-    setStatusText('Buscando...');
+    setStatusText("Buscando...");
 
     const address = await getAddress();
 
-    setStatusText('Usar localização atual');
+    setStatusText("Usar localização atual");
     if (!address) return setDisabled(false);
 
     setAddress(address);
@@ -114,11 +114,11 @@ const Addresses = () => {
 
   if (activeId === undefined) return <Loading />;
 
-  const isSelectRoute = routing.screen === 'SelectAddress';
+  const isSelectRoute = routing.screen === "SelectAddress";
   return (
     <>
       <MyHeader
-        title={isSelectRoute ? 'Escolha um endereço' : 'Endereços salvos'}
+        title={isSelectRoute ? "Escolha um endereço" : "Endereços salvos"}
         goBackLess={isSelectRoute}
       />
       <MyTouchable
@@ -129,16 +129,18 @@ const Addresses = () => {
             if (got) goBack();
           });
         }}
-        style={{ flexDirection: 'row' }}>
+        style={{ flexDirection: "row" }}
+      >
         <>
           <View
             style={[
               styles.icon,
               globalStyles.elevation5,
               globalStyles.darkBorder,
-            ]}>
+            ]}
+          >
             <MyIcon
-              name='crosshairs-gps'
+              name="crosshairs-gps"
               size={28}
               color={!activeId ? myColors.primaryColor : myColors.grey_1}
             />
@@ -146,7 +148,7 @@ const Addresses = () => {
           <View style={styles.gpsContainer}>
             <MyText style={styles.gpsStatus}>{statusText}</MyText>
             <MyText style={styles.gpsAddress}>
-              {gpsAddress ? stringifyAddress(gpsAddress) : 'Ativar localização'}
+              {gpsAddress ? stringifyAddress(gpsAddress) : "Ativar localização"}
             </MyText>
           </View>
         </>
@@ -179,8 +181,8 @@ const AddressesList = (props: {
   if (!accessToken)
     return (
       <Errors
-        title='Entre para ver seus endereços salvos'
-        error='missing_auth'
+        title="Entre para ver seus endereços salvos"
+        error="missing_auth"
       />
     );
 
@@ -197,12 +199,12 @@ const AddressesList = (props: {
     const removeAddress = () => {
       if (isSelected)
         return alert(
-          'Este endereço está sendo usado!',
-          'Não é possível excluir um endereço que está sendo utilizado',
+          "Este endereço está sendo usado!",
+          "Não é possível excluir um endereço que está sendo utilizado",
         );
 
       alert(
-        'Apagar endereço',
+        "Apagar endereço",
         `Tem certeza que deseja apagar o endereço "${name}"?`,
         { onConfirm: () => deleteAddress(accessToken, address.id) },
       );
@@ -215,25 +217,27 @@ const AddressesList = (props: {
           globalStyles.darkBorder,
           styles.cardBase,
           isSelected ? styles.cardActive : styles.cardInactive,
-        ]}>
+        ]}
+      >
         <MyTouchable
           style={{ flex: 1 }}
           onPress={() => {
             setActiveId(address.id);
             setAddress(address);
             goBack();
-          }}>
+          }}
+        >
           <View style={styles.addressNameContainer}>
             <MyIcon
               style={{ marginTop: 2 }}
-              name='map-marker'
+              name="map-marker"
               size={24}
               color={myColors.primaryColor}
             />
             <MyText style={styles.addressName}>{name}</MyText>
             {isSelected && (
               <MyIcon
-                name='check-circle'
+                name="check-circle"
                 size={20}
                 color={myColors.primaryColor}
                 style={styles.iconCheck}
@@ -244,13 +248,13 @@ const AddressesList = (props: {
         </MyTouchable>
         <View style={styles.itemButtonsContainer}>
           <IconButton
-            icon='pencil'
+            icon="pencil"
             color={myColors.grey3}
             style={styles.itemButton}
-            onPress={() => routing.navigate('EditAddress', { i: address.id })}
+            onPress={() => routing.navigate("EditAddress", { i: address.id })}
           />
           <IconButton
-            icon='delete'
+            icon="delete"
             color={myColors.grey3}
             style={styles.itemButton}
             onPress={removeAddress}
@@ -274,9 +278,9 @@ const AddressesList = (props: {
         renderItem={addressItem}
       />
       <MyButton
-        screen='EditAddress'
-        title='Adicionar endereço'
-        type='outline'
+        screen="EditAddress"
+        title="Adicionar endereço"
+        type="outline"
         buttonStyle={globalStyles.bottomButton}
       />
     </>
@@ -287,9 +291,9 @@ const styles = StyleSheet.create({
   icon: {
     width: 52,
     height: 52,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 60,
     marginVertical: 8,
     marginLeft: 26,
@@ -297,7 +301,7 @@ const styles = StyleSheet.create({
   gpsContainer: {
     paddingLeft: 16,
     paddingRight: 100,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   gpsStatus: {
     color: myColors.text2,
@@ -313,7 +317,7 @@ const styles = StyleSheet.create({
   },
   cardBase: {
     minHeight: 94,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     marginTop: 16,
     paddingLeft: 8,
@@ -328,7 +332,7 @@ const styles = StyleSheet.create({
     borderColor: myColors.divider,
   },
   addressNameContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 12,
   },
   addressName: {
@@ -348,7 +352,7 @@ const styles = StyleSheet.create({
     color: myColors.text2,
   },
   itemButtonsContainer: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
     top: -2,
   },

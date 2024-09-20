@@ -1,11 +1,11 @@
-import { Market, MarketRating } from '~/core/models';
-import { validateMarket } from '~/functions/converter';
-import { SearchParams } from './products';
-import Utils from './utils';
+import { Market, MarketRating } from "~/core/models";
+import { validateMarket } from "~/functions/converter";
+import { SearchParams } from "./products";
+import Utils from "./utils";
 
 const { ApiClient } = Utils;
 
-type MarketParams = Omit<SearchParams, 'categories' | 'ids'>;
+type MarketParams = Omit<SearchParams, "categories" | "ids">;
 
 export const apiMarkets = {
   async findMany(city: string, params: MarketParams) {

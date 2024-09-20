@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import * as Location from 'expo-location';
-import { myColors, device, globalStyles } from '~/constants';
-import { saveIsNewUser } from '~/core/dataStorage';
-import useRouting from '~/hooks/useRouting';
-import Loading from '~/components/Loading';
-import MyButton from '~/components/MyButton';
-import MyText from '~/components/MyText';
+import React, { useState } from "react";
+import { View, StyleSheet } from "react-native";
+import * as Location from "expo-location";
+import { myColors, device, globalStyles } from "~/constants";
+import { saveIsNewUser } from "~/core/dataStorage";
+import useRouting from "~/hooks/useRouting";
+import Loading from "~/components/Loading";
+import MyButton from "~/components/MyButton";
+import MyText from "~/components/MyText";
 
 const NewUser = () => {
   const { replace } = useRouting();
@@ -16,7 +16,7 @@ const NewUser = () => {
 
   const next = () => {
     saveIsNewUser(false);
-    replace('SignIn', { newUser: true });
+    replace("SignIn", { newUser: true });
   };
 
   return (
@@ -24,7 +24,7 @@ const NewUser = () => {
       <MyText style={{ fontSize: 18, color: myColors.text2, marginTop: 16 }}>
         Bem-Vindo
       </MyText>
-      <View style={{ alignItems: 'center' }}>
+      <View style={{ alignItems: "center" }}>
         <MyText style={{ fontSize: 20, color: myColors.text5 }}>
           Permitir Localização
         </MyText>
@@ -34,14 +34,14 @@ const NewUser = () => {
       </View>
       <View style={styles.bottom}>
         <MyButton
-          title='Pular'
-          type='outline'
+          title="Pular"
+          type="outline"
           titleStyle={styles.buttonText}
           buttonStyle={styles.button}
           onPress={next}
         />
         <MyButton
-          title='Permitir'
+          title="Permitir"
           titleStyle={styles.buttonText}
           buttonStyle={styles.button}
           onPress={async () => {
@@ -57,21 +57,21 @@ const NewUser = () => {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
     flex: 1,
   },
   bottom: {
     marginBottom: device.iPhoneNotch ? 40 : 8,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    width: "100%",
   },
   buttonText: {
     fontSize: 18,
   },
   button: {
-    width: '42%',
+    width: "42%",
     paddingVertical: 12,
   },
 });

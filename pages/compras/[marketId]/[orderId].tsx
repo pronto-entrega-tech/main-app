@@ -1,16 +1,16 @@
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
   FlatList,
   TextInput,
   useWindowDimensions,
-} from 'react-native';
-import { ProgressBar } from 'react-native-paper';
-import { Image } from 'react-native-elements/dist/image/Image';
-import { io } from 'socket.io-client';
-import dynamic from 'next/dynamic';
-import { myColors, images, myFonts, globalStyles } from '~/constants';
+} from "react-native";
+import { ProgressBar } from "react-native-paper";
+import { Image } from "react-native-elements/dist/image/Image";
+import { io } from "socket.io-client";
+import dynamic from "next/dynamic";
+import { myColors, images, myFonts, globalStyles } from "~/constants";
 import {
   canReview,
   fail,
@@ -20,14 +20,14 @@ import {
   getJwtExpiration,
   stringifyAddress,
   validateOrder,
-} from '~/functions/converter';
-import { BottomNav } from '~/components/Layout';
-import MyDivider from '~/components/MyDivider';
-import MyText from '~/components/MyText';
-import MyIcon from '~/components/MyIcon';
-import MyHeader from '~/components/MyHeader';
-import Loading from '~/components/Loading';
-import useRouting from '~/hooks/useRouting';
+} from "~/functions/converter";
+import { BottomNav } from "~/components/Layout";
+import MyDivider from "~/components/MyDivider";
+import MyText from "~/components/MyText";
+import MyIcon from "~/components/MyIcon";
+import MyHeader from "~/components/MyHeader";
+import Loading from "~/components/Loading";
+import useRouting from "~/hooks/useRouting";
 import {
   Order,
   OrderItem,
@@ -35,59 +35,59 @@ import {
   RetryPayment,
   Review,
   SetState,
-} from '~/core/models';
-import { api } from '~/services/api';
-import { useAuthContext } from '~/contexts/AuthContext';
-import { money } from '~/functions/money';
-import Errors, { MyErrors, serverError } from '~/components/Errors';
-import CenterModal from '~/components/CenterModal';
-import { ModalState, useModalState } from '~/hooks/useModalState';
-import MyTouchable from '~/components/MyTouchable';
-import IconButton from '~/components/IconButton';
-import QRCode from 'react-native-qrcode-svg';
-import * as Clipboard from 'expo-clipboard';
-import { useAlertContext } from '~/contexts/AlertContext';
-import { useToastContext } from '~/contexts/ToastContext';
-import { getConfirmationTokens } from '~/core/dataStorage';
-import { appOrSite } from '~/constants/device';
-import MyButton from '~/components/MyButton';
-import Rating from '~/components/Rating';
-import MyInput from '~/components/MyInput';
-import BottomModal from '~/components/BottomModal';
-import Portal from '~/core/Portal';
-import OrderHelp from '~/screens/OrderHelp';
-import OrderCancel from '~/screens/OrderCancel';
-import { sleep } from '~/functions/sleep';
-import { Urls } from '~/constants/urls';
-import { lightFormat } from 'date-fns';
+} from "~/core/models";
+import { api } from "~/services/api";
+import { useAuthContext } from "~/contexts/AuthContext";
+import { money } from "~/functions/money";
+import Errors, { MyErrors, serverError } from "~/components/Errors";
+import CenterModal from "~/components/CenterModal";
+import { ModalState, useModalState } from "~/hooks/useModalState";
+import MyTouchable from "~/components/MyTouchable";
+import IconButton from "~/components/IconButton";
+import QRCode from "react-native-qrcode-svg";
+import * as Clipboard from "expo-clipboard";
+import { useAlertContext } from "~/contexts/AlertContext";
+import { useToastContext } from "~/contexts/ToastContext";
+import { getConfirmationTokens } from "~/core/dataStorage";
+import { appOrSite } from "~/constants/device";
+import MyButton from "~/components/MyButton";
+import Rating from "~/components/Rating";
+import MyInput from "~/components/MyInput";
+import BottomModal from "~/components/BottomModal";
+import Portal from "~/core/Portal";
+import OrderHelp from "~/screens/OrderHelp";
+import OrderCancel from "~/screens/OrderCancel";
+import { sleep } from "~/functions/sleep";
+import { Urls } from "~/constants/urls";
+import { lightFormat } from "date-fns";
 // Hi
 const importPaymentMethodsBody = () =>
-  import('@pages/meios-de-pagamento').then((mod) => mod.PaymentMethodsBody);
+  import("@pages/meios-de-pagamento").then((mod) => mod.PaymentMethodsBody);
 const PaymentMethodsBody = dynamic(importPaymentMethodsBody, {
   loading: () => <Loading />,
 });
 
 const importPaymentCardBody = () =>
-  import('@pages/meios-de-pagamento/cartao').then((mod) => mod.PaymentCardBody);
+  import("@pages/meios-de-pagamento/cartao").then((mod) => mod.PaymentCardBody);
 const PaymentCardBody = dynamic(importPaymentCardBody, {
   loading: () => <Loading />,
 });
 
 const isCompleted = (order: Order) =>
-  ['COMPLETING', 'COMPLETED'].includes(order.status);
+  ["COMPLETING", "COMPLETED"].includes(order.status);
 
-export type OrderPages = 'OrderDetails' | 'OrderHelp' | 'OrderCancel';
+export type OrderPages = "OrderDetails" | "OrderHelp" | "OrderCancel";
 
 const OrderDetails = () => {
   const { params, isReady } = useRouting();
   const { isAuth, accessToken } = useAuthContext();
-  const [history, setHistory] = useState<OrderPages[]>(['OrderDetails']);
+  const [history, setHistory] = useState<OrderPages[]>(["OrderDetails"]);
   const [order, setOrder] = useState<Order>();
   const [apiError, setApiError] = useState<MyErrors>(null);
   const [tryAgain, setTryAgain] = useState(false);
 
   // JavaScriptCore don't support `array.at()`
-  const selectedPage = history.slice(-1)[0] ?? 'OrderDetails';
+  const selectedPage = history.slice(-1)[0] ?? "OrderDetails";
 
   const navigate = useCallback(
     (page: OrderPages) =>
@@ -103,26 +103,26 @@ const OrderDetails = () => {
 
     try {
       const socket = io(Urls.API_WS, {
-        transports: ['websocket'],
+        transports: ["websocket"],
         auth: { token: accessToken },
       });
-      socket.on('orders', (newOrder: Partial<Order>) => {
+      socket.on("orders", (newOrder: Partial<Order>) => {
         setOrder((order) => validateOrder({ ...(order ?? {}), ...newOrder }));
       });
-      socket.emit('orders', { order_id: orderId, market_id: marketId });
+      socket.emit("orders", { order_id: orderId, market_id: marketId });
       return () => {
         socket.close();
       };
     } catch (err) {
-      setApiError(api.isError('NotFound', err) ? 'nothing_order' : 'server');
+      setApiError(api.isError("NotFound", err) ? "nothing_order" : "server");
     }
     return;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tryAgain, isReady, isAuth, orderId, marketId]);
 
   useEffect(() => {
-    if (selectedPage === 'OrderCancel' && order && isCompleted(order))
-      navigate('OrderDetails');
+    if (selectedPage === "OrderCancel" && order && isCompleted(order))
+      navigate("OrderDetails");
   }, [order, selectedPage, navigate]);
 
   if (apiError)
@@ -139,7 +139,7 @@ const OrderDetails = () => {
   if (!order) return <Loading />;
 
   switch (selectedPage) {
-    case 'OrderDetails':
+    case "OrderDetails":
       return (
         <BottomNav>
           <OrderDetailsPage
@@ -149,11 +149,11 @@ const OrderDetails = () => {
           />
         </BottomNav>
       );
-    case 'OrderHelp':
+    case "OrderHelp":
       return (
         <OrderHelp order={order} onNavigate={navigate} onGoBack={goBack} />
       );
-    case 'OrderCancel':
+    case "OrderCancel":
       return (
         <OrderCancel order={order} onNavigate={navigate} onGoBack={goBack} />
       );
@@ -177,7 +177,7 @@ const OrderDetailsPage = ({
 
   const { payment } = order;
 
-  const [, cardBrand] = payment.description.split(' ');
+  const [, cardBrand] = payment.description.split(" ");
   const cardBrandIcon = () =>
     ({
       Mastercard: images.mastercard,
@@ -192,8 +192,8 @@ const OrderDetailsPage = ({
   }[payment.method];
 
   const change = money.isGreater(payment.change, 0)
-    ? ` - Troco para ${money.toString(payment.change, 'R$')}`
-    : '';
+    ? ` - Troco para ${money.toString(payment.change, "R$")}`
+    : "";
   const subtotal = money.minus(order.total, order.delivery_fee);
   const hasDeliveryFee = !money.isEqual(order.delivery_fee, 0);
 
@@ -201,15 +201,16 @@ const OrderDetailsPage = ({
     <View>
       <StatusBar order={order} />
       <MyDivider style={styles.divider} />
-      {order.status === 'PAYMENT_REQUIRE_ACTION' && (
+      {order.status === "PAYMENT_REQUIRE_ACTION" && (
         <>
           <MyTouchable
             onPress={openPixModal}
-            style={{ padding: 16, flexDirection: 'row', alignItems: 'center' }}>
+            style={{ padding: 16, flexDirection: "row", alignItems: "center" }}
+          >
             <Image
               {...images.pix}
-              alt=''
-              resizeMode='contain'
+              alt=""
+              resizeMode="contain"
               containerStyle={{ height: 24, width: 24, marginRight: 8 }}
             />
             <MyText style={styles.text}>Ver Pix QR Code</MyText>
@@ -217,27 +218,29 @@ const OrderDetailsPage = ({
           <MyDivider style={styles.divider} />
         </>
       )}
-      {['PAYMENT_REQUIRE_ACTION', 'PAYMENT_FAILED'].includes(order.status) && (
+      {["PAYMENT_REQUIRE_ACTION", "PAYMENT_FAILED"].includes(order.status) && (
         <>
           <MyTouchable
             onPress={openPaymentModal}
-            style={{ padding: 16, flexDirection: 'row', alignItems: 'center' }}>
+            style={{ padding: 16, flexDirection: "row", alignItems: "center" }}
+          >
             <MyText style={styles.text}>
-              {order.status === 'PAYMENT_FAILED'
-                ? 'Tentar pagamento novamente'
-                : 'Mudar meio de pagamento'}
+              {order.status === "PAYMENT_FAILED"
+                ? "Tentar pagamento novamente"
+                : "Mudar meio de pagamento"}
             </MyText>
           </MyTouchable>
           <MyDivider style={styles.divider} />
         </>
       )}
-      {order.status === 'DELIVERY_PENDING' && (
+      {order.status === "DELIVERY_PENDING" && (
         <>
           <MyTouchable
             onPress={openConfirmModal}
-            style={{ padding: 16, flexDirection: 'row', alignItems: 'center' }}>
+            style={{ padding: 16, flexDirection: "row", alignItems: "center" }}
+          >
             <MyIcon
-              name='check-circle'
+              name="check-circle"
               color={myColors.green}
               size={24}
               style={{ marginRight: 8 }}
@@ -253,9 +256,10 @@ const OrderDetailsPage = ({
             <View
               style={{
                 padding: 16,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
               <MyText style={[styles.text, { marginRight: 8 }]}>
                 Avaliação
               </MyText>
@@ -269,11 +273,12 @@ const OrderDetailsPage = ({
               onPress={openReviewModal}
               style={{
                 padding: 16,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
               <MyIcon
-                name='star'
+                name="star"
                 color={myColors.rating}
                 size={24}
                 style={{ marginRight: 8 }}
@@ -286,9 +291,10 @@ const OrderDetailsPage = ({
       {!isCompleted(order) && (
         <>
           <MyTouchable
-            onPress={() => routing.navigate('Chat', routing.params)}
-            style={{ padding: 16, flexDirection: 'row', alignItems: 'center' }}>
-            <MyIcon name='message' size={24} style={{ marginRight: 8 }} />
+            onPress={() => routing.navigate("Chat", routing.params)}
+            style={{ padding: 16, flexDirection: "row", alignItems: "center" }}
+          >
+            <MyIcon name="message" size={24} style={{ marginRight: 8 }} />
             <MyText style={styles.text}>Entrar em contato com mercado</MyText>
           </MyTouchable>
           <MyDivider style={styles.divider} />
@@ -296,19 +302,19 @@ const OrderDetailsPage = ({
       )}
       <View style={styles.marketContainer}>
         <Image
-          source={{ uri: getImageUrl('market', order.market_id) }}
-          alt=''
-          placeholderStyle={{ backgroundColor: 'white' }}
+          source={{ uri: getImageUrl("market", order.market_id) }}
+          alt=""
+          placeholderStyle={{ backgroundColor: "white" }}
           containerStyle={{ borderRadius: 8, height: 65, width: 65 }}
         />
         <MyText style={styles.marketName}>{order.market.name}</MyText>
       </View>
       <View style={styles.infoContainer}>
         <MyText style={styles.text}>
-          Realizado {lightFormat(order.created_at, 'dd/MM/yy - HH:mm')}
+          Realizado {lightFormat(order.created_at, "dd/MM/yy - HH:mm")}
         </MyText>
-        <MyText style={[styles.text, { textAlign: 'right' }]}>
-          Pedido {order.market_order_id.padStart(3, '0')}
+        <MyText style={[styles.text, { textAlign: "right" }]}>
+          Pedido {order.market_order_id.padStart(3, "0")}
         </MyText>
       </View>
       <MyDivider style={styles.divider} />
@@ -323,15 +329,15 @@ const OrderDetailsPage = ({
       <MyDivider style={styles.divider} />
       <View style={styles.paymentContainer}>
         <MyText style={styles.text}>
-          {`Pagamento ${payment.in_app ? `pelo ${appOrSite}` : 'na entrega'}`}
+          {`Pagamento ${payment.in_app ? `pelo ${appOrSite}` : "na entrega"}`}
         </MyText>
         <View style={{ flexShrink: 1 }}>
           <MyText style={styles.payment}>{payment.description + change}</MyText>
         </View>
         <Image
           {...paymentIcon}
-          alt=''
-          resizeMode='contain'
+          alt=""
+          resizeMode="contain"
           containerStyle={styles.paymentIcon}
           childrenContainerStyle={{ top: 2 }}
         />
@@ -339,15 +345,16 @@ const OrderDetailsPage = ({
       <MyDivider style={styles.divider} />
       <View style={[styles.priceContainer, { marginTop: 10 }]}>
         <MyText style={styles.price}>Subtotal</MyText>
-        <MyText style={styles.price}>{money.toString(subtotal, 'R$')}</MyText>
+        <MyText style={styles.price}>{money.toString(subtotal, "R$")}</MyText>
       </View>
       <View style={styles.priceContainer}>
         <MyText style={styles.price}>Taxa de entrega</MyText>
         <MyText
-          style={[styles.price, !hasDeliveryFee && { color: myColors.green }]}>
+          style={[styles.price, !hasDeliveryFee && { color: myColors.green }]}
+        >
           {!hasDeliveryFee
-            ? 'Grátis'
-            : money.toString(order.delivery_fee, 'R$')}
+            ? "Grátis"
+            : money.toString(order.delivery_fee, "R$")}
         </MyText>
       </View>
       <MyDivider
@@ -356,7 +363,7 @@ const OrderDetailsPage = ({
       <View style={styles.totalPriceContainer}>
         <MyText style={styles.totalPrice}>Total</MyText>
         <MyText style={styles.totalPrice}>
-          {money.toString(order.total, 'R$')}
+          {money.toString(order.total, "R$")}
         </MyText>
       </View>
       <MyDivider style={styles.divider} />
@@ -370,8 +377,8 @@ const OrderDetailsPage = ({
 
   const helpButton = (
     <IconButton
-      onPress={() => navigate('OrderHelp')}
-      icon='help-circle'
+      onPress={() => navigate("OrderHelp")}
+      icon="help-circle"
       style={{
         marginLeft: -8,
         width: 56,
@@ -382,7 +389,7 @@ const OrderDetailsPage = ({
 
   return (
     <Portal.Host>
-      <MyHeader title='Detalhes do pedido' rightIcon={helpButton} />
+      <MyHeader title="Detalhes do pedido" rightIcon={helpButton} />
       <FlatList
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 24 }}
@@ -416,7 +423,7 @@ const orderItem = ({ item }: { item: OrderItem }) => (
           {`${item.product.name} ${item.product.brand}`}
         </MyText>
         <MyText style={styles.itemPrice}>
-          {money.toString(+item.price, 'R$')}
+          {money.toString(+item.price, "R$")}
         </MyText>
         <MyText style={styles.itemWeight}>{item.product.quantity}</MyText>
       </View>
@@ -443,7 +450,7 @@ const PageModal = ({
   );
 };
 
-const PixModal = ({ payment }: { payment: Order['payment'] }) => {
+const PixModal = ({ payment }: { payment: Order["payment"] }) => {
   const { toast } = useToastContext();
 
   if (!payment.pix_code || !payment.pix_expires_at) return null;
@@ -456,36 +463,37 @@ const PixModal = ({ payment }: { payment: Order['payment'] }) => {
   const minsLeft = timeLeft.getUTCMinutes();
   const hoursLeft = timeLeft.getUTCHours();
 
-  const plural = (n: number) => (n > 1 ? 's' : '');
+  const plural = (n: number) => (n > 1 ? "s" : "");
   const hours = `${hoursLeft} hora${plural(hoursLeft)}`;
   const mins = `${minsLeft} minuto${plural(minsLeft)}`;
 
   const copyCode = async () => {
     const hasCopied = await Clipboard.setStringAsync(pix_code);
-    toast(hasCopied ? 'Copiado' : 'Error ao copiar', {
-      type: hasCopied ? 'Confirmation' : 'Error',
+    toast(hasCopied ? "Copiado" : "Error ao copiar", {
+      type: hasCopied ? "Confirmation" : "Error",
     });
   };
 
   return (
     <View style={globalStyles.centralizer}>
       <MyText style={[styles.text, { marginBottom: 12 }]}>
-        {isValid ? `Pix expira em ${hours} e ${mins}` : 'Pix expirado'}
+        {isValid ? `Pix expira em ${hours} e ${mins}` : "Pix expirado"}
       </MyText>
       <QRCode size={200} value={pix_code} />
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '100%',
-        }}>
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+        }}
+      >
         <TextInput
           value={pix_code}
           editable={false}
-          style={[styles.text, { width: '60%' }]}
+          style={[styles.text, { width: "60%" }]}
         />
-        <IconButton icon='content-copy' onPress={copyCode} />
+        <IconButton icon="content-copy" onPress={copyCode} />
       </View>
     </View>
   );
@@ -525,15 +533,15 @@ const PaymentModal = ({
       setLoading(false);
     };
 
-    const again = order.card_token === card?.asaas_id ? ' novamente' : '';
+    const again = order.card_token === card?.asaas_id ? " novamente" : "";
     const action =
       order.payment.method === dto.payment_method
         ? `Tentar${again} o`
-        : 'Mudar meio de pagamento para';
-    const method = { PIX: 'Pix', CARD: 'Cartão' }[dto.payment_method];
+        : "Mudar meio de pagamento para";
+    const method = { PIX: "Pix", CARD: "Cartão" }[dto.payment_method];
     const cardInfo = card
       ? `${card.nickname ?? formatCardBrand(card)} •••• ${card.last4}`
-      : '';
+      : "";
 
     alert(`${action} ${method}?`, cardInfo, {
       onConfirm: retryPayment,
@@ -543,12 +551,12 @@ const PaymentModal = ({
   const body = !selectedPage ? (
     <PaymentMethodsBody
       onPixPress={
-        order.payment.method !== 'PIX'
-          ? () => selectPayment({ payment_method: 'PIX' })
+        order.payment.method !== "PIX"
+          ? () => selectPayment({ payment_method: "PIX" })
           : undefined
       }
       onCardPress={(card) =>
-        selectPayment({ payment_method: 'CARD', card_id: card.id }, card)
+        selectPayment({ payment_method: "CARD", card_id: card.id }, card)
       }
       onAddCard={() => setSelectedPage(1)}
     />
@@ -606,7 +614,7 @@ const ReviewModal = ({
   const { accessToken } = useAuthContext();
   const [isLoading, setLoading] = useState(false);
   const [rating, setRating] = useState(0);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   if (isLoading) return <Loading />;
 
@@ -619,27 +627,27 @@ const ReviewModal = ({
     });
 
   return (
-    <View style={{ alignItems: 'center' }}>
+    <View style={{ alignItems: "center" }}>
       <MyText style={[styles.title, { marginBottom: 16 }]}>Avalie</MyText>
       <MyText style={[styles.text, { marginBottom: 12 }]}>
         Escolha de 1 a 5 estrelas
       </MyText>
-      <Rating value={rating} onChange={setRating} size='big' />
+      <Rating value={rating} onChange={setRating} size="big" />
       <MyInput
         value={message}
         onChangeText={setMessage}
-        label='Escreva um comentário'
+        label="Escreva um comentário"
         labelStyle={{
           color: myColors.optionalInput,
           marginLeft: 8,
           marginBottom: 6,
         }}
-        placeholder='Opcional'
+        placeholder="Opcional"
         multiline
         maxLength={256}
         numberOfLines={2}
         containerStyle={{ marginTop: 24 }}
-        inputContainerStyle={{ borderColor: 'transparent' }}
+        inputContainerStyle={{ borderColor: "transparent" }}
         inputStyle={{
           borderWidth: 2,
           borderRadius: 12,
@@ -648,7 +656,7 @@ const ReviewModal = ({
         }}
       />
       <MyButton
-        title='Avaliar'
+        title="Avaliar"
         disabled={!rating}
         onPress={async () => {
           setLoading(true);
@@ -667,19 +675,19 @@ const ReviewModal = ({
 };
 
 const StatusBar = ({ order }: { order: Order }) => {
-  const Unfinished = ({ msg = '', step = 0, color = '' }) => {
+  const Unfinished = ({ msg = "", step = 0, color = "" }) => {
     const inProgress = !color;
     return (
       <>
         <View style={{ marginHorizontal: 16, marginVertical: 12 }}>
           <MyText style={styles.previsionMyText}>
-            {order.is_scheduled ? 'Agendado para' : 'Previsão de entrega'}
+            {order.is_scheduled ? "Agendado para" : "Previsão de entrega"}
           </MyText>
           <MyText style={styles.previsionTime}>
             {formatDeliveryTime(order)}
           </MyText>
         </View>
-        <View style={{ flexDirection: 'row', marginHorizontal: 16 }}>
+        <View style={{ flexDirection: "row", marginHorizontal: 16 }}>
           <View style={{ flex: 1 }}>
             <ProgressBar
               indeterminate={inProgress && step === 1}
@@ -705,24 +713,26 @@ const StatusBar = ({ order }: { order: Order }) => {
           style={{
             marginHorizontal: 16,
             height: 40,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <MyIcon name='circle' color={color || myColors.green} size={8} />
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <MyIcon name="circle" color={color || myColors.green} size={8} />
           <MyText style={styles.steps}>{msg}</MyText>
         </View>
       </>
     );
   };
 
-  const Finished = ({ msg = '', Icon = CompletedIcon }) => (
+  const Finished = ({ msg = "", Icon = CompletedIcon }) => (
     <View
       style={{
         padding: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <Icon />
       <MyText style={styles.text}>{msg}</MyText>
     </View>
@@ -740,53 +750,53 @@ const StatusBar = ({ order }: { order: Order }) => {
 
   const CompletedIcon = () => (
     <MyIcon
-      name='check-circle'
-      color='green'
+      name="check-circle"
+      color="green"
       size={24}
       style={{ marginRight: 8 }}
     />
   );
   const CanceledIcon = () => (
     <MyIcon
-      name='close-circle'
-      color='red'
+      name="close-circle"
+      color="red"
       size={24}
       style={{ marginRight: 8 }}
     />
   );
 
   const finishedTime =
-    order.finished_at && lightFormat(order.finished_at, 'HH:mm');
+    order.finished_at && lightFormat(order.finished_at, "HH:mm");
 
   const statusBar = {
     PAYMENT_PROCESSING: createUnfinished({
-      msg: 'Processando pagamento',
+      msg: "Processando pagamento",
       step: 1,
     }),
     PAYMENT_FAILED: createUnfinished({
-      msg: 'Falha no pagamento',
+      msg: "Falha no pagamento",
       step: 1,
-      color: 'red',
+      color: "red",
     }),
     PAYMENT_REQUIRE_ACTION: createUnfinished({
-      msg: 'Pague o pix',
+      msg: "Pague o pix",
       step: 1,
       color: myColors.pending,
     }),
     APPROVAL_PENDING: createUnfinished({
-      msg: 'Aguardado confirmação do mercado',
+      msg: "Aguardado confirmação do mercado",
       step: 1,
     }),
     PROCESSING: createUnfinished({
-      msg: 'Pedido sendo preparando',
+      msg: "Pedido sendo preparando",
       step: 2,
     }),
     DELIVERY_PENDING: createUnfinished({
-      msg: 'Pedido saiu para entrega',
+      msg: "Pedido saiu para entrega",
       step: 3,
     }),
     COMPLETING: createFinished({
-      msg: 'Pedido sendo concluído',
+      msg: "Pedido sendo concluído",
       Icon: CompletedIcon,
     }),
     COMPLETED: createFinished({
@@ -794,7 +804,7 @@ const StatusBar = ({ order }: { order: Order }) => {
       Icon: CompletedIcon,
     }),
     CANCELING: createFinished({
-      msg: 'Pedido sendo cancelado',
+      msg: "Pedido sendo cancelado",
       Icon: CanceledIcon,
     }),
     CANCELED: createFinished({
@@ -844,14 +854,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   marketContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 12,
     marginHorizontal: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   infoContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 12,
     marginHorizontal: 16,
   },
@@ -865,9 +875,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   paymentContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginHorizontal: 16,
     marginVertical: 12,
   },
@@ -875,17 +885,17 @@ const styles = StyleSheet.create({
     color: myColors.text5,
     fontSize: 16,
     marginRight: 34,
-    textAlign: 'right',
+    textAlign: "right",
   },
   paymentIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
     width: 28,
     height: 28,
   },
   priceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginHorizontal: 16,
     marginBottom: 12,
   },
@@ -894,8 +904,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   totalPriceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginHorizontal: 16,
     marginVertical: 10,
   },
@@ -905,10 +915,10 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   itemContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingTop: 10,
     paddingHorizontal: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   itemQuantity: {
     fontFamily: myFonts.Medium,

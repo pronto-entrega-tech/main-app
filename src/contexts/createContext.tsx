@@ -5,8 +5,8 @@ import {
   useEffect,
   useState,
   useSyncExternalStore,
-} from 'react';
-import { fail } from '~/functions/converter';
+} from "react";
+import { fail } from "~/functions/converter";
 
 type Store<T> = {
   value: T;

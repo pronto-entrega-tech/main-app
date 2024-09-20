@@ -1,11 +1,11 @@
-import { useCallback, useState } from 'react';
-import { createContext } from '~/contexts/createContext';
+import { useCallback, useState } from "react";
+import { createContext } from "~/contexts/createContext";
 import {
   CreatePaymentCard,
   PaymentCard,
   UpdatePaymentCard,
-} from '~/core/models';
-import { api } from '~/services/api';
+} from "~/core/models";
+import { api } from "~/services/api";
 
 function usePaymentCard() {
   const [paymentCards, setPaymentCards] = useState<PaymentCard[]>();
@@ -32,7 +32,7 @@ function usePaymentCard() {
       );
   };
 
-  const deletePaymentCard = async (token: string, id: PaymentCard['id']) => {
+  const deletePaymentCard = async (token: string, id: PaymentCard["id"]) => {
     await api.paymentCards.remove(token, id);
 
     if (paymentCards) setPaymentCards(paymentCards.filter((a) => a.id !== id));

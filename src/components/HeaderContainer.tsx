@@ -1,7 +1,7 @@
-import React, { ReactNode } from 'react';
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { device } from '~/constants';
-import { zIndex } from '~/constants/zIndex';
+import React, { ReactNode } from "react";
+import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
+import { device } from "~/constants";
+import { zIndex } from "~/constants/zIndex";
 
 const HeaderContainer = ({
   children,
@@ -24,8 +24,8 @@ const styles = StyleSheet.create({
     zIndex: zIndex.Header,
   },
   subContainer: {
-    position: 'fixed',
-    width: '100%',
+    position: "fixed",
+    width: "100%",
   },
 });
 

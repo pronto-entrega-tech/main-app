@@ -1,6 +1,6 @@
-import React, { ComponentProps } from 'react';
-import { Switch as NativeSwitch } from 'react-native';
-import { device, myColors } from '~/constants';
+import React, { ComponentProps } from "react";
+import { Switch as NativeSwitch } from "react-native";
+import { device, myColors } from "~/constants";
 
 type Props = ComponentProps<typeof NativeSwitch> & {
   color?: string;
@@ -11,14 +11,14 @@ const Switch = ({
   ...props
 }: Props) => {
   const activeTrackColor = props.disabled
-    ? 'rgba(255, 255, 255, 0.12)'
-    : 'rgba(6, 121, 183, 0.5)';
+    ? "rgba(255, 255, 255, 0.12)"
+    : "rgba(6, 121, 183, 0.5)";
 
   const thumbColor = props.disabled
-    ? '#bdbdbd'
+    ? "#bdbdbd"
     : props.value
-    ? color
-    : '#fafafa';
+      ? color
+      : "#fafafa";
 
   const baseProps = device.web
     ? {
@@ -26,19 +26,19 @@ const Switch = ({
         activeThumbColor: color,
       }
     : device.iOS
-    ? {
-        trackColor: {
-          true: color,
-          false: '',
-        },
-      }
-    : {
-        thumbColor,
-        trackColor: {
-          true: activeTrackColor,
-          false: '',
-        },
-      };
+      ? {
+          trackColor: {
+            true: color,
+            false: "",
+          },
+        }
+      : {
+          thumbColor,
+          trackColor: {
+            true: activeTrackColor,
+            false: "",
+          },
+        };
 
   return (
     <NativeSwitch

@@ -1,3 +1,3 @@
-import app from '~/../app.json';
+import app from "~/../app.json";
 
 export default app.expo;

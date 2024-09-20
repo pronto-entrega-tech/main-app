@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
-import { createContext } from '~/contexts/createContext';
-import { fail, getJwtExpiration } from '~/functions/converter';
-import { saveRefreshToken, getRefreshToken } from '~/core/dataStorage';
-import { device } from '~/constants';
-import { useConnection } from '~/functions/connection';
-import { api } from '~/services/api';
-import { withMutex } from '~/services/mutex';
-import { useAlertContext } from '~/contexts/AlertContext';
+import { useCallback, useEffect, useState } from "react";
+import { createContext } from "~/contexts/createContext";
+import { fail, getJwtExpiration } from "~/functions/converter";
+import { saveRefreshToken, getRefreshToken } from "~/core/dataStorage";
+import { device } from "~/constants";
+import { useConnection } from "~/functions/connection";
+import { api } from "~/services/api";
+import { withMutex } from "~/services/mutex";
+import { useAlertContext } from "~/contexts/AlertContext";
 
 type AuthToken = { accessToken?: string | null; refreshToken?: string | null };
 
@@ -38,24 +38,24 @@ function useAuth() {
     if (accessToken === null || hasInternet === false) return;
 
     const revalidateToken = () =>
-      withMutex('revalidate', async () => {
+      withMutex("revalidate", async () => {
         if (!device.web && refreshToken === undefined) return;
 
         try {
           const _refreshToken = device.web
             ? undefined
             : refreshToken === null
-            ? fail('Unauthorized')
-            : refreshToken;
+              ? fail("Unauthorized")
+              : refreshToken;
 
           const res = await api.auth.revalidate(_refreshToken);
           setAccessToken(res.access_token);
           setRefreshToken(res.refresh_token ?? null);
         } catch (err) {
-          api.isError('Unauthorized', err) ||
-          (err as Error).message === 'Unauthorized'
+          api.isError("Unauthorized", err) ||
+          (err as Error).message === "Unauthorized"
             ? setAccessToken(null)
-            : alert('Error ao tentar entrar', 'Tente novamente mais tarde');
+            : alert("Error ao tentar entrar", "Tente novamente mais tarde");
         }
       });
 

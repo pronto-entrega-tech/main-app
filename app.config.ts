@@ -1,10 +1,10 @@
-import { ExpoConfig, ConfigContext } from 'expo/config';
-import os from 'node:os';
-import { fail } from 'node:assert';
+import { ExpoConfig, ConfigContext } from "expo/config";
+import os from "node:os";
+import { fail } from "node:assert";
 
 const lanIp =
-  os.networkInterfaces().en0?.find((v) => v.family === 'IPv4')?.address ??
-  fail('Missing LAN IP');
+  os.networkInterfaces().en0?.find((v) => v.family === "IPv4")?.address ??
+  fail("Missing LAN IP");
 
 process.env.NEXT_PUBLIC_LAN_IP = lanIp;
 

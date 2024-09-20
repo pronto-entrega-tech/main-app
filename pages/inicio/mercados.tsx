@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList } from 'react-native';
-import { myColors } from '~/constants';
-import MarketItem from '~/components/MarketItem';
-import { Coords, Market } from '~/core/models';
-import Loading from '~/components/Loading';
-import Errors, { MyErrors } from '~/components/Errors';
-import { getLatLong, toCityState } from '~/functions/converter';
-import { WithBottomNav } from '~/components/Layout';
-import MyHeader from '~/components/MyHeader';
-import { useAddressContext } from '~/contexts/AddressContext';
-import { api } from '~/services/api';
+import React, { useEffect, useState } from "react";
+import { FlatList } from "react-native";
+import { myColors } from "~/constants";
+import MarketItem from "~/components/MarketItem";
+import { Coords, Market } from "~/core/models";
+import Loading from "~/components/Loading";
+import Errors, { MyErrors } from "~/components/Errors";
+import { getLatLong, toCityState } from "~/functions/converter";
+import { WithBottomNav } from "~/components/Layout";
+import MyHeader from "~/components/MyHeader";
+import { useAddressContext } from "~/contexts/AddressContext";
+import { api } from "~/services/api";
 
 const MarketList = () => (
   <>
-    <MyHeader title='Mercados' smallDivider />
+    <MyHeader title="Mercados" smallDivider />
     <MarketListBody />
   </>
 );
@@ -28,7 +28,7 @@ const MarketListBody = () => {
     (async () => {
       setError(null);
 
-      if (address === null) return setError('missing_address');
+      if (address === null) return setError("missing_address");
       if (!address) return;
 
       const city = toCityState(address);
@@ -36,7 +36,7 @@ const MarketListBody = () => {
         latLong: getLatLong(address),
       });
 
-      if (!markets.length) return setError('nothing_feed');
+      if (!markets.length) return setError("nothing_feed");
 
       setData({
         markets,
@@ -44,7 +44,7 @@ const MarketListBody = () => {
       });
     })().catch((error) => {
       console.error(error);
-      setError('server');
+      setError("server");
     });
   }, [tryAgain, address]);
 

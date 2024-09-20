@@ -1,13 +1,13 @@
-import React from 'react';
-import { View } from 'react-native';
-import { WithBottomNav } from '~/components/Layout';
-import MyHeader from '~/components/MyHeader';
-import MyText from '~/components/MyText';
-import { globalStyles, myColors } from '~/constants';
+import React from "react";
+import { View } from "react-native";
+import { WithBottomNav } from "~/components/Layout";
+import MyHeader from "~/components/MyHeader";
+import MyText from "~/components/MyText";
+import { globalStyles, myColors } from "~/constants";
 
 const Cupons = () => (
   <>
-    <MyHeader title='Cupons' smallDivider />
+    <MyHeader title="Cupons" smallDivider />
     <View style={globalStyles.centralizer}>
       <MyText style={{ fontSize: 15, color: myColors.text2 }}>
         Nenhum cupom ainda

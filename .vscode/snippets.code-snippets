@@ -11,23 +11,23 @@
       "  )",
       "}",
       "",
-      "export default $TM_FILENAME_BASE;"
-    ]
+      "export default $TM_FILENAME_BASE;",
+    ],
   },
   "Create useState": {
     "scope": "typescriptreact",
     "prefix": ["use-state", "us"],
-    "body": ["const [state, setState] = useState();"]
+    "body": ["const [state, setState] = useState();"],
   },
   "Create useEffect": {
     "scope": "typescriptreact",
     "prefix": ["use-effect", "ue"],
-    "body": ["useEffect(() => {", "", "}, [])"]
+    "body": ["useEffect(() => {", "", "}, [])"],
   },
   "Create StyleSheet": {
     "scope": "typescriptreact",
     "prefix": ["create-stylesheet", "css"],
-    "body": ["const styles = StyleSheet.create({", "", "})"]
+    "body": ["const styles = StyleSheet.create({", "", "})"],
   },
   "Create context": {
     "scope": "typescriptreact",
@@ -40,7 +40,7 @@
       "  return {};",
       "};",
       "",
-      "export const [${TM_FILENAME_BASE/Context/$1/}Provider, use${TM_FILENAME_BASE}, use${TM_FILENAME_BASE}Selector] = createContext(use${TM_FILENAME_BASE/Context/$1/});"
-    ]
-  }
+      "export const [${TM_FILENAME_BASE/Context/$1/}Provider, use${TM_FILENAME_BASE}, use${TM_FILENAME_BASE}Selector] = createContext(use${TM_FILENAME_BASE/Context/$1/});",
+    ],
+  },
 }

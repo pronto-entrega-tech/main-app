@@ -1,10 +1,10 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useAlertContext } from '~/contexts/AlertContext';
-import { myColors, myFonts } from '~/constants';
-import CenterModal from './CenterModal';
-import MyButton from './MyButton';
-import MyText from './MyText';
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import { useAlertContext } from "~/contexts/AlertContext";
+import { myColors, myFonts } from "~/constants";
+import CenterModal from "./CenterModal";
+import MyButton from "./MyButton";
+import MyText from "./MyText";
 
 export type AlertState = {
   title: string;
@@ -26,30 +26,31 @@ const MyAlert = () => {
   const { onConfirm: confirm, onCancel: cancel } = alertState ?? {};
 
   const buttons = alertState?.onConfirm ? (
-    <View style={{ flexDirection: 'row' }}>
+    <View style={{ flexDirection: "row" }}>
       <MyButton
-        title={alertState.cancelTitle ?? 'Cancelar'}
+        title={alertState.cancelTitle ?? "Cancelar"}
         onPress={closeAnd(cancel)}
-        type='outline'
+        type="outline"
         buttonStyle={[styles.button, styles.cancel]}
       />
       <MyButton
-        title={alertState.confirmTitle ?? 'Confirmar'}
+        title={alertState.confirmTitle ?? "Confirmar"}
         onPress={closeAnd(confirm)}
         buttonStyle={styles.button}
       />
     </View>
   ) : (
     <MyButton
-      title='Ok'
+      title="Ok"
       onPress={closeAnd(cancel)}
-      buttonStyle={{ width: '100%' }}
+      buttonStyle={{ width: "100%" }}
     />
   );
 
   return (
     <CenterModal
-      state={{ isVisible: alertState != null, onDismiss: closeAnd(cancel) }}>
+      state={{ isVisible: alertState != null, onDismiss: closeAnd(cancel) }}
+    >
       <View>
         <MyText style={styles.title}>{alertState?.title}</MyText>
         <MyText style={styles.subtitle}>{alertState?.subtitle}</MyText>
@@ -61,14 +62,14 @@ const MyAlert = () => {
 
 const styles = StyleSheet.create({
   title: {
-    textAlign: 'center',
+    textAlign: "center",
     fontFamily: myFonts.Medium,
     fontSize: 20,
     color: myColors.text3,
     marginBottom: 8,
   },
   subtitle: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 16,
     color: myColors.text2,
     marginBottom: 24,

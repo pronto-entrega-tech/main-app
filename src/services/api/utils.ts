@@ -1,9 +1,9 @@
-import axios, { AxiosError } from 'axios';
-import { stringify } from 'qs';
-import { Urls } from '~/constants/urls';
+import axios, { AxiosError } from "axios";
+import { stringify } from "qs";
+import { Urls } from "~/constants/urls";
 
 const paramsSerializer = (params: unknown) =>
-  stringify(params, { arrayFormat: 'repeat' });
+  stringify(params, { arrayFormat: "repeat" });
 
 const authHeader = (token: string) => ({
   headers: { Authorization: `Bearer ${token}` },
@@ -17,7 +17,7 @@ const ApiClient = axios.create({
     (data) => {
       if (data)
         Object.entries(data).forEach(([key, value]) => {
-          if (value === '') delete data[key];
+          if (value === "") delete data[key];
         });
 
       return data;
@@ -31,7 +31,7 @@ ApiClient.interceptors.response.use(undefined, (err: AxiosError) => {
     try {
       return stringify(JSON.parse(v));
     } catch (err) {
-      return 'ERROR';
+      return "ERROR";
     }
   };
 
@@ -39,7 +39,7 @@ ApiClient.interceptors.response.use(undefined, (err: AxiosError) => {
     `${err.config?.method?.toUpperCase()} ${err.request?.responseURL}`,
     `Request ${format(err.config?.data)}`,
     `Response ${stringify(err.response?.data)}`,
-  ].join('\n');
+  ].join("\n");
   console.error(errMsg);
 
   return Promise.reject(err);

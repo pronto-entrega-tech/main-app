@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
-import { useAlertContext } from '~/contexts/AlertContext';
-import { updateAddress, getAddress } from '~/functions/address';
+import { useCallback } from "react";
+import { useAlertContext } from "~/contexts/AlertContext";
+import { updateAddress, getAddress } from "~/functions/address";
 
 export const useUpdateAddress = () => {
   const { alert } = useAlertContext();

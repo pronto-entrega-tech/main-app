@@ -1,28 +1,28 @@
-import React, { useState, useEffect, createRef } from 'react';
-import { View, StyleSheet, TextInput } from 'react-native';
-import { geocodeAsync } from 'expo-location';
-import Loading from '~/components/Loading';
-import MyButton from '~/components/MyButton';
-import MyPicker from '~/components/MyPicker';
-import { myColors, device, myFonts, globalStyles } from '~/constants';
-import { useToastContext } from '~/contexts/ToastContext';
-import useRouting from '~/hooks/useRouting';
-import { reduceErrors } from '~/functions/reduceErrors';
-import { Address } from '~/core/models';
-import MyHeader from '~/components/MyHeader';
-import { useAddressContext } from '~/contexts/AddressContext';
-import { useAuthContext } from '~/contexts/AuthContext';
-import MyInput from '~/components/MyInput';
-import FormContainer from '~/components/FormContainer';
-import { api } from '~/services/api';
+import React, { useState, useEffect, createRef } from "react";
+import { View, StyleSheet, TextInput } from "react-native";
+import { geocodeAsync } from "expo-location";
+import Loading from "~/components/Loading";
+import MyButton from "~/components/MyButton";
+import MyPicker from "~/components/MyPicker";
+import { myColors, device, myFonts, globalStyles } from "~/constants";
+import { useToastContext } from "~/contexts/ToastContext";
+import useRouting from "~/hooks/useRouting";
+import { reduceErrors } from "~/functions/reduceErrors";
+import { Address } from "~/core/models";
+import MyHeader from "~/components/MyHeader";
+import { useAddressContext } from "~/contexts/AddressContext";
+import { useAuthContext } from "~/contexts/AuthContext";
+import MyInput from "~/components/MyInput";
+import FormContainer from "~/components/FormContainer";
+import { api } from "~/services/api";
 
 const blankAddress = (): Address => ({
-  id: '',
-  street: '',
-  number: '',
-  district: '',
-  city: 'Jataí',
-  state: 'GO',
+  id: "",
+  street: "",
+  number: "",
+  district: "",
+  city: "Jataí",
+  state: "GO",
 });
 
 const NewAddress = () => {
@@ -61,17 +61,17 @@ const NewAddress = () => {
   const { address, addressIndex = 0 } = getAddressAndIndex() ?? {};
 
   useEffect(() => {
-    if (isAuth === false) navigate('SignIn');
+    if (isAuth === false) navigate("SignIn");
     if (!accessToken) return;
 
     if (!addresses) loadAddresses(accessToken);
   }, [isAuth, accessToken, addressId, addresses, loadAddresses, navigate]);
 
   if (!address || !accessToken || isLoading)
-    return <Loading title={isLoading ? 'Salvando endereço...' : undefined} />;
+    return <Loading title={isLoading ? "Salvando endereço..." : undefined} />;
 
   const saveAddress = async () => {
-    const wrongValues = [undefined, '', '-'];
+    const wrongValues = [undefined, "", "-"];
     const errs = (
       [
         [address.street, setStreetError],
@@ -108,69 +108,69 @@ const NewAddress = () => {
       ? await createAddress(accessToken, _address)
       : await updateAddress(accessToken, _address);
 
-    toast('Endereço salvo');
+    toast("Endereço salvo");
     goBack();
   };
 
   return (
     <>
-      <MyHeader title={isNew ? 'Novo endereço' : 'Editar endereço'} />
+      <MyHeader title={isNew ? "Novo endereço" : "Editar endereço"} />
       <FormContainer>
         <MyInput
-          label='Apelido do endereço'
+          label="Apelido do endereço"
           labelStyle={{ color: myColors.optionalInput }}
-          placeholder={!device.web ? `Endereço ${addressIndex + 1}` : ''}
+          placeholder={!device.web ? `Endereço ${addressIndex + 1}` : ""}
           onChangeText={(text) => (address.nickname = text)}
           defaultValue={address.nickname ?? undefined}
-          enterKeyHint='next'
+          enterKeyHint="next"
           onSubmitEditing={() => inputStreet.current?.focus()}
         />
         <MyInput
           _ref={inputStreet}
-          label='Rua'
-          errorMessage={streetError ? 'Insira uma rua' : ''}
+          label="Rua"
+          errorMessage={streetError ? "Insira uma rua" : ""}
           onChangeText={(text) => {
             address.street = text;
             setStreetError(false);
           }}
           defaultValue={address.street}
-          autoComplete={'address-line1'}
-          textContentType='streetAddressLine1'
-          enterKeyHint='next'
+          autoComplete={"address-line1"}
+          textContentType="streetAddressLine1"
+          enterKeyHint="next"
           onSubmitEditing={() => inputNumber.current?.focus()}
         />
         <MyInput
           _ref={inputNumber}
-          label='Número'
-          errorMessage={numberError ? 'Insira um número' : ''}
+          label="Número"
+          errorMessage={numberError ? "Insira um número" : ""}
           onChangeText={(text) => {
             address.number = text;
             setNumberError(false);
           }}
           defaultValue={address.number}
-          keyboardType='numeric'
-          autoComplete={'address-line2'}
-          textContentType='streetAddressLine2'
-          enterKeyHint='next'
+          keyboardType="numeric"
+          autoComplete={"address-line2"}
+          textContentType="streetAddressLine2"
+          enterKeyHint="next"
           onSubmitEditing={() => inputDistrict.current?.focus()}
         />
         <MyInput
           _ref={inputDistrict}
-          label='Bairro'
-          errorMessage={districtError ? 'Insira um bairro' : ''}
+          label="Bairro"
+          errorMessage={districtError ? "Insira um bairro" : ""}
           onChangeText={(text) => {
             address.district = text;
             setDistrictError(false);
           }}
           defaultValue={address.district}
-          textContentType='sublocality'
+          textContentType="sublocality"
         />
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: "row" }}>
           <MyPicker
-            label='Cidade'
+            label="Cidade"
             style={{ flex: 2 }}
-            errorMessage={cityError ? 'Insira uma cidade' : ''}
-            items={['Jataí', 'Rio verde']}
+            errorMessage={cityError ? "Insira uma cidade" : ""}
+            items={["Jataí", "Rio verde"]}
             selectedValue={address.city}
             onValueChange={(v) => {
               address.city = v;
@@ -178,10 +178,10 @@ const NewAddress = () => {
             }}
           />
           <MyPicker
-            label='Estado'
+            label="Estado"
             style={{ flex: 1 }}
-            errorMessage={stateError ? 'Insira um estado' : ''}
-            items={['GO']}
+            errorMessage={stateError ? "Insira um estado" : ""}
+            items={["GO"]}
             selectedValue={address.state}
             onValueChange={(v) => {
               address.state = v;
@@ -190,18 +190,18 @@ const NewAddress = () => {
           />
         </View>
         <MyInput
-          label='Complemento'
+          label="Complemento"
           labelStyle={{ color: myColors.optionalInput }}
           inputContainerStyle={styles.inputLine}
           onChangeText={(text) => (address.complement = text)}
           defaultValue={address.complement ?? undefined}
-          textContentType='location'
+          textContentType="location"
         />
       </FormContainer>
       <MyButton
-        title='Salvar endereço'
+        title="Salvar endereço"
         onPress={saveAddress}
-        type='outline'
+        type="outline"
         buttonStyle={globalStyles.bottomButton}
       />
     </>
@@ -219,11 +219,11 @@ const styles = StyleSheet.create({
     color: myColors.primaryColor,
     marginBottom: 0,
     marginLeft: 10,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     fontSize: 16,
     fontFamily: myFonts.Bold,
   },
-  inputLine: { borderBottomColor: '#aaa' },
+  inputLine: { borderBottomColor: "#aaa" },
 });
 
 export default NewAddress;

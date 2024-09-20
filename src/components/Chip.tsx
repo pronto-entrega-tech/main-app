@@ -1,8 +1,8 @@
-import React, { ReactNode } from 'react';
-import { StyleProp, ViewStyle, TextStyle } from 'react-native';
-import IconButton from './IconButton';
-import MyText from './MyText';
-import MyTouchable from './MyTouchable';
+import React, { ReactNode } from "react";
+import { StyleProp, ViewStyle, TextStyle } from "react-native";
+import IconButton from "./IconButton";
+import MyText from "./MyText";
+import MyTouchable from "./MyTouchable";
 
 const Chip = (props: {
   title?: string;
@@ -18,32 +18,34 @@ const Chip = (props: {
       onPress={onPress}
       style={[
         {
-          backgroundColor: '#ECECEC',
-          flexDirection: 'row',
-          alignItems: 'center',
+          backgroundColor: "#ECECEC",
+          flexDirection: "row",
+          alignItems: "center",
           minHeight: 32,
           borderRadius: 16,
           paddingHorizontal: 8,
           paddingVertical: 4,
         },
         style,
-      ]}>
+      ]}
+    >
       {icon}
       <MyText
         style={[
           {
             paddingLeft: 8,
             paddingRight: 8,
-            color: 'rgba(0, 0, 0, 0.87)',
+            color: "rgba(0, 0, 0, 0.87)",
           },
           titleStyle,
-        ]}>
+        ]}
+      >
         {title}
       </MyText>
       {onClose && (
         <IconButton
-          icon='close-circle'
-          color='rgba(0, 0, 0, 0.54)'
+          icon="close-circle"
+          color="rgba(0, 0, 0, 0.54)"
           size={16}
           style={{ height: 24, width: 24 }}
           onPress={onClose}

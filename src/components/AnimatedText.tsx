@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Text, TextInput, TextProps } from 'react-native';
-import { StyleProp, TextStyle } from 'react-native';
+import React, { useEffect, useRef, useState } from "react";
+import { Text, TextInput, TextProps } from "react-native";
+import { StyleProp, TextStyle } from "react-native";
 import Animated, {
   useSharedValue,
   withSequence,
@@ -10,9 +10,9 @@ import Animated, {
   SharedValue,
   AnimatedProps,
   useAnimatedReaction,
-} from 'react-native-reanimated';
-import { device, myFonts } from '~/constants';
-import { Money, money } from '~/functions/money';
+} from "react-native-reanimated";
+import { device, myFonts } from "~/constants";
+import { Money, money } from "~/functions/money";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 Animated.addWhitelistedNativeProps({ text: true });
@@ -88,7 +88,7 @@ const AnimatedText = ({
     />
   ) : (
     <AnimatedTextInput
-      underlineColorAndroid='transparent'
+      underlineColorAndroid="transparent"
       readOnly
       animatedProps={animatedProps}
       style={[
@@ -125,7 +125,7 @@ function WebAnimatedText({
 }
 
 function format(value: number | Money) {
-  return typeof value === 'number' ? `${value}` : money.toString(value, 'R$');
+  return typeof value === "number" ? `${value}` : money.toString(value, "R$");
 }
 
 export default AnimatedText;

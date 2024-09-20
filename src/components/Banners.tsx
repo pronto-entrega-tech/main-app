@@ -5,21 +5,21 @@ import React, {
   useEffect,
   useRef,
   useState,
-} from 'react';
+} from "react";
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
   StyleSheet,
   View,
-} from 'react-native';
-import { globalStyles } from '~/constants';
-import { getImageUrl } from '~/functions/converter';
-import { useMediaQuery } from '~/hooks/useMediaQuery';
-import { api } from '~/services/api';
-import IconButton from './IconButton';
-import { Banner } from '~/core/models';
-import MyImage from './MyImage';
+} from "react-native";
+import { globalStyles } from "~/constants";
+import { getImageUrl } from "~/functions/converter";
+import { useMediaQuery } from "~/hooks/useMediaQuery";
+import { api } from "~/services/api";
+import IconButton from "./IconButton";
+import { Banner } from "~/core/models";
+import MyImage from "./MyImage";
 
 const slideHeight = 456;
 const slideWidth = 1024;
@@ -83,7 +83,7 @@ const Banners = (p: { banners?: Banner[] }) => {
               width: itemWidth,
               marginRight: margins * 2,
               transform: `translateX(${margins}px)`,
-              backgroundColor: 'white',
+              backgroundColor: "white",
             },
           ]}
         />,
@@ -99,12 +99,13 @@ const Banners = (p: { banners?: Banner[] }) => {
               width: itemWidth,
               marginRight: index === banners.length - 1 ? margins * 2 : gap,
               transform: `translateX(${margins}px)`,
-              backgroundColor: 'white',
+              backgroundColor: "white",
             },
-          ]}>
+          ]}
+        >
           <MyImage
             thumbhash={banner.thumbhash}
-            source={getImageUrl('banners', banner.name)}
+            source={getImageUrl("banners", banner.name)}
             alt={banner.description}
             style={{ flex: 1 }}
             height={itemHeight}
@@ -124,14 +125,15 @@ const Banners = (p: { banners?: Banner[] }) => {
         horizontal
         pagingEnabled
         snapToInterval={gappedItemWidth}
-        decelerationRate='fast'
+        decelerationRate="fast"
         showsHorizontalScrollIndicator={false}
         disableIntervalMomentum={true}
         contentContainerStyle={styles.scrollContainer}
         style={{
-          width: '100%',
+          width: "100%",
           minHeight: itemHeight,
-        }}>
+        }}
+      >
         {images}
       </ScrollView>
       {isMobile ? (
@@ -150,7 +152,7 @@ const Banners = (p: { banners?: Banner[] }) => {
       ) : (
         <>
           <NavButton
-            icon='arrow-left'
+            icon="arrow-left"
             onPress={() => {
               ref.current?.scrollTo({ x: gappedItemWidth * (index - 1) });
             }}
@@ -158,7 +160,7 @@ const Banners = (p: { banners?: Banner[] }) => {
           />
           <NavButton
             right
-            icon='arrow-right'
+            icon="arrow-right"
             onPress={() => {
               ref.current?.scrollTo({ x: gappedItemWidth * (index + 1) });
             }}
@@ -178,17 +180,18 @@ const NavButton = (
       style={{
         right: p.right ? 0 : undefined,
         marginHorizontal: 12,
-        position: 'absolute',
-        height: '100%',
-        justifyContent: 'center',
-      }}>
+        position: "absolute",
+        height: "100%",
+        justifyContent: "center",
+      }}
+    >
       <IconButton
         style={{
           height: 40,
           width: 40,
-          backgroundColor: 'rgba(255, 255, 255, 0.6)',
+          backgroundColor: "rgba(255, 255, 255, 0.6)",
         }}
-        hoverStyle={{ backgroundColor: 'white' }}
+        hoverStyle={{ backgroundColor: "white" }}
         {...p}
       />
     </View>
@@ -197,7 +200,7 @@ const NavButton = (
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
+    position: "relative",
   },
   scrollContainer: {
     paddingTop: 4,
@@ -205,13 +208,13 @@ const styles = StyleSheet.create({
   },
   slide: {
     borderRadius: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   dotContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 16,
-    alignSelf: 'center',
-    flexDirection: 'row',
+    alignSelf: "center",
+    flexDirection: "row",
     height: 7,
   },
   dot: {
@@ -221,10 +224,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   active: {
-    backgroundColor: '#444',
+    backgroundColor: "#444",
   },
   inactive: {
-    backgroundColor: '#ECECEC',
+    backgroundColor: "#ECECEC",
   },
 });
 

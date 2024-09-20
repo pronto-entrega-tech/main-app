@@ -1,5 +1,5 @@
-import React, { CSSProperties, ReactNode } from 'react';
-import Link from 'next/link';
+import React, { CSSProperties, ReactNode } from "react";
+import Link from "next/link";
 import {
   View,
   StyleProp,
@@ -9,11 +9,11 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   Pressable,
-} from 'react-native';
-import device from '~/constants/device';
-import innerUseHover, { UseHover } from '~/hooks/useHover';
-import useRouting, { Params } from '~/hooks/useRouting';
-import { urlFrom } from '~/functions/converter';
+} from "react-native";
+import device from "~/constants/device";
+import innerUseHover, { UseHover } from "~/hooks/useHover";
+import useRouting, { Params } from "~/hooks/useRouting";
+import { urlFrom } from "~/functions/converter";
 
 type OnlyButton = {
   /**
@@ -81,7 +81,7 @@ const MyTouchable = ({
     const [isHovered, hoverBind] = useHover ?? innerUseHover();
 
     const baseStyle: ViewStyle = {
-      transitionDuration: '200ms',
+      transitionDuration: "200ms",
     };
     const baseHoverStyle = { opacity: 0.5 };
     const hovered = !!(isHovered && (screen || !disabled)); // should be a link or a button not disabled
@@ -103,7 +103,8 @@ const MyTouchable = ({
         {...hoverBind}
         onPress={onPress}
         disabled={disabled}
-        style={fullStyle}>
+        style={fullStyle}
+      >
         <>{children}</>
       </Pressable>
     );
@@ -114,11 +115,12 @@ const MyTouchable = ({
   if (device.iOS) {
     return solid ? (
       <TouchableHighlight
-        underlayColor='#68b5f2'
+        underlayColor="#68b5f2"
         onPress={onPressOrNav}
         disabled={disabled}
         hitSlop={hitSlop}
-        style={style}>
+        style={style}
+      >
         <>{children}</>
       </TouchableHighlight>
     ) : (
@@ -126,7 +128,8 @@ const MyTouchable = ({
         onPress={onPressOrNav}
         disabled={disabled}
         hitSlop={hitSlop}
-        style={style}>
+        style={style}
+      >
         <>{children}</>
       </TouchableOpacity>
     );
@@ -140,9 +143,10 @@ const MyTouchable = ({
       hitSlop={hitSlop}
       android_ripple={{
         foreground: true,
-        color: 'rgba(0 0 0 / .32)',
+        color: "rgba(0 0 0 / .32)",
       }}
-      style={[{ overflow: 'hidden' }, style]}>
+      style={[{ overflow: "hidden" }, style]}
+    >
       <>{children}</>
     </Pressable>
   );

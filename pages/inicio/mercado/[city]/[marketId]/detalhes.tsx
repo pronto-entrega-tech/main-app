@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Image } from 'react-native';
-import { Market, weekDayArray, weekDayNames } from '~/core/models';
-import Loading from '~/components/Loading';
-import Errors, { MyErrors } from '~/components/Errors';
-import MyText from '~/components/MyText';
-import { myColors, myFonts } from '~/constants';
-import { documentMask } from '~/functions/converter';
-import { WithBottomNav } from '~/components/Layout';
-import MyDivider from '~/components/MyDivider';
-import MyHeader from '~/components/MyHeader';
-import useRouting from '~/hooks/useRouting';
-import { GetStaticProps } from 'next';
-import Chip from '~/components/Chip';
-import { api } from '~/services/api';
-import { paymentImages } from '~/constants/images';
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, ScrollView, Image } from "react-native";
+import { Market, weekDayArray, weekDayNames } from "~/core/models";
+import Loading from "~/components/Loading";
+import Errors, { MyErrors } from "~/components/Errors";
+import MyText from "~/components/MyText";
+import { myColors, myFonts } from "~/constants";
+import { documentMask } from "~/functions/converter";
+import { WithBottomNav } from "~/components/Layout";
+import MyDivider from "~/components/MyDivider";
+import MyHeader from "~/components/MyHeader";
+import useRouting from "~/hooks/useRouting";
+import { GetStaticProps } from "next";
+import Chip from "~/components/Chip";
+import { api } from "~/services/api";
+import { paymentImages } from "~/constants/images";
 
 type MarketDetailsProps = { market?: Market };
 
 const MarketDetails = (props: MarketDetailsProps) => (
   <>
-    <MyHeader title='Informações' />
+    <MyHeader title="Informações" />
     <MarketDetailsBody {...props} />
   </>
 );
@@ -38,7 +38,7 @@ const MarketDetailsBody = (props: MarketDetailsProps) => {
       .findOne(params.city, params.marketId)
       .then(setMarket)
       .catch((err) =>
-        setError(api.isError('NotFound', err) ? 'nothing_market' : 'server'),
+        setError(api.isError("NotFound", err) ? "nothing_market" : "server"),
       );
   }, [tryAgain, market, params.city, params.marketId]);
 
@@ -48,11 +48,11 @@ const MarketDetailsBody = (props: MarketDetailsProps) => {
   if (!market) return <Loading />;
 
   const payDelivery = market.payments_accepted.map((title) => ({
-    icon: paymentImages[title.replace(/.* /, '')],
+    icon: paymentImages[title.replace(/.* /, "")],
     title,
   }));
 
-  const close = 'Fechado';
+  const close = "Fechado";
   const time = weekDayNames.map((day) => ({ day, hour: close }));
 
   market.business_hours.forEach(({ days, open_time, close_time }) => {
@@ -73,7 +73,8 @@ const MarketDetailsBody = (props: MarketDetailsProps) => {
     <>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.container}>
+        contentContainerStyle={styles.container}
+      >
         {market.info && <MyText style={styles.text}>{market.info}</MyText>}
         <MyText style={styles.title}>Horário de entrega</MyText>
         {time.map((item) => {
@@ -85,14 +86,16 @@ const MarketDetailsBody = (props: MarketDetailsProps) => {
           return (
             <View
               key={item.day}
-              style={{ marginHorizontal: 16, marginBottom: 10 }}>
+              style={{ marginHorizontal: 16, marginBottom: 10 }}
+            >
               <MyText style={[todayStyle, styles.time]}>{item.day}</MyText>
               <MyText
                 style={[
                   todayStyle,
                   styles.time,
-                  { position: 'absolute', marginLeft: 80 },
-                ]}>
+                  { position: "absolute", marginLeft: 80 },
+                ]}
+              >
                 {item.hour}
               </MyText>
             </View>
@@ -102,11 +105,12 @@ const MarketDetailsBody = (props: MarketDetailsProps) => {
         <MyText style={styles.title}>Pagamento na entrega</MyText>
         <View
           style={{
-            flexDirection: 'row',
+            flexDirection: "row",
             flexShrink: 1,
             paddingHorizontal: 8,
             paddingBottom: 12,
-          }}>
+          }}
+        >
           {payDelivery.map((item) => (
             <Chip
               key={item.title}
@@ -114,7 +118,7 @@ const MarketDetailsBody = (props: MarketDetailsProps) => {
               icon={
                 <Image
                   {...item.icon}
-                  alt=''
+                  alt=""
                   style={{ height: 24, width: 24 }}
                 />
               }
@@ -161,7 +165,7 @@ const styles = StyleSheet.create({
 
 export default WithBottomNav(MarketDetails);
 
-export { getStaticPaths } from '../[marketId]';
+export { getStaticPaths } from "../[marketId]";
 
 export const getStaticProps: GetStaticProps<MarketDetailsProps> = async ({
   params,

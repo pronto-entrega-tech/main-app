@@ -6,9 +6,9 @@ import {
   Review,
   RetryPayment,
   CancelOrder,
-} from '~/core/models';
-import { validateOrder } from '~/functions/converter';
-import Utils from './utils';
+} from "~/core/models";
+import { validateOrder } from "~/functions/converter";
+import Utils from "./utils";
 
 const { ApiClient, authHeader } = Utils;
 
@@ -30,8 +30,8 @@ export const apiOrders = {
 
   async findOne(
     token: string,
-    id: Order['order_id'],
-    market_id: Market['market_id'],
+    id: Order["order_id"],
+    market_id: Market["market_id"],
   ) {
     const { data } = await ApiClient.get(
       `/orders/${market_id}/${id}`,

@@ -1,12 +1,12 @@
-import { GetStaticPaths, GetStaticProps } from 'next';
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import MyHeader from '~/components/MyHeader';
-import { WithBottomNav } from '~/components/Layout';
-import { myColors } from '~/constants';
-import useRouting from '~/hooks/useRouting';
-import { helpList } from '../ajuda';
-import MyText from '~/components/MyText';
+import { GetStaticPaths, GetStaticProps } from "next";
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import MyHeader from "~/components/MyHeader";
+import { WithBottomNav } from "~/components/Layout";
+import { myColors } from "~/constants";
+import useRouting from "~/hooks/useRouting";
+import { helpList } from "../ajuda";
+import MyText from "~/components/MyText";
 
 const Questions = () => {
   const { params } = useRouting();
@@ -15,7 +15,7 @@ const Questions = () => {
 
   return (
     <>
-      <MyHeader title='Perguntas frequentes' />
+      <MyHeader title="Perguntas frequentes" />
       <View style={styles.container}>
         {question && (
           <>
@@ -43,7 +43,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   return {
     paths: helpPaths,
-    fallback: 'blocking',
+    fallback: "blocking",
   };
 };
 

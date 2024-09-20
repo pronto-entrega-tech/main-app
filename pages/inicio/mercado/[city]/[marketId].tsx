@@ -1,32 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { Share, StyleSheet, View } from 'react-native';
-import { Image } from 'react-native-elements/dist/image/Image';
-import { device, myColors, myFonts } from '~/constants';
-import MyTouchable from '~/components/MyTouchable';
-import ProdList from '~/components/ProdList';
-import Loading from '~/components/Loading';
-import Errors, { MyErrors } from '~/components/Errors';
-import { computeDistance, getImageUrl } from '~/functions/converter';
-import { marketOpenness } from '~/functions/marketOpenness';
-import { money } from '~/functions/money';
-import MyButton from '~/components/MyButton';
-import MyText from '~/components/MyText';
-import MyIcon, { IconNames } from '~/components/MyIcon';
-import Rating from '~/components/Rating';
-import IconButton from '~/components/IconButton';
-import MySearchBar from '~/components/MySearchBar';
-import { WithBottomNav } from '~/components/Layout';
-import { Urls } from '~/constants/urls';
-import useRouting from '~/hooks/useRouting';
-import { GetStaticPaths, GetStaticProps } from 'next';
-import { ListHeader } from '@pages/inicio';
-import { objectConditional } from '~/functions/conditionals';
-import { Market, Product } from '~/core/models';
-import MyHeader from '~/components/MyHeader';
-import { useAddressContext } from '~/contexts/AddressContext';
-import { api } from '~/services/api';
+import React, { useState, useEffect } from "react";
+import { Share, StyleSheet, View } from "react-native";
+import { Image } from "react-native-elements/dist/image/Image";
+import { device, myColors, myFonts } from "~/constants";
+import MyTouchable from "~/components/MyTouchable";
+import ProdList from "~/components/ProdList";
+import Loading from "~/components/Loading";
+import Errors, { MyErrors } from "~/components/Errors";
+import { computeDistance, getImageUrl } from "~/functions/converter";
+import { marketOpenness } from "~/functions/marketOpenness";
+import { money } from "~/functions/money";
+import MyButton from "~/components/MyButton";
+import MyText from "~/components/MyText";
+import MyIcon, { IconNames } from "~/components/MyIcon";
+import Rating from "~/components/Rating";
+import IconButton from "~/components/IconButton";
+import MySearchBar from "~/components/MySearchBar";
+import { WithBottomNav } from "~/components/Layout";
+import { Urls } from "~/constants/urls";
+import useRouting from "~/hooks/useRouting";
+import { GetStaticPaths, GetStaticProps } from "next";
+import { ListHeader } from "@pages/inicio";
+import { objectConditional } from "~/functions/conditionals";
+import { Market, Product } from "~/core/models";
+import MyHeader from "~/components/MyHeader";
+import { useAddressContext } from "~/contexts/AddressContext";
+import { api } from "~/services/api";
 
-const useIsProductRoute = () => useRouting().screen.startsWith('Product');
+const useIsProductRoute = () => useRouting().screen.startsWith("Product");
 
 type MarketFeedProps = { marketId?: string } & MarketAndProducts;
 
@@ -49,7 +49,7 @@ const MarketHeader = () => {
   };
   const shareIcon = (
     <IconButton
-      icon='share-variant'
+      icon="share-variant"
       onPress={sharePage}
       style={{
         marginLeft: -8,
@@ -61,10 +61,10 @@ const MarketHeader = () => {
 
   return (
     <>
-      <MyHeader title='Mercado' smallDivider rightIcon={shareIcon} />
+      <MyHeader title="Mercado" smallDivider rightIcon={shareIcon} />
       <View style={{ marginTop: 10, marginBottom: 8, paddingHorizontal: 16 }}>
         <MySearchBar
-          onSubmit={(query) => navigate('Search', { query, marketId })}
+          onSubmit={(query) => navigate("Search", { query, marketId })}
         />
       </View>
     </>
@@ -95,11 +95,11 @@ const MarketFeedBody = (props: MarketFeedProps) => {
         api.markets.findOne(params.city, marketId),
         api.products.findMany(params.city, { marketId }),
       ]);
-      if (!products.length) return setError('nothing_market');
+      if (!products.length) return setError("nothing_market");
 
       setData({ market, products });
     })().catch((err) =>
-      setError(api.isError('NotFound', err) ? 'nothing_market' : 'server'),
+      setError(api.isError("NotFound", err) ? "nothing_market" : "server"),
     );
   }, [tryAgain, market, params.city, marketId]);
 
@@ -111,34 +111,32 @@ const MarketFeedBody = (props: MarketFeedProps) => {
   const distance =
     address?.coords && computeDistance(address?.coords, market.address.coords);
 
-  const marketFee = money.toString(market.delivery_fee, 'R$');
+  const marketFee = money.toString(market.delivery_fee, "R$");
 
   const marketDetails: { icon: IconNames; text: string }[] = [
-    { icon: 'clock', text: marketOpenness(market) },
+    { icon: "clock", text: marketOpenness(market) },
     ...(distance
-      ? [{ icon: 'map-marker', text: `Á ${distance}km de você` } as const]
+      ? [{ icon: "map-marker", text: `Á ${distance}km de você` } as const]
       : []),
     {
-      icon: 'truck-fast',
+      icon: "truck-fast",
       text: `${market.min_time}-${market.max_time}min • ${marketFee}`,
     },
     {
-      icon: 'currency-usd',
-      text: `Mínimo ${money.toString(market.order_min, 'R$')}`,
+      icon: "currency-usd",
+      text: `Mínimo ${money.toString(market.order_min, "R$")}`,
     },
   ];
 
   const marketListHeader = (
     <>
       <View
-        style={[
-          styles.headerContainer,
-          { marginTop: isProductRoute ? 12 : 0 },
-        ]}>
+        style={[styles.headerContainer, { marginTop: isProductRoute ? 12 : 0 }]}
+      >
         <View style={{ paddingTop: 2 }}>
           <Image
-            source={{ uri: getImageUrl('market', market.market_id) }}
-            alt=''
+            source={{ uri: getImageUrl("market", market.market_id) }}
+            alt=""
             containerStyle={{ borderRadius: 8, height: 128, width: 128 }}
           />
           {market.rating ? (
@@ -149,7 +147,7 @@ const MarketFeedBody = (props: MarketFeedProps) => {
             <MyText style={styles.textNew}>Novo!</MyText>
           )}
           <MyTouchable
-            screen='MarketRating'
+            screen="MarketRating"
             params={{
               ...objectConditional(!device.web)(market),
               city: market.city_slug,
@@ -159,20 +157,20 @@ const MarketFeedBody = (props: MarketFeedProps) => {
           />
         </View>
         <View style={{ flex: 1 }}>
-          <View style={{ flexDirection: 'row', marginLeft: 5 }}>
+          <View style={{ flexDirection: "row", marginLeft: 5 }}>
             <MyButton
               buttonStyle={{ paddingVertical: 3 }}
-              type='clear'
+              type="clear"
               title={market.name}
               titleStyle={styles.title}
               iconRight
               icon={{
-                name: 'chevron-right',
+                name: "chevron-right",
                 size: 28,
                 color: myColors.text3,
                 style: { marginLeft: -2, marginTop: 3 },
               }}
-              screen='MarketDetails'
+              screen="MarketDetails"
               params={{
                 ...objectConditional(!device.web)(market),
                 city: market.city_slug,
@@ -207,7 +205,7 @@ const MarketFeedBody = (props: MarketFeedProps) => {
 const styles = StyleSheet.create({
   headerContainer: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: 16,
     paddingBottom: 2,
   },
@@ -225,7 +223,7 @@ const styles = StyleSheet.create({
     padding: 6,
     marginTop: -2,
     width: 128,
-    textAlign: 'center',
+    textAlign: "center",
   },
   ratingTouchable: {
     marginTop: -36,
@@ -240,10 +238,10 @@ const styles = StyleSheet.create({
     fontFamily: myFonts.Medium,
   },
   detailsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 4,
     marginLeft: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
 });
 
@@ -251,8 +249,8 @@ export default WithBottomNav(MarketFeed);
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: [{ params: { city: 'jatai-go', marketId: 'market_1' } }],
-    fallback: 'blocking',
+    paths: [{ params: { city: "jatai-go", marketId: "market_1" } }],
+    fallback: "blocking",
   };
 };
 

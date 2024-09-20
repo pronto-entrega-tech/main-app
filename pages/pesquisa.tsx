@@ -1,20 +1,20 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import CartBar from '~/components/CartBar';
-import ProdList from '~/components/ProdList';
-import { myColors, globalStyles, myFonts } from '~/constants';
-import MySearchBar from '~/components/MySearchBar';
-import MyButton from '~/components/MyButton';
-import { categoriesArray } from './categorias';
-import MyText from '~/components/MyText';
-import useRouting from '~/hooks/useRouting';
-import Chip from '~/components/Chip';
-import { omit, toArray } from '~/functions/converter';
-import Loading from '~/components/Loading';
-import HeaderContainer from '~/components/HeaderContainer';
-import { ItemOrderBy } from '~/core/models';
-import { arrayConditional } from '~/functions/conditionals';
-import { GoBackButton } from '~/components/MyHeader';
+import React from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
+import CartBar from "~/components/CartBar";
+import ProdList from "~/components/ProdList";
+import { myColors, globalStyles, myFonts } from "~/constants";
+import MySearchBar from "~/components/MySearchBar";
+import MyButton from "~/components/MyButton";
+import { categoriesArray } from "./categorias";
+import MyText from "~/components/MyText";
+import useRouting from "~/hooks/useRouting";
+import Chip from "~/components/Chip";
+import { omit, toArray } from "~/functions/converter";
+import Loading from "~/components/Loading";
+import HeaderContainer from "~/components/HeaderContainer";
+import { ItemOrderBy } from "~/core/models";
+import { arrayConditional } from "~/functions/conditionals";
+import { GoBackButton } from "~/components/MyHeader";
 
 type SearchParams = {
   query?: string;
@@ -32,11 +32,11 @@ const Search = () => {
 
   const header = (
     <HeaderContainer style={[styles.header, globalStyles.notch]}>
-      <GoBackButton onGoBack={() => goBack('Home')} />
+      <GoBackButton onGoBack={() => goBack("Home")} />
       <MySearchBar
         defaultValue={query}
         onSubmit={(query) => {
-          navigate('Search', { ...params, query });
+          navigate("Search", { ...params, query });
         }}
         style={{ flex: 1 }}
       />
@@ -44,27 +44,27 @@ const Search = () => {
   );
 
   const filterName = {
-    [ItemOrderBy.Default]: '',
-    [ItemOrderBy.Rating]: 'Por avaliação',
-    [ItemOrderBy.DeliveryTime]: 'Por tempo de entrega',
-    [ItemOrderBy.Distance]: 'Por distância',
+    [ItemOrderBy.Default]: "",
+    [ItemOrderBy.Rating]: "Por avaliação",
+    [ItemOrderBy.DeliveryTime]: "Por tempo de entrega",
+    [ItemOrderBy.Distance]: "Por distância",
   }[orderBy ?? ItemOrderBy.Default];
 
   const chipsValues = [
     ...arrayConditional(filterName)({
       title: filterName,
-      remove: () => navigate('Search', omit(params, 'orderBy')),
+      remove: () => navigate("Search", omit(params, "orderBy")),
     }),
     ...arrayConditional(distance)({
       title: `Até ${distance}km`,
-      remove: () => navigate('Search', omit(params, 'distance')),
+      remove: () => navigate("Search", omit(params, "distance")),
     }),
     ...(categories?.map((c) => ({
       title: categoriesArray[+c - 1],
       remove: () => {
         if (!c) return;
 
-        navigate('Search', {
+        navigate("Search", {
           ...params,
           category: categories.filter((v) => v !== c),
         });
@@ -95,16 +95,17 @@ const Search = () => {
         fadingEdgeLength={10}
         showsHorizontalScrollIndicator={false}
         style={{ flex: 1, height: 44 }}
-        contentContainerStyle={styles.line2}>
+        contentContainerStyle={styles.line2}
+      >
         {chipsBar}
       </ScrollView>
       <MyButton
-        screen='Filter'
+        screen="Filter"
         params={{ category: categories }}
-        type='clear'
-        title='Filtros'
+        type="clear"
+        title="Filtros"
         titleStyle={{ color: myColors.grey2 }}
-        icon={{ name: 'tune', color: myColors.grey2 }}
+        icon={{ name: "tune", color: myColors.grey2 }}
       />
     </View>
   );
@@ -130,22 +131,22 @@ const Search = () => {
 const styles = StyleSheet.create({
   header: {
     backgroundColor: myColors.background,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingTop: 4,
     paddingRight: 16,
   },
   subHeader: {
-    width: '100%',
+    width: "100%",
     height: 48,
     elevation: 10,
     zIndex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
   },
   line2: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingLeft: 8,
     marginRight: 8,
   },

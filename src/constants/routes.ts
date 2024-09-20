@@ -1,99 +1,99 @@
-import { createURL } from 'expo-linking';
-import { LinkingOptions } from '@react-navigation/native';
+import { createURL } from "expo-linking";
+import { LinkingOptions } from "@react-navigation/native";
 
 const linking: LinkingOptions<ReactNavigation.RootParamList> = {
-  prefixes: [createURL('/')],
+  prefixes: [createURL("/")],
   config: {
     screens: {
-      Splash: '',
+      Splash: "",
       SignIn: {
-        path: 'entrar',
+        path: "entrar",
         screens: {
-          SignIn: '',
-          EmailSignIn: 'email',
+          SignIn: "",
+          EmailSignIn: "email",
         },
       },
-      SelectAddress: 'selecione-endereco',
+      SelectAddress: "selecione-endereco",
       BottomTabs: {
-        initialRouteName: 'HomeTab',
+        initialRouteName: "HomeTab",
         screens: {
           HomeTab: {
-            path: 'inicio',
+            path: "inicio",
             screens: {
-              Home: '',
-              Explore: 'explore/:city',
-              Cupons: 'cupons',
-              Favorites: 'favoritos',
-              MarketList: 'mercados',
-              Market: 'mercado/:city/:marketId',
-              MarketDetails: 'mercado/:city/:marketId/detalhes',
-              MarketRating: 'mercado/:city/:marketId/avaliacao',
+              Home: "",
+              Explore: "explore/:city",
+              Cupons: "cupons",
+              Favorites: "favoritos",
+              MarketList: "mercados",
+              Market: "mercado/:city/:marketId",
+              MarketDetails: "mercado/:city/:marketId/detalhes",
+              MarketRating: "mercado/:city/:marketId/avaliacao",
             },
           },
-          Categories: 'categorias',
+          Categories: "categorias",
           OrdersTab: {
-            path: 'compras',
+            path: "compras",
             screens: {
-              Orders: '',
-              OrderDetails: ':marketId/:orderId',
-              Chat: ':marketId/:orderId/chat',
+              Orders: "",
+              OrderDetails: ":marketId/:orderId",
+              Chat: ":marketId/:orderId/chat",
             },
           },
           ProfileTab: {
-            path: 'perfil',
+            path: "perfil",
             screens: {
-              Profile: '',
-              Notifications: 'notificacoes',
-              Help: 'ajuda',
-              Questions: 'perguntas/:question',
+              Profile: "",
+              Notifications: "notificacoes",
+              Help: "ajuda",
+              Questions: "perguntas/:question",
               Config: {
-                path: 'configuracoes',
+                path: "configuracoes",
                 screens: {
-                  Config: '',
-                  NotifConfig: 'notificacoes',
+                  Config: "",
+                  NotifConfig: "notificacoes",
                 },
               },
             },
           },
         },
       },
-      Product: 'produto/:city/:itemId',
+      Product: "produto/:city/:itemId",
       PaymentMethods: {
-        path: 'meios-de-pagamento',
+        path: "meios-de-pagamento",
         screens: {
-          PaymentMethods: '',
-          PaymentCard: 'cartao',
+          PaymentMethods: "",
+          PaymentCard: "cartao",
         },
       },
-      Payment: 'pagamento',
-      Cart: 'carrinho',
-      Cupons: 'cupons',
-      Schedule: 'agendamento',
-      Addresses: 'endereco',
-      EditAddress: 'editar-endereco',
-      Filter: 'filtro',
-      Search: 'pesquisa',
-      MyProfile: 'meu-perfil',
-      Suggestion: 'sugestao',
-      UploadQuestion: 'mandar-pergunta',
-      Devices: 'dispositivos',
-      NoMatch: '*',
+      Payment: "pagamento",
+      Cart: "carrinho",
+      Cupons: "cupons",
+      Schedule: "agendamento",
+      Addresses: "endereco",
+      EditAddress: "editar-endereco",
+      Filter: "filtro",
+      Search: "pesquisa",
+      MyProfile: "meu-perfil",
+      Suggestion: "sugestao",
+      UploadQuestion: "mandar-pergunta",
+      Devices: "dispositivos",
+      NoMatch: "*",
     },
   },
 };
 
 export const screensPaths = (() => {
-  const screensPaths = new Map<string, string>([['BottomTabs', '/inicio']]);
+  const screensPaths = new Map<string, string>([["BottomTabs", "/inicio"]]);
 
   const joinPaths = (paths: string[]) =>
     paths
       .filter(Boolean)
-      .join('/')
+      .join("/")
       .replace(/(?:\/):.*?(?=\/|$)/g, (param) => `/[${param.slice(2)}]`);
 
-  const iterate = (screens: object, path = '') => {
+  const iterate = (screens: object, path = "") => {
     Object.entries(screens).forEach(([screen, route]) => {
-      typeof route === 'string'
+      typeof route === "string"
         ? screensPaths.set(screen, `/${joinPaths([path, route])}`)
         : iterate(route.screens, joinPaths([path, route.path]));
     });

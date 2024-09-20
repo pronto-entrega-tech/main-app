@@ -1,1 +1,1 @@
-export { Cupons as default } from './inicio/cupons';
+export { Cupons as default } from "./inicio/cupons";

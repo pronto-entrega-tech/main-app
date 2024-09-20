@@ -1,7 +1,7 @@
-import { PreinitializedWritableAtom, atom, computed } from 'nanostores';
-import { useStore } from '@nanostores/react';
-import { ReactNode, useEffect, useState } from 'react';
-import { Store, StoreValue } from 'nanostores/map';
+import { PreinitializedWritableAtom, atom, computed } from "nanostores";
+import { useStore } from "@nanostores/react";
+import { ReactNode, useEffect, useState } from "react";
+import { Store, StoreValue } from "nanostores/map";
 
 export function useAtom<T = undefined>(): PreinitializedWritableAtom<
   T | undefined

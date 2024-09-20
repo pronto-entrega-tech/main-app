@@ -1,10 +1,10 @@
-import React, { ComponentProps } from 'react';
+import React, { ComponentProps } from "react";
 /* import { Image, ImageProps } from 'expo-image'; */
-import Image from 'next/image';
-import device from '~/constants/device';
-import { thumbHashToDataURL } from 'thumbhash';
+import Image from "next/image";
+import device from "~/constants/device";
+import { thumbHashToDataURL } from "thumbhash";
 
-interface Props extends Omit<ComponentProps<typeof Image>, 'src'> {
+interface Props extends Omit<ComponentProps<typeof Image>, "src"> {
   source: string;
   thumbhash?: string;
   height: number;
@@ -25,7 +25,7 @@ const MyImage = ({ source, thumbhash, ...props }: Props) => {
 const base64ToBinary = (base64: string) =>
   new Uint8Array(
     atob(base64)
-      .split('')
+      .split("")
       .map((x) => x.charCodeAt(0)),
   );
 

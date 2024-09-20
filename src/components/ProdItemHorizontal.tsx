@@ -1,18 +1,18 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { myColors, device, globalStyles, myFonts } from '~/constants';
-import { getImageUrl } from '~/functions/converter';
-import { calcPrices, money } from '~/functions/money';
-import IconButton from './IconButton';
-import MyIcon from './MyIcon';
-import MyTouchable from './MyTouchable';
-import AnimatedText from './AnimatedText';
-import { objectConditional } from '~/functions/conditionals';
-import { Product } from '~/core/models';
-import MyText from './MyText';
-import { MotiView } from 'moti';
-import MyImage from './MyImage';
-import { useCartContextSelector } from '~/contexts/CartContext';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { myColors, device, globalStyles, myFonts } from "~/constants";
+import { getImageUrl } from "~/functions/converter";
+import { calcPrices, money } from "~/functions/money";
+import IconButton from "./IconButton";
+import MyIcon from "./MyIcon";
+import MyTouchable from "./MyTouchable";
+import AnimatedText from "./AnimatedText";
+import { objectConditional } from "~/functions/conditionals";
+import { Product } from "~/core/models";
+import MyText from "./MyText";
+import { MotiView } from "moti";
+import MyImage from "./MyImage";
+import { useCartContextSelector } from "~/contexts/CartContext";
 
 const ProdItemHorizontal = (props: {
   item: Product;
@@ -40,25 +40,27 @@ const ProdItemHorizontal = (props: {
 
   return (
     <View
-      style={[globalStyles.elevation4, globalStyles.darkBorder, styles.card]}>
+      style={[globalStyles.elevation4, globalStyles.darkBorder, styles.card]}
+    >
       <MyTouchable
         style={{ flex: 1 }}
-        screen='Product'
-        params={{ city: item.city_slug, itemId: item.item_id, ...pathParam }}>
+        screen="Product"
+        params={{ city: item.city_slug, itemId: item.item_id, ...pathParam }}
+      >
         <View style={styles.container}>
           <View style={styles.containerImage}>
             {item.images_names ? (
               <MyImage
                 thumbhash={item.thumbhash}
-                source={getImageUrl('product', item.images_names[0])}
-                alt=''
+                source={getImageUrl("product", item.images_names[0])}
+                alt=""
                 style={styles.image}
                 height={80}
                 width={80}
               />
             ) : (
               <MyIcon
-                name='cart-outline'
+                name="cart-outline"
                 color={myColors.grey2}
                 size={80}
                 style={styles.image}
@@ -75,12 +77,12 @@ const ProdItemHorizontal = (props: {
                   <MyText style={styles.offText}>{discountText}</MyText>
                 </View>
                 <MyText style={styles.oldPriceText}>
-                  {money.toString(previous_price, 'R$')}
+                  {money.toString(previous_price, "R$")}
                 </MyText>
               </View>
             )}
             <MyText style={styles.priceText}>
-              {money.toString(price, 'R$')}
+              {money.toString(price, "R$")}
             </MyText>
             <MyText style={styles.quantityText}>{item.quantity}</MyText>
           </View>
@@ -88,8 +90,8 @@ const ProdItemHorizontal = (props: {
             {showsMarketLogo && (
               <MyImage
                 thumbhash={item.market_thumbhash}
-                source={getImageUrl('market', item.market_id)}
-                alt=''
+                source={getImageUrl("market", item.market_id)}
+                alt=""
                 style={styles.marketImage}
                 height={34}
                 width={34}
@@ -100,17 +102,18 @@ const ProdItemHorizontal = (props: {
       </MyTouchable>
 
       <MotiView
-        transition={{ type: 'timing', duration: 200 }}
+        transition={{ type: "timing", duration: 200 }}
         animate={{ width: quantity === 0 ? 32 : 32 * 2 + 16 }}
         style={[
           globalStyles.elevation4,
           globalStyles.darkBorder,
           styles.addBar,
           { height: 32 },
-        ]}>
+        ]}
+      >
         <IconButton
           onPress={onPressAdd}
-          icon='plus'
+          icon="plus"
           style={styles.add}
           hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
         />
@@ -121,7 +124,7 @@ const ProdItemHorizontal = (props: {
             </AnimatedText>
             <IconButton
               onPress={onPressRemove}
-              icon='minus'
+              icon="minus"
               style={[styles.add, styles.remove]}
               hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
             />
@@ -135,49 +138,49 @@ const ProdItemHorizontal = (props: {
 const textLinePad = device.android ? -2 : 1;
 const styles = StyleSheet.create({
   card: {
-    overflow: 'hidden',
+    overflow: "hidden",
     height: 104,
     marginHorizontal: 8,
     marginBottom: 8,
     borderRadius: 8,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   container: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingLeft: 16,
   },
 
   addBar: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 30,
-    position: 'absolute',
+    position: "absolute",
     top: 6,
     right: 6,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    overflow: 'hidden',
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    overflow: "hidden",
   },
   centerNumText: {
     fontSize: 15,
     color: myColors.text3,
     fontFamily: myFonts.Medium,
     left: device.web ? 34 : 30,
-    position: 'absolute',
-    textAlign: 'center',
+    position: "absolute",
+    textAlign: "center",
   },
   add: {
     width: 32,
     height: 32,
   },
   remove: {
-    position: 'absolute',
+    position: "absolute",
     right: 48,
   },
 
   containerAdd: {
-    position: 'absolute',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    position: "absolute",
+    justifyContent: "space-between",
+    alignItems: "center",
     height: 104,
     paddingVertical: 8,
     paddingLeft: 4,
@@ -186,11 +189,11 @@ const styles = StyleSheet.create({
   buttonAdd: {
     width: 26,
     height: 26,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   containerImage: {
     marginLeft: -6,
-    alignItems: 'center',
+    alignItems: "center",
   },
   image: {
     marginVertical: 12,
@@ -199,8 +202,8 @@ const styles = StyleSheet.create({
     width: 80,
   },
   fav: {
-    position: 'absolute',
-    alignSelf: 'flex-end',
+    position: "absolute",
+    alignSelf: "flex-end",
     top: -3,
     right: -10,
   },
@@ -215,9 +218,9 @@ const styles = StyleSheet.create({
     fontFamily: myFonts.Condensed,
   },
   oldPriceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'absolute',
+    flexDirection: "row",
+    alignItems: "center",
+    position: "absolute",
     top: 30,
   },
   offTextBox: {
@@ -227,12 +230,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   offText: {
-    color: 'white',
+    color: "white",
     fontFamily: myFonts.Bold,
     fontSize: 12,
   },
   oldPriceText: {
-    textDecorationLine: 'line-through',
+    textDecorationLine: "line-through",
     color: myColors.grey2,
     fontSize: 13,
     fontFamily: myFonts.Regular,
@@ -250,7 +253,7 @@ const styles = StyleSheet.create({
     fontFamily: myFonts.Regular,
   },
   marketContainer: {
-    position: 'absolute',
+    position: "absolute",
     right: 6,
     top: 56,
   },

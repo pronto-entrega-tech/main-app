@@ -1,25 +1,25 @@
-import React from 'react';
-import MyHeader from '~/components/MyHeader';
-import Portal from '~/core/Portal';
-import { SinglePageTabs } from '~/components/SinglePageTabs';
-import PaymentOnDelivery from '~/screens/PaymentOnDelivery';
-import { PaymentMethodsBody } from './meios-de-pagamento';
-import { appOrSite } from '~/constants/device';
-import { useCartContext } from '~/contexts/CartContext';
-import { PaymentCard } from '~/core/models';
-import useRouting from '~/hooks/useRouting';
-import { formatCardBrand } from '~/functions/converter';
+import React from "react";
+import MyHeader from "~/components/MyHeader";
+import Portal from "~/core/Portal";
+import { SinglePageTabs } from "~/components/SinglePageTabs";
+import PaymentOnDelivery from "~/screens/PaymentOnDelivery";
+import { PaymentMethodsBody } from "./meios-de-pagamento";
+import { appOrSite } from "~/constants/device";
+import { useCartContext } from "~/contexts/CartContext";
+import { PaymentCard } from "~/core/models";
+import useRouting from "~/hooks/useRouting";
+import { formatCardBrand } from "~/functions/converter";
 
 const PaymentTabs = () => (
   <Portal.Host>
     <SinglePageTabs
-      header={<MyHeader title='Pagamento' dividerLess notchLess />}
+      header={<MyHeader title="Pagamento" dividerLess notchLess />}
       tabs={[
         {
           title: `Pagar pelo ${appOrSite}`,
           element: <PaymentOnApp />,
         },
-        { title: 'Pagar na entrega', element: <PaymentOnDelivery /> },
+        { title: "Pagar na entrega", element: <PaymentOnDelivery /> },
       ]}
     />
   </Portal.Host>
@@ -35,12 +35,12 @@ export const PaymentOnApp = () => {
       ...(card
         ? {
             description: `Crédito ${formatCardBrand(card)} •••• ${card.last4}`,
-            method: 'CARD',
+            method: "CARD",
             cardId: card.id,
           }
         : {
-            description: 'PIX',
-            method: 'PIX',
+            description: "PIX",
+            method: "PIX",
           }),
     });
     goBack();

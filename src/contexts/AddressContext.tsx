@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
-import { getActiveAddress, saveActiveAddress } from '~/core/dataStorage';
-import { Address } from '~/core/models';
-import { createContext } from '~/contexts/createContext';
-import { api } from '~/services/api';
+import { useCallback, useEffect, useState } from "react";
+import { getActiveAddress, saveActiveAddress } from "~/core/dataStorage";
+import { Address } from "~/core/models";
+import { createContext } from "~/contexts/createContext";
+import { api } from "~/services/api";
 
 function useAddress() {
   const [address, _setAddress] = useState<Address | null>();
@@ -38,7 +38,7 @@ function useAddress() {
       setAddresses(addresses.map((a) => (a.id === address.id ? address : a)));
   };
 
-  const deleteAddress = async (token: string, id: Address['id']) => {
+  const deleteAddress = async (token: string, id: Address["id"]) => {
     await api.addresses.remove(token, id);
 
     if (addresses) setAddresses(addresses.filter((a) => a.id !== id));

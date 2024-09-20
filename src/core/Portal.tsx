@@ -4,8 +4,8 @@ import React, {
   useContext,
   useEffect,
   useState,
-} from 'react';
-import { SetState } from './models';
+} from "react";
+import { SetState } from "./models";
 
 type PortalValues = {
   setGates: SetState<ReactNode>;

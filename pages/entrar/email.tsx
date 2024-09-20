@@ -1,16 +1,16 @@
-import React, { useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { serverError } from '~/components/Errors';
-import Loading from '~/components/Loading';
-import MyButton from '~/components/MyButton';
-import MyInput from '~/components/MyInput';
-import MyText from '~/components/MyText';
-import { globalStyles, myColors } from '~/constants';
-import { useAuthContext } from '~/contexts/AuthContext';
-import { useAlertContext } from '~/contexts/AlertContext';
-import { range } from '~/functions/range';
-import useRouting from '~/hooks/useRouting';
-import { api } from '~/services/api';
+import React, { useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { serverError } from "~/components/Errors";
+import Loading from "~/components/Loading";
+import MyButton from "~/components/MyButton";
+import MyInput from "~/components/MyInput";
+import MyText from "~/components/MyText";
+import { globalStyles, myColors } from "~/constants";
+import { useAuthContext } from "~/contexts/AuthContext";
+import { useAlertContext } from "~/contexts/AlertContext";
+import { range } from "~/functions/range";
+import useRouting from "~/hooks/useRouting";
+import { api } from "~/services/api";
 
 const EmailSignIn = () => {
   const { navigate } = useRouting();
@@ -18,20 +18,20 @@ const EmailSignIn = () => {
   const { alert } = useAlertContext();
   const [isLoading, setLoading] = useState(false);
   const [stage, setStage] = useState(0);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [hasCodeError, setCodeError] = useState(false);
-  const key = useRef('');
-  const createToken = useRef('');
+  const key = useRef("");
+  const createToken = useRef("");
 
   const nextState = () => {
     setStage((s) => s + 1);
-    setInput('');
+    setInput("");
     setLoading(false);
   };
 
   const auth = (accessToken: string, refreshToken?: string) => {
     signIn({ accessToken, refreshToken });
-    navigate('Home');
+    navigate("Home");
   };
 
   const sendCode = async (text: string) => {
@@ -44,11 +44,11 @@ const EmailSignIn = () => {
       const res = await api.auth.validate(key.current, text);
       createToken.current = res.token;
 
-      res.type === 'ACCESS'
+      res.type === "ACCESS"
         ? auth(res.token, res.session?.refresh_token)
         : nextState();
     } catch {
-      setInput('');
+      setInput("");
       setCodeError(true);
       setLoading(false);
     }
@@ -56,7 +56,7 @@ const EmailSignIn = () => {
 
   const codeInput = (
     <View style={{ marginLeft: 55 }}>
-      <View style={{ position: 'absolute', flexDirection: 'row', left: -8 }}>
+      <View style={{ position: "absolute", flexDirection: "row", left: -8 }}>
         {range(1, 5).map((n) => (
           <View key={n} style={styles.codeBorder} />
         ))}
@@ -64,9 +64,9 @@ const EmailSignIn = () => {
       <MyInput
         autoFocus
         maxLength={5}
-        keyboardType='numeric'
+        keyboardType="numeric"
         inputStyle={styles.codeInput}
-        errorMessage={hasCodeError ? 'Código inválido' : ''}
+        errorMessage={hasCodeError ? "Código inválido" : ""}
         onChangeText={sendCode}
         containerStyle={styles.codeInputContainer}
         inputContainerStyle={{ borderBottomWidth: 0 }}
@@ -78,8 +78,8 @@ const EmailSignIn = () => {
   const data = (
     [
       {
-        title: 'Insira seu email',
-        autoComplete: 'email',
+        title: "Insira seu email",
+        autoComplete: "email",
         onPress: async () => {
           const res = await api.auth.email(input);
           key.current = res.key;
@@ -88,12 +88,12 @@ const EmailSignIn = () => {
         },
       },
       {
-        title: 'Insira o código de verificação',
+        title: "Insira o código de verificação",
         component: codeInput,
       },
       {
-        title: 'Insira seu nome',
-        autoComplete: 'name',
+        title: "Insira seu nome",
+        autoComplete: "name",
         onPress: async () => {
           const res = await api.customers.create(createToken.current, input);
 
@@ -125,14 +125,14 @@ const EmailSignIn = () => {
             onChangeText={setInput}
             onSubmitEditing={next}
             autoFocus
-            autoCapitalize='none'
+            autoCapitalize="none"
             autoCorrect={false}
             autoComplete={data.autoComplete}
             containerStyle={{ maxWidth: 400 }}
           />
           <MyButton
             buttonStyle={styles.continueButton}
-            title='Continuar'
+            title="Continuar"
             disabled={!input}
             onPress={next}
           />
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   continueButton: {
     marginTop: 18,
     maxWidth: 400,
-    width: '100%',
+    width: "100%",
   },
   codeBorder: {
     borderColor: myColors.divider3,

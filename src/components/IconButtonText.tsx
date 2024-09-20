@@ -1,10 +1,10 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { globalStyles, myColors } from '~/constants';
-import IconButton from './IconButton';
-import { ButtonOrLink } from './MyTouchable';
-import { IconNames } from './MyIcon';
-import MyText from './MyText';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { globalStyles, myColors } from "~/constants";
+import IconButton from "./IconButton";
+import { ButtonOrLink } from "./MyTouchable";
+import { IconNames } from "./MyIcon";
+import MyText from "./MyText";
 
 type IconButtonTextBase = {
   icon: IconNames;
@@ -35,17 +35,17 @@ const IconButtonText = ({ icon, text, ...props }: IconButtonTextProps) => {
 const styles = StyleSheet.create({
   container: {
     gap: 2,
-    alignItems: 'center',
+    alignItems: "center",
   },
   iconButton: {
     width: 54,
     height: 54,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   text: {
     color: myColors.text,
     fontSize: 13,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 

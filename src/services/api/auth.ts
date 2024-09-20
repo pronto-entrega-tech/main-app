@@ -1,13 +1,13 @@
-import { device } from '~/constants';
-import { withCache } from '../cache';
-import Utils from './utils';
+import { device } from "~/constants";
+import { withCache } from "../cache";
+import Utils from "./utils";
 
 const { ApiClient } = Utils;
 
-const role = 'CUSTOMER';
+const role = "CUSTOMER";
 const useCookie = device.web;
 
-type Provider = 'GOOGLE';
+type Provider = "GOOGLE";
 const social = async (provider: Provider, token: string) => {
   const { data } = await ApiClient.post(
     `/customers/social`,
@@ -18,21 +18,21 @@ const social = async (provider: Provider, token: string) => {
 };
 
 const email = async (email: string) => {
-  const { data } = await ApiClient.post('/auth/email', { role, email });
+  const { data } = await ApiClient.post("/auth/email", { role, email });
   return data as {
-    status: 'Success';
+    status: "Success";
     key: string;
   };
 };
 
 const validate = async (key: string, otp: string) => {
   const { data } = await ApiClient.post(
-    '/auth/validate',
+    "/auth/validate",
     { role, key, otp },
     { params: { useCookie } },
   );
   return data as {
-    type: 'CREATE' | 'CONNECT' | 'ACCESS';
+    type: "CREATE" | "CONNECT" | "ACCESS";
     token: string;
     session?: {
       refresh_token: string;

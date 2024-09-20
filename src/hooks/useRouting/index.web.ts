@@ -1,8 +1,8 @@
-import { useCallback, useRef } from 'react';
-import { useRouter } from 'next/router';
-import { MyRouting } from '.';
-import { screenFrom, urlFrom } from '~/functions/converter';
-import { useHasNavigatedContext } from '~/contexts/HasNavigatedContext';
+import { useCallback, useRef } from "react";
+import { useRouter } from "next/router";
+import { MyRouting } from ".";
+import { screenFrom, urlFrom } from "~/functions/converter";
+import { useHasNavigatedContext } from "~/contexts/HasNavigatedContext";
 
 const useRouting = (): MyRouting => {
   const { hasNavigated } = useHasNavigatedContext();
@@ -10,7 +10,7 @@ const useRouting = (): MyRouting => {
   // pseudo `canGoBack` implemented by tracking if we've navigated
   const canGoBack = useRef(() => hasNavigated.current).current;
 
-  const navigate: MyRouting['navigate'] = useCallback(
+  const navigate: MyRouting["navigate"] = useCallback(
     (screen, params) => push(urlFrom(screen, params)),
     [push],
   );
@@ -23,14 +23,14 @@ const useRouting = (): MyRouting => {
       [replace],
     ),
     canGoBack,
-    goBack: (fallback = 'Home') => {
+    goBack: (fallback = "Home") => {
       if (canGoBack()) return back();
       push(urlFrom(fallback));
     },
     pop: () => {},
     params: query,
     pathname,
-    screen: screenFrom(pathname) ?? '',
+    screen: screenFrom(pathname) ?? "",
     isReady,
   };
 };

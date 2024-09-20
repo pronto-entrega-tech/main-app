@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { View, StyleProp, TextInput, ViewStyle } from 'react-native';
-import { globalStyles, myColors, myFonts } from '~/constants';
-import IconButton from './IconButton';
+import React, { useState } from "react";
+import { View, StyleProp, TextInput, ViewStyle } from "react-native";
+import { globalStyles, myColors, myFonts } from "~/constants";
+import IconButton from "./IconButton";
 
 const MySearchBar = ({
   style,
-  defaultValue = '',
+  defaultValue = "",
   onSubmit,
 }: {
   style?: StyleProp<ViewStyle>;
@@ -23,23 +23,24 @@ const MySearchBar = ({
       style={[
         {
           flexGrow: 1,
-          flexDirection: 'row',
+          flexDirection: "row",
           borderRadius: 50,
           borderWidth: 2,
           borderColor: myColors.primaryColor,
           height: 38,
-          backgroundColor: 'white',
+          backgroundColor: "white",
         },
         globalStyles.elevation3,
         style,
-      ]}>
+      ]}
+    >
       <IconButton
-        icon='magnify'
-        color='rgba(0, 0, 0, 0.54)'
+        icon="magnify"
+        color="rgba(0, 0, 0, 0.54)"
         style={{
           width: 48,
           height: 48,
-          alignSelf: 'center',
+          alignSelf: "center",
         }}
         disabledStyle={{}}
         disabled={!query}
@@ -52,24 +53,24 @@ const MySearchBar = ({
           fontSize: 18,
           fontFamily: myFonts.Regular,
         }}
-        placeholder='O que você procura?'
-        role='searchbox'
-        enterKeyHint='search'
+        placeholder="O que você procura?"
+        role="searchbox"
+        enterKeyHint="search"
         value={query}
         onChangeText={setSearchQuery}
         onSubmitEditing={submit}
       />
       {!!query && (
         <IconButton
-          icon='close'
-          color='rgba(0, 0, 0, 0.54)'
+          icon="close"
+          color="rgba(0, 0, 0, 0.54)"
           style={{
             width: 48,
             height: 48,
             padding: 12,
-            alignSelf: 'center',
+            alignSelf: "center",
           }}
-          onPress={() => setSearchQuery('')}
+          onPress={() => setSearchQuery("")}
         />
       )}
     </View>

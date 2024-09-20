@@ -1,8 +1,8 @@
-import { GetServerSideProps } from 'next';
-import { api } from '~/services/api';
-import { HomeProps } from '@pages/inicio';
+import { GetServerSideProps } from "next";
+import { api } from "~/services/api";
+import { HomeProps } from "@pages/inicio";
 
-export { default } from '@pages/inicio';
+export { default } from "@pages/inicio";
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async ({
   params,

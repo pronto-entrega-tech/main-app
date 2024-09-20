@@ -1,16 +1,16 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { device, myColors, myFonts } from '~/constants';
-import MyTouchable from '~/components/MyTouchable';
-import MyText from '~/components/MyText';
-import AnimatedText from '~/components/AnimatedText';
-import MyIcon from './MyIcon';
-import useRouting from '~/hooks/useRouting';
-import { Money, money } from '~/functions/money';
-import { useCartContext } from '~/contexts/CartContext';
-import { MotiView } from 'moti';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { device, myColors, myFonts } from "~/constants";
+import MyTouchable from "~/components/MyTouchable";
+import MyText from "~/components/MyText";
+import AnimatedText from "~/components/AnimatedText";
+import MyIcon from "./MyIcon";
+import useRouting from "~/hooks/useRouting";
+import { Money, money } from "~/functions/money";
+import { useCartContext } from "~/contexts/CartContext";
+import { MotiView } from "moti";
 
-const screensWOCartBar = ['OrderDetails', 'Chat'];
+const screensWOCartBar = ["OrderDetails", "Chat"];
 
 const hiddenY = 50 + 24;
 
@@ -28,29 +28,33 @@ const CartBar = ({ toped = false }: { toped?: boolean }) => {
       style={[
         styles.cartBarContainer,
         toped ? { marginBottom: device.iPhoneNotch ? 54 + 34 : 54 } : {},
-      ]}>
+      ]}
+    >
       <MotiView
-        transition={{ type: 'timing', duration: 200 }}
-        animate={{ translateY }}>
+        transition={{ type: "timing", duration: 200 }}
+        animate={{ translateY }}
+      >
         <MyTouchable
           solid
           style={[
             styles.cartBarTouchable,
             !toped && device.iPhoneNotch ? { height: 50 + 24 } : { height: 50 },
           ]}
-          onPress={() => navigate('Cart')}>
+          onPress={() => navigate("Cart")}
+        >
           <View
             style={{
               flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
               marginBottom: !toped && device.iPhoneNotch ? 24 : 0,
-            }}>
+            }}
+          >
             <MyIcon
-              name={'cart'}
+              name={"cart"}
               size={28}
-              color={'#FFF'}
+              color={"#FFF"}
               style={styles.iconCart}
             />
             <MyText style={styles.textCart}>Ver carrinho</MyText>
@@ -64,28 +68,28 @@ const CartBar = ({ toped = false }: { toped?: boolean }) => {
 
 const styles = StyleSheet.create({
   cartBarContainer: {
-    position: device.web ? 'fixed' : 'absolute',
-    overflow: 'hidden',
+    position: device.web ? "fixed" : "absolute",
+    overflow: "hidden",
     bottom: 0,
-    width: '100%',
+    width: "100%",
   },
   cartBarTouchable: {
-    width: '100%',
+    width: "100%",
     backgroundColor: myColors.primaryColor,
   },
   iconCart: {
-    position: 'absolute',
+    position: "absolute",
     left: 24,
   },
   textCart: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 14,
   },
   priceCart: {
-    position: 'absolute',
+    position: "absolute",
     right: 18,
-    alignContent: 'flex-end',
-    color: '#FFF',
+    alignContent: "flex-end",
+    color: "#FFF",
     fontSize: 16,
     fontFamily: myFonts.Medium,
   },

@@ -1,16 +1,16 @@
-import { BusinessHours, Market, weekDayArray } from '~/core/models';
-import { omit } from './converter';
-import { range } from './range';
+import { BusinessHours, Market, weekDayArray } from "~/core/models";
+import { omit } from "./converter";
+import { range } from "./range";
 
-type NormalizedBHs = Omit<BusinessHours, 'days'> & {
+type NormalizedBHs = Omit<BusinessHours, "days"> & {
   day: number;
 };
 
 export const marketOpenness = (market: Market) => {
   const { isOpen, nextHour, tomorrow } = isMarketOpen(market.business_hours);
 
-  const openMsg = isOpen ? 'Aberto' : 'Fechado';
-  const tomorrowMsg = tomorrow ? ' de amanhã' : '';
+  const openMsg = isOpen ? "Aberto" : "Fechado";
+  const tomorrowMsg = tomorrow ? " de amanhã" : "";
 
   return !nextHour ? openMsg : `${openMsg} até ${nextHour}${tomorrowMsg}`;
 };
@@ -19,7 +19,7 @@ export const isMarketOpen = (
   business_hours: BusinessHours[],
   intervalDaysQuantity = 1,
 ) => {
-  const removeZero = (text: string) => text.replace(/^.{0}0/, '');
+  const removeZero = (text: string) => text.replace(/^.{0}0/, "");
 
   const date = new Date();
   const min = date.getMinutes();
@@ -27,7 +27,7 @@ export const isMarketOpen = (
   const weekday = date.getDay();
 
   const normalizeBH = (day: number) => (v: BusinessHours) => ({
-    ...omit(v, 'days'),
+    ...omit(v, "days"),
     day,
   });
   const futureBHs = (() => {
@@ -47,7 +47,7 @@ export const isMarketOpen = (
   })();
 
   const todayBHs = business_hours.filter(({ days, close_time }) => {
-    const [closeHour, closeMin] = close_time.split(':');
+    const [closeHour, closeMin] = close_time.split(":");
     const closeInSec = +closeHour * 60 + +closeMin;
     const nowInSec = hour * 60 + min;
 
@@ -58,7 +58,7 @@ export const isMarketOpen = (
   });
   if (todayBHs.length) {
     const [{ open_time, close_time }] = todayBHs;
-    const openHour = +open_time.split(':')[0];
+    const openHour = +open_time.split(":")[0];
 
     const isOpen = hour >= openHour;
     return {

@@ -1,18 +1,18 @@
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
-import { FlatList, StyleProp, ViewStyle, RefreshControl } from 'react-native';
-import { myColors } from '~/constants';
-import { SearchParams } from '~/services/api/products';
-import { useConnection } from '~/functions/connection';
-import ProdItem from './ProdItem';
-import ProdItemHorizontal from './ProdItemHorizontal';
-import Loading from './Loading';
-import Errors, { NothingFeed } from './Errors';
-import { Product } from '~/core/models';
-import { getLatLong, toCityState } from '~/functions/converter';
-import { useAddressContext } from '~/contexts/AddressContext';
-import { api } from '~/services/api';
-import { useCartContext, useCartContextSelector } from '~/contexts/CartContext';
-import { useMediaQuery } from '~/hooks/useMediaQuery';
+import React, { ReactElement, useCallback, useEffect, useState } from "react";
+import { FlatList, StyleProp, ViewStyle, RefreshControl } from "react-native";
+import { myColors } from "~/constants";
+import { SearchParams } from "~/services/api/products";
+import { useConnection } from "~/functions/connection";
+import ProdItem from "./ProdItem";
+import ProdItemHorizontal from "./ProdItemHorizontal";
+import Loading from "./Loading";
+import Errors, { NothingFeed } from "./Errors";
+import { Product } from "~/core/models";
+import { getLatLong, toCityState } from "~/functions/converter";
+import { useAddressContext } from "~/contexts/AddressContext";
+import { api } from "~/services/api";
+import { useCartContext, useCartContextSelector } from "~/contexts/CartContext";
+import { useMediaQuery } from "~/hooks/useMediaQuery";
 
 const ProdList = (props: {
   header?: ReactElement;
@@ -46,22 +46,22 @@ const ProdList = (props: {
 
   const { address } = useAddressContext();
   const city = address && toCityState(address);
-  const missingAddress = city === null ? 'missing_address' : undefined;
+  const missingAddress = city === null ? "missing_address" : undefined;
 
   const [innerData, setInnerData] = useState<Product[]>();
-  const [serverErr, setServerErr] = useState<'server'>();
+  const [serverErr, setServerErr] = useState<"server">();
   const [refreshing, setRefreshing] = useState(false);
 
   const listData = data ?? innerData;
 
   const hasInternet = useConnection();
-  const connectErr = hasInternet === false ? 'connection' : undefined;
+  const connectErr = hasInternet === false ? "connection" : undefined;
 
   const nothingErr =
     listData && !listData.length
       ? isSearch
-        ? 'nothing_search'
-        : 'nothing_feed'
+        ? "nothing_search"
+        : "nothing_feed"
       : undefined;
 
   const { width, size } = useMediaQuery();
@@ -88,7 +88,7 @@ const ProdList = (props: {
         setInnerData(prodFeed);
         setServerErr(undefined);
       } catch {
-        setServerErr('server');
+        setServerErr("server");
       }
     },
     [listData, connectErr, city, searchParams, address],

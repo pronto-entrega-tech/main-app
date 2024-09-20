@@ -2,9 +2,9 @@ import {
   StackNavigationState,
   useNavigation,
   useRoute,
-} from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useCallback } from 'react';
+} from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { useCallback } from "react";
 
 export type Params = Record<string, any>;
 export type MyRouting = {
@@ -32,7 +32,7 @@ const useRouting = (): MyRouting => {
   const { params, path, name } = useRoute();
 
   const getScreenName = (
-    s: StackNavigationState<any>['routes'][number]['state'],
+    s: StackNavigationState<any>["routes"][number]["state"],
   ): string => {
     if (s?.index === undefined) throw new Error();
 
@@ -48,24 +48,24 @@ const useRouting = (): MyRouting => {
     push: useCallback((...args) => push(...validate(...args)), [push]),
     replace: useCallback((...args) => replace(...validate(...args)), [replace]),
     canGoBack,
-    goBack: (fallback = 'Home') => {
+    goBack: (fallback = "Home") => {
       if (canGoBack()) return goBack();
       navigate(fallback);
     },
     pop,
     params: (params ?? {}) as Params,
-    pathname: path ?? '',
-    screen: name !== 'BottomTabs' ? name : getScreenName(getState()),
+    pathname: path ?? "",
+    screen: name !== "BottomTabs" ? name : getScreenName(getState()),
     isReady: true,
   };
 };
 
 const validate = (screen: string, params?: Params) => {
   const map: { [x: string]: [string, Params | undefined] } = {
-    Home: ['BottomTabs', params],
+    Home: ["BottomTabs", params],
     OrderDetails: [
-      'BottomTabs',
-      { screen: 'OrdersTab', params: { screen: 'OrderDetails', params } },
+      "BottomTabs",
+      { screen: "OrdersTab", params: { screen: "OrderDetails", params } },
     ],
   };
 

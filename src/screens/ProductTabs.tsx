@@ -1,13 +1,13 @@
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import CartBar from '~/components/CartBar';
-import { myColors, myTitle } from '~/constants';
-import { ProductDetails } from '@pages/produto/[city]/[itemId]';
-import { MarketFeed } from '@pages/inicio/mercado/[city]/[marketId]';
-import ProductHeader from '~/components/ProductHeader';
-import useRouting from '~/hooks/useRouting';
-import { UseStore, useAtom } from '~/functions/stores';
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import React, { useState } from "react";
+import { View } from "react-native";
+import CartBar from "~/components/CartBar";
+import { myColors, myTitle } from "~/constants";
+import { ProductDetails } from "@pages/produto/[city]/[itemId]";
+import { MarketFeed } from "@pages/inicio/mercado/[city]/[marketId]";
+import ProductHeader from "~/components/ProductHeader";
+import useRouting from "~/hooks/useRouting";
+import { UseStore, useAtom } from "~/functions/stores";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -24,17 +24,20 @@ const ProductTabs = () => {
             title: myTitle,
             tabBarActiveTintColor: myColors.text3,
             tabBarIndicatorStyle: { backgroundColor: myColors.primaryColor },
-          }}>
+          }}
+        >
           <Tab.Screen
-            name='ProductDetails'
+            name="ProductDetails"
             initialParams={params}
-            options={{ tabBarLabel: 'Produto' }}>
+            options={{ tabBarLabel: "Produto" }}
+          >
             {() => <ProductDetails setMarketId={$marketId.set} />}
           </Tab.Screen>
           <Tab.Screen
-            name='ProductMarket'
+            name="ProductMarket"
             initialParams={params}
-            options={{ tabBarLabel: 'Mercado' }}>
+            options={{ tabBarLabel: "Mercado" }}
+          >
             {() => (
               <UseStore store={$marketId}>
                 {(marketId) => <MarketFeed marketId={marketId} />}

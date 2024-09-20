@@ -1,8 +1,8 @@
-import React, { ReactElement } from 'react';
-import { StyleProp, ViewStyle } from 'react-native';
-import { Product } from '~/core/models';
-import ProdList from './ProdList';
-import { SearchParams } from '~/services/api/products';
+import React, { ReactElement } from "react";
+import { StyleProp, ViewStyle } from "react-native";
+import { Product } from "~/core/models";
+import ProdList from "./ProdList";
+import { SearchParams } from "~/services/api/products";
 
 const ProdListHorizontal = ({
   header,

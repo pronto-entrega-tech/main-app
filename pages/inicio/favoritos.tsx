@@ -1,19 +1,19 @@
-import React from 'react';
-import { View } from 'react-native';
-import MySearchBar from '~/components/MySearchBar';
-import ProdListHorizontal from '~/components/ProdListHorizontal';
-import { globalStyles, myColors } from '~/constants';
-import MyText from '~/components/MyText';
-import { WithBottomNav } from '~/components/Layout';
-import MyHeader from '~/components/MyHeader';
-import { useFavoritesContext } from '~/contexts/FavoritesContext';
+import React from "react";
+import { View } from "react-native";
+import MySearchBar from "~/components/MySearchBar";
+import ProdListHorizontal from "~/components/ProdListHorizontal";
+import { globalStyles, myColors } from "~/constants";
+import MyText from "~/components/MyText";
+import { WithBottomNav } from "~/components/Layout";
+import MyHeader from "~/components/MyHeader";
+import { useFavoritesContext } from "~/contexts/FavoritesContext";
 
 const Favorites = () => {
   const { favorites } = useFavoritesContext();
 
   return (
     <>
-      <MyHeader title='Favoritos' smallDivider />
+      <MyHeader title="Favoritos" smallDivider />
       <View style={{ marginTop: 12, marginBottom: 8, paddingHorizontal: 16 }}>
         <MySearchBar onSubmit={() => 0} />
       </View>

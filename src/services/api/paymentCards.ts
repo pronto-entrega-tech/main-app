@@ -2,8 +2,8 @@ import {
   CreatePaymentCard,
   PaymentCard,
   UpdatePaymentCard,
-} from '~/core/models';
-import Utils from './utils';
+} from "~/core/models";
+import Utils from "./utils";
 
 const { ApiClient, authHeader } = Utils;
 
@@ -25,7 +25,7 @@ const update = async (token: string, card: UpdatePaymentCard) => {
   await ApiClient.patch(`/customers/cards/${card.id}`, card, authHeader(token));
 };
 
-const remove = async (token: string, id: PaymentCard['id']) => {
+const remove = async (token: string, id: PaymentCard["id"]) => {
   await ApiClient.delete(`/customers/cards/${id}`, authHeader(token));
 };
 

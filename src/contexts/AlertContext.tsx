@@ -1,11 +1,11 @@
-import { useCallback, useState } from 'react';
-import { createContext } from '~/contexts/createContext';
-import { AlertState } from '~/components/MyAlert';
+import { useCallback, useState } from "react";
+import { createContext } from "~/contexts/createContext";
+import { AlertState } from "~/components/MyAlert";
 
 export type ShowAlert = (
   title: string,
   subtitle?: string,
-  opts?: Omit<AlertState, 'title' | 'subtitle'>,
+  opts?: Omit<AlertState, "title" | "subtitle">,
 ) => void;
 
 function useAlert() {
