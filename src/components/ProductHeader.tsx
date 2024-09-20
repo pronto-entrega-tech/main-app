@@ -5,13 +5,22 @@ import { myColors, device } from '~/constants';
 import useRouting from '~/hooks/useRouting';
 import { Urls } from '~/constants/urls';
 import { GoBackButton } from './MyHeader';
+import {
+  useFavoritesContext,
+  useFavoritesContextSelector,
+} from '~/contexts/FavoritesContext';
 
 const ProductHeader = () => {
   const { params, goBack } = useRouting();
-  /* const { notify, onPressNot } = useMyContext(); */
+  const { city, itemId } = params;
+
+  /* const { toggleFavorite } = useFavoritesContext(); */
+  const toggleFavorite = useFavoritesContextSelector((v) => v.toggleFavorite);
+  const isFavorite = useFavoritesContextSelector((v) =>
+    v.favorites.has(itemId),
+  );
 
   const share = () => {
-    const { city, itemId } = params;
     const url = `${Urls.WWW}/produto/${city}/${itemId}`;
 
     if (!device.web) Share.share({ message: url });
@@ -40,14 +49,14 @@ const ProductHeader = () => {
         }}>
         <GoBackButton onGoBack={() => goBack('Home')} />
         <View style={{ flexDirection: 'row' }}>
-          {/* <IconButton
-            onPress={() => onPressNot(item)}
-            icon={notify.has(item.prod_id) ? 'bell' : 'bell-outline'}
+          <IconButton
+            onPress={() => toggleFavorite(itemId)}
+            icon={isFavorite ? 'heart' : 'heart-outline'}
             style={{
               width: 56,
               height: 56,
             }}
-          /> */}
+          />
           <IconButton
             onPress={share}
             icon='share-variant'

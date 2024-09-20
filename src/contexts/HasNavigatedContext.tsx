@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext } from 'react';
-import { createUseContext } from '~/contexts/createUseContext';
+import { createUseContext } from '~/contexts/createContext';
 
 const HasNavigatedContext = createContext(
   {} as { hasNavigated: React.MutableRefObject<boolean> },

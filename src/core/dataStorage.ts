@@ -76,14 +76,14 @@ export const getNotifies = async () => {
 };
 
 // favorites
-export const saveFavorites = async (value: Map<string, Product>) => {
+export const saveFavorites = async (value: Set<string>) => {
   const stringValue = JSON.stringify([...value]);
   await AsyncStorage.setItem(key.favorites, stringValue);
 };
 
 export const getFavorites = async () => {
   const stringValue = await AsyncStorage.getItem(key.favorites);
-  return new Map<string, Product>(stringValue ? JSON.parse(stringValue) : null);
+  return new Set<string>(stringValue ? JSON.parse(stringValue) : null);
 };
 
 // shoppingList

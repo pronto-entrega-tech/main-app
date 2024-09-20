@@ -1,8 +1,8 @@
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import useMyContext from '~/core/MyContext';
 import { calcSubtotal } from '~/functions/calcSubtotal';
 import { pick } from '~/functions/converter';
-import { createContext } from '~/contexts/createUseContext';
+import { createContext } from '~/contexts/createContext';
 import { money } from '~/functions/money';
 import { api } from '~/services/api';
 import {
@@ -24,7 +24,7 @@ import { useStateToRef } from '~/hooks/useStateToRef';
 
 type FullMarketId = { market_id?: string; city_slug?: string };
 
-function useProviderValues() {
+function useCart() {
   const { alert } = useMyContext();
   const [subtotal, setSubtotal] = useState(money('0'));
   const [totalOff, setTotalOff] = useState(money('0'));
@@ -201,4 +201,4 @@ function useProviderValues() {
 }
 
 export const [CartProvider, useCartContext, useCartContextSelector] =
-  createContext(useProviderValues);
+  createContext(useCart);

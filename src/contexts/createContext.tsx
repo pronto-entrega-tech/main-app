@@ -7,6 +7,7 @@ import {
   useSyncExternalStore,
 } from 'react';
 import { Context, useContextSelector } from 'use-context-selector';
+import { fail } from '~/functions/converter';
 
 export const createUseContext = <T extends Record<string | symbol, unknown>>(
   context: Context<T>,
@@ -27,7 +28,7 @@ type Store<T> = {
 };
 
 export const createContext = <Value extends object>(useValue: () => Value) => {
-  const context = createContextOrig({} as Store<Value>);
+  const context = createContextOrig<Store<Value> | undefined>(undefined);
 
   function Provider({ children }: { children: ReactNode }) {
     const value = useValue();
@@ -55,7 +56,8 @@ export const createContext = <Value extends object>(useValue: () => Value) => {
   }
 
   const useContext = () => {
-    const store = useContextOrig(context);
+    const store =
+      useContextOrig(context) ?? fail(`Missing provider for ${useValue.name}`);
     return new Proxy({} as Value, {
       get: (_, name) => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -70,7 +72,8 @@ export const createContext = <Value extends object>(useValue: () => Value) => {
   const useContextSelector = <Selected,>(
     selector: (value: Value) => Selected,
   ) => {
-    const store = useContextOrig(context);
+    const store =
+      useContextOrig(context) ?? fail(`Missing provider for ${useValue.name}`);
     return useSyncExternalStore(store.subscribe, () => selector(store.value));
   };
 

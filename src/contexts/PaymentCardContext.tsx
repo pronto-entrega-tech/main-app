@@ -5,7 +5,7 @@ import {
   PaymentCard,
   UpdatePaymentCard,
 } from '~/core/models';
-import { createUseContext } from '~/contexts/createUseContext';
+import { createUseContext } from '~/contexts/createContext';
 import { api } from '~/services/api';
 
 type PaymentCardContextValues = {

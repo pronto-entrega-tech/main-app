@@ -3,13 +3,13 @@ import { View } from 'react-native';
 import MySearchBar from '~/components/MySearchBar';
 import ProdListHorizontal from '~/components/ProdListHorizontal';
 import { globalStyles, myColors } from '~/constants';
-import useMyContext from '~/core/MyContext';
 import MyText from '~/components/MyText';
 import { WithBottomNav } from '~/components/Layout';
 import MyHeader from '~/components/MyHeader';
+import { useFavoritesContext } from '~/contexts/FavoritesContext';
 
 const Favorites = () => {
-  const { favorites } = useMyContext();
+  const { favorites } = useFavoritesContext();
 
   return (
     <>
@@ -26,7 +26,7 @@ const Favorites = () => {
       ) : (
         <ProdListHorizontal
           style={{ paddingTop: 12 }}
-          data={[...favorites.values()].reverse()}
+          searchParams={{ ids: [...favorites.values()] }}
         />
       )}
     </>
