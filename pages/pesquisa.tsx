@@ -25,7 +25,7 @@ type SearchParams = {
 };
 
 const Search = () => {
-  const { params, isReady, goBack, navigate } = useRouting();
+  const { params, setParams, isReady, goBack } = useRouting();
   const { query, marketId, orderBy, distance, category } =
     params as SearchParams;
   const categories = toArray(category);
@@ -36,7 +36,7 @@ const Search = () => {
       <MySearchBar
         defaultValue={query}
         onSubmit={(query) => {
-          navigate("Search", { ...params, query });
+          setParams({ ...params, query });
         }}
         style={{ flex: 1 }}
       />
@@ -53,18 +53,18 @@ const Search = () => {
   const chipsValues = [
     ...arrayConditional(filterName)({
       title: filterName,
-      remove: () => navigate("Search", omit(params, "orderBy")),
+      remove: () => setParams(omit(params, "orderBy")),
     }),
     ...arrayConditional(distance)({
       title: `Até ${distance}km`,
-      remove: () => navigate("Search", omit(params, "distance")),
+      remove: () => setParams(omit(params, "distance")),
     }),
     ...(categories?.map((c) => ({
       title: categoriesArray[+c - 1],
       remove: () => {
         if (!c) return;
 
-        navigate("Search", {
+        setParams({
           ...params,
           category: categories.filter((v) => v !== c),
         });

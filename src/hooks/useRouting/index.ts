@@ -14,6 +14,7 @@ export type MyRouting = {
   canGoBack(): boolean;
   goBack(fallback?: string): void;
   pop(count?: number): void;
+  setParams(params: Partial<any> | undefined): void;
   params: Params;
   pathname: string;
   screen: string;
@@ -28,11 +29,12 @@ const useRouting = (): MyRouting => {
     goBack,
     pop,
     getState,
+    setParams,
   }: StackNavigationProp<any, any> = useNavigation();
   const { params, path, name } = useRoute();
 
   const getScreenName = (
-    s: StackNavigationState<any>["routes"][number]["state"],
+    s: StackNavigationState<any>["routes"][number]["state"]
   ): string => {
     if (s?.index === undefined) throw new Error();
 
@@ -43,7 +45,7 @@ const useRouting = (): MyRouting => {
   return {
     navigate: useCallback(
       (...args) => navigate(...validate(...args)),
-      [navigate],
+      [navigate]
     ),
     push: useCallback((...args) => push(...validate(...args)), [push]),
     replace: useCallback((...args) => replace(...validate(...args)), [replace]),
@@ -53,6 +55,7 @@ const useRouting = (): MyRouting => {
       navigate(fallback);
     },
     pop,
+    setParams,
     params: (params ?? {}) as Params,
     pathname: path ?? "",
     screen: name !== "BottomTabs" ? name : getScreenName(getState()),

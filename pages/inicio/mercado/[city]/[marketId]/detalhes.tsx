@@ -38,7 +38,7 @@ const MarketDetailsBody = (props: MarketDetailsProps) => {
       .findOne(params.city, params.marketId)
       .then(setMarket)
       .catch((err) =>
-        setError(api.isError("NotFound", err) ? "nothing_market" : "server"),
+        setError(api.isError("NotFound", err) ? "nothing_market" : "server")
       );
   }, [tryAgain, market, params.city, params.marketId]);
 
@@ -106,9 +106,9 @@ const MarketDetailsBody = (props: MarketDetailsProps) => {
         <View
           style={{
             flexDirection: "row",
-            flexShrink: 1,
-            paddingHorizontal: 8,
-            paddingBottom: 12,
+            flexWrap: "wrap",
+            marginHorizontal: 8,
+            marginBottom: 12,
           }}
         >
           {payDelivery.map((item) => (

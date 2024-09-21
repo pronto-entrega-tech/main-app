@@ -12,7 +12,7 @@ const useRouting = (): MyRouting => {
 
   const navigate: MyRouting["navigate"] = useCallback(
     (screen, params) => push(urlFrom(screen, params)),
-    [push],
+    [push]
   );
 
   return {
@@ -20,7 +20,7 @@ const useRouting = (): MyRouting => {
     push: navigate,
     replace: useCallback(
       (screen, params) => replace(urlFrom(screen, params)),
-      [replace],
+      [replace]
     ),
     canGoBack,
     goBack: (fallback = "Home") => {
@@ -28,6 +28,10 @@ const useRouting = (): MyRouting => {
       push(urlFrom(fallback));
     },
     pop: () => {},
+    setParams: useCallback(
+      (params) => replace(urlFrom(screenFrom(pathname) ?? "/", params)),
+      [replace]
+    ),
     params: query,
     pathname,
     screen: screenFrom(pathname) ?? "",
