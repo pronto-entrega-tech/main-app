@@ -4,7 +4,6 @@ const { withExpo } = require("@expo/next-adapter");
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
-const os = require("node:os");
 
 const isDev = process.env.NODE_ENV !== "production";
 
@@ -41,9 +40,3 @@ const nextConfig = withBundleAnalyzer(
 );
 
 module.exports = withPlugins([withExpo, withBundleAnalyzer], nextConfig);
-
-const lanIp =
-  os.networkInterfaces().en0?.find((v) => v.family === "IPv4")?.address ??
-  fail("Missing LAN IP");
-
-process.env.NEXT_PUBLIC_LAN_IP = lanIp;

@@ -6,8 +6,6 @@ const lanIp =
   os.networkInterfaces().en0?.find((v) => v.family === "IPv4")?.address ??
   fail("Missing LAN IP");
 
-process.env.NEXT_PUBLIC_LAN_IP = lanIp;
-
 // eslint-disable-next-line import/no-anonymous-default-export
 export default ({ config }: ConfigContext): ExpoConfig => {
   return {
