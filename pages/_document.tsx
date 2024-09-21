@@ -170,7 +170,7 @@ class CustomDocument extends Document {
             href="/pwa/apple-touch-startup-image/apple-touch-startup-image-1536x2048.png"
           />
         </Head>
-        <body>
+        <body style={{ height: "100dvh" }}>
           <Main />
           <NextScript />
         </body>
