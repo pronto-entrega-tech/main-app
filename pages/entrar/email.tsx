@@ -1,11 +1,11 @@
-import React, { useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet, View, AppState } from "react-native";
 import { serverError } from "~/components/Errors";
 import Loading from "~/components/Loading";
 import MyButton from "~/components/MyButton";
 import MyInput from "~/components/MyInput";
 import MyText from "~/components/MyText";
-import { globalStyles, myColors } from "~/constants";
+import { device, globalStyles, myColors } from "~/constants";
 import { useAuthContext } from "~/contexts/AuthContext";
 import { useAlertContext } from "~/contexts/AlertContext";
 import { range } from "~/functions/range";
@@ -13,6 +13,7 @@ import useRouting from "~/hooks/useRouting";
 import { api } from "~/services/api";
 import { PageTitle } from "~/components/PageTitle";
 import MyHeader from "~/components/MyHeader";
+import * as Clipboard from "expo-clipboard";
 
 export default function EmailSignInScreen() {
   return (
@@ -66,24 +67,28 @@ const EmailSignIn = () => {
   };
 
   const codeInput = (
-    <View style={{ marginLeft: 55 }}>
-      <View style={{ position: "absolute", flexDirection: "row", left: -8 }}>
-        {range(1, 5).map((n) => (
-          <View key={n} style={styles.codeBorder} />
-        ))}
+    <>
+      <View style={{ marginLeft: 55 }}>
+        <View style={{ position: "absolute", flexDirection: "row", left: -8 }}>
+          {range(1, 5).map((n) => (
+            <View key={n} style={styles.codeBorder} />
+          ))}
+        </View>
+        <MyInput
+          autoFocus
+          maxLength={5}
+          keyboardType="numeric"
+          inputStyle={styles.codeInput}
+          errorMessage={hasCodeError ? "Código inválido" : ""}
+          onChangeText={sendCode}
+          containerStyle={styles.codeInputContainer}
+          inputContainerStyle={{ borderBottomWidth: 0 }}
+          errorStyle={{ fontSize: 14, marginTop: 16 }}
+          cursorColor="transparent"
+        />
       </View>
-      <MyInput
-        autoFocus
-        maxLength={5}
-        keyboardType="numeric"
-        inputStyle={styles.codeInput}
-        errorMessage={hasCodeError ? "Código inválido" : ""}
-        onChangeText={sendCode}
-        containerStyle={styles.codeInputContainer}
-        inputContainerStyle={{ borderBottomWidth: 0 }}
-        errorStyle={{ fontSize: 14, marginTop: 16 }}
-      />
-    </View>
+      {device.android && <PasteCodeButton onPaste={sendCode} />}
+    </>
   );
 
   const data = (
@@ -157,6 +162,38 @@ const EmailSignIn = () => {
   );
 };
 
+function PasteCodeButton(p: { onPaste: (code: string) => void }) {
+  const [code, setCode] = useState<string>();
+
+  useEffect(() => {
+    const sub1 = AppState.addEventListener("focus", async () => {
+      const string = await Clipboard.getStringAsync();
+      if (string.match(/\d\d\d\d\d/)) setCode(string);
+    });
+
+    const sub2 = Clipboard.addClipboardListener(async ({ contentTypes }) => {
+      if (!contentTypes.includes(Clipboard.ContentType.PLAIN_TEXT)) return;
+
+      const string = await Clipboard.getStringAsync();
+      if (string.match(/\d\d\d\d\d/)) setCode(string);
+    });
+
+    return () => {
+      sub1.remove();
+      sub2.remove();
+    };
+  }, []);
+
+  return (
+    <MyButton
+      buttonStyle={styles.continueButton}
+      title={code ? `Colar código ${code}` : "Colar código"}
+      disabled={code == null}
+      onPress={code ? () => p.onPaste(code) : undefined}
+    />
+  );
+}
+
 const styles = StyleSheet.create({
   continueButton: {
     marginTop: 18,
@@ -178,7 +215,8 @@ const styles = StyleSheet.create({
   },
   codeInput: {
     width: 0,
-    letterSpacing: 46,
+    letterSpacing: device.web ? 46 : 46,
+    marginLeft: -23,
     fontSize: 22,
   },
 });

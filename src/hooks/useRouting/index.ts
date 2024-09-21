@@ -52,7 +52,7 @@ const useRouting = (): MyRouting => {
     canGoBack,
     goBack: (fallback = "Home") => {
       if (canGoBack()) return goBack();
-      navigate(fallback);
+      replace(...validate(fallback));
     },
     pop,
     setParams,

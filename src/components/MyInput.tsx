@@ -13,7 +13,9 @@ const MyInput = (props: InputArgs & { _ref?: RefObject<TextInput> }) => (
   <Input
     labelStyle={{ color: myColors.primaryColor }}
     inputContainerStyle={{ borderBottomColor: "#aaa" }}
-    selectionColor={myColors.colorAccent}
+    selectionColor={myColors.colorAccent + "50"}
+    cursorColor={myColors.colorAccent}
+    selectionHandleColor={myColors.colorAccent}
     ref={props._ref}
     {...props}
   />
