@@ -24,6 +24,9 @@ const nextConfig = withBundleAnalyzer(
       "react-native",
       "react-native-web",
       "react-native-reanimated",
+      "react-native-elements",
+      "react-native-vector-icons",
+      "react-native-size-matters",
       "expo",
       "expo-modules-core",
       "expo-linking",
@@ -34,7 +37,7 @@ const nextConfig = withBundleAnalyzer(
       "moti",
     ],
     experimental: { forceSwcTransforms: true },
-  }),
+  })
 );
 
 module.exports = withPlugins([withExpo, withBundleAnalyzer], nextConfig);

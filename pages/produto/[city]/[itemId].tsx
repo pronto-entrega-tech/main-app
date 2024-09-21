@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { Image } from "react-native-elements/dist/image/Image";
 import IconButton from "~/components/IconButton";
 import ProdListHorizontal from "~/components/ProdListHorizontal";
 import { myColors, device, myFonts, globalStyles } from "~/constants";
@@ -17,11 +16,12 @@ import { MarketFeed } from "@pages/inicio/mercado/[city]/[marketId]";
 import ProductHeader from "~/components/ProductHeader";
 import { SinglePageTabs } from "~/components/SinglePageTabs";
 import CartBar from "~/components/CartBar";
-import { Product, SetState } from "~/core/models";
+import { Product } from "~/core/models";
 import MyText from "~/components/MyText";
 import { api } from "~/services/api";
 import { useCartContext, useCartContextSelector } from "~/contexts/CartContext";
 import { UseStore, useAtom } from "~/functions/stores";
+import MyImage from "~/components/MyImage";
 
 type ProductDetailsProps = { setMarketId?: (v: string) => void };
 
@@ -30,11 +30,6 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
   const [error, setError] = useState<MyErrors>(null);
   const [tryAgain, setTryAgain] = useState(false);
   const [product, setProduct] = useState<Product>();
-
-  const { addProduct, removeProduct } = useCartContext();
-  const quantity = useCartContextSelector(
-    (v) => product && v.shoppingList?.get(product.item_id)?.quantity,
-  );
 
   useEffect(() => {
     if (product?.item_id === params.itemId) return;
@@ -96,15 +91,13 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
 
         <View>
           {product.images_names ? (
-            <Image
-              placeholderStyle={{ backgroundColor: "white" }}
-              PlaceholderContent={
-                <MyIcon name="cart-outline" color={myColors.grey2} size={140} />
-              }
-              source={{ uri: getImageUrl("product", product.images_names[0]) }}
+            <MyImage
+              source={getImageUrl("product", product.images_names[0])}
               alt=""
-              resizeMode="contain"
+              thumbhash={product.thumbhash}
               style={styles.image}
+              height={140}
+              width={140}
             />
           ) : (
             <MyIcon
@@ -115,32 +108,7 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
             />
           )}
 
-          <View style={styles.containerAdd}>
-            <IconButton
-              onPress={() => removeProduct(product)}
-              disabled={!quantity}
-              icon="minus"
-              style={[
-                styles.buttonAdd,
-                globalStyles.elevation4,
-                globalStyles.darkBorder,
-              ]}
-              hitSlop={{ top: 9, bottom: 9, left: 12, right: 12 }}
-            />
-            <AnimatedText style={styles.centerNumText} animateZero>
-              {quantity ?? 0}
-            </AnimatedText>
-            <IconButton
-              onPress={() => addProduct(product)}
-              icon="plus"
-              style={[
-                styles.buttonAdd,
-                globalStyles.elevation4,
-                globalStyles.darkBorder,
-              ]}
-              hitSlop={{ top: 9, bottom: 9, left: 12, right: 12 }}
-            />
-          </View>
+          <QuantityButton product={product} />
         </View>
       </View>
       <KitItems product={product} />
@@ -148,6 +116,42 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
       <MyDivider style={{ height: 2 }} />
       <MyText style={styles.ofertasText}>Compare ofertas</MyText>
     </>
+  );
+};
+
+const QuantityButton = ({ product }: { product: Product }) => {
+  const { addProduct, removeProduct } = useCartContext();
+  const quantity = useCartContextSelector(
+    (v) => v.shoppingList?.get(product.item_id)?.quantity ?? 0
+  );
+
+  return (
+    <View style={styles.containerAdd}>
+      <IconButton
+        onPressIn={() => removeProduct(product)}
+        disabled={!quantity}
+        icon="minus"
+        style={[
+          styles.buttonAdd,
+          globalStyles.elevation4,
+          globalStyles.darkBorder,
+        ]}
+        hitSlop={{ top: 9, bottom: 9, left: 12, right: 12 }}
+      />
+      <AnimatedText style={styles.centerNumText} animateZero>
+        {quantity}
+      </AnimatedText>
+      <IconButton
+        onPressIn={() => addProduct(product)}
+        icon="plus"
+        style={[
+          styles.buttonAdd,
+          globalStyles.elevation4,
+          globalStyles.darkBorder,
+        ]}
+        hitSlop={{ top: 9, bottom: 9, left: 12, right: 12 }}
+      />
+    </View>
   );
 };
 
@@ -282,6 +286,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: myColors.text3,
     fontFamily: myFonts.Medium,
+    textAlign: "center",
   },
   ofertasText: {
     marginLeft: 16,

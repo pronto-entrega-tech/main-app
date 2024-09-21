@@ -20,7 +20,7 @@ export const SinglePageTabs = ({
   const pages = useRef(new Map([[0, tabs[0].element]]));
 
   return (
-    <>
+    <View style={{ height: "100dvh" }}>
       <View
         style={[
           globalStyles.elevation3,
@@ -105,6 +105,6 @@ export const SinglePageTabs = ({
           );
         })}
       </View>
-    </>
+    </View>
   );
 };

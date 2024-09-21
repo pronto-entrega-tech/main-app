@@ -1,4 +1,10 @@
-import React, { ReactElement, useCallback, useEffect, useState } from "react";
+import React, {
+  ComponentType,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { FlatList, StyleProp, ViewStyle, RefreshControl } from "react-native";
 import { myColors } from "~/constants";
 import { SearchParams } from "~/services/api/products";
@@ -11,11 +17,11 @@ import { Product } from "~/core/models";
 import { getLatLong, toCityState } from "~/functions/converter";
 import { useAddressContext } from "~/contexts/AddressContext";
 import { api } from "~/services/api";
-import { useCartContext, useCartContextSelector } from "~/contexts/CartContext";
+import { useCartContextSelector } from "~/contexts/CartContext";
 import { useMediaQuery } from "~/hooks/useMediaQuery";
 
 const ProdList = (props: {
-  header?: ReactElement;
+  header?: ComponentType<any> | ReactElement;
   data?: Product[];
   isSearch?: boolean;
   searchParams?: SearchParams;
@@ -39,9 +45,8 @@ const ProdList = (props: {
     tryAgain,
   } = props;
 
-  const { addProduct, removeProduct } = useCartContext();
   const shoppingListLoaded = useCartContextSelector(
-    (v) => v.shoppingList != null,
+    (v) => v.shoppingList != null
   );
 
   const { address } = useAddressContext();
@@ -91,7 +96,7 @@ const ProdList = (props: {
         setServerErr("server");
       }
     },
-    [listData, connectErr, city, searchParams, address],
+    [listData, connectErr, city, searchParams, address]
   );
 
   const searchParamsString = JSON.stringify(searchParams);
@@ -127,8 +132,6 @@ const ProdList = (props: {
         }}
         item={item}
         showsMarketLogo={!hideMarketLogo}
-        onPressAdd={() => addProduct(item)}
-        onPressRemove={() => removeProduct(item)}
       />
     );
 
@@ -170,12 +173,7 @@ const ProdList = (props: {
   }
 
   const _ProdItemHorizontal = ({ item }: { item: Product }) => (
-    <ProdItemHorizontal
-      item={item}
-      showsMarketLogo={!hideMarketLogo}
-      onPressAdd={() => addProduct(item)}
-      onPressRemove={() => removeProduct(item)}
-    />
+    <ProdItemHorizontal item={item} showsMarketLogo={!hideMarketLogo} />
   );
 
   return (

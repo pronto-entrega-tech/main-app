@@ -10,6 +10,7 @@ import Animated, {
   SharedValue,
   AnimatedProps,
   useAnimatedReaction,
+  Easing,
 } from "react-native-reanimated";
 import { device, myFonts } from "~/constants";
 import { Money, money } from "~/functions/money";
@@ -53,19 +54,23 @@ const AnimatedText = ({
     cancelAnimation(translateY);
     translateY.value = 0;
     translateY.value = withSequence(
-      withTiming(isGoingUp ? -distance : distance, { duration }, (finished) => {
-        if (finished) {
-          sharedText.value = text;
+      withTiming(
+        isGoingUp ? -distance : distance,
+        { duration, easing: Easing.out(Easing.cubic) },
+        (finished) => {
+          if (finished) {
+            sharedText.value = text;
+          }
         }
-      }),
+      ),
       withTiming(isGoingUp ? distance : -distance, { duration: 0 }),
-      withTiming(0, { duration }),
+      withTiming(0, { duration, easing: Easing.out(Easing.cubic) })
     );
     cancelAnimation(opacity);
     opacity.value = 1;
     opacity.value = withSequence(
-      withTiming(0, { duration }),
-      withTiming(1, { duration }),
+      withTiming(0, { duration, easing: Easing.out(Easing.cubic) }),
+      withTiming(1, { duration, easing: Easing.out(Easing.cubic) })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
@@ -114,7 +119,7 @@ function WebAnimatedText({
     (currentValue) => {
       if (ref.current) ref.current.textContent = currentValue;
     },
-    [sharedText],
+    [sharedText]
   );
 
   return (

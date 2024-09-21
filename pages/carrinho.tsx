@@ -1,7 +1,12 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import { Image } from "react-native-elements/dist/image/Image";
 import { MotiView } from "moti";
 import MyTouchable from "~/components/MyTouchable";
 import MyButton from "~/components/MyButton";
@@ -16,7 +21,6 @@ import {
   OrderSchedule,
   Product,
   Profile,
-  SetState,
   ShoppingList,
   weekDayNames,
 } from "~/core/models";
@@ -51,34 +55,194 @@ import { range } from "~/functions/range";
 import HeaderContainer from "~/components/HeaderContainer";
 import { useAlertContext } from "~/contexts/AlertContext";
 import { minute, hour } from "~/constants/time";
+import { createContext } from "~/contexts/createContext";
+import MyImage from "~/components/MyImage";
 
-type OrderDto = {
-  accessToken: string;
-  market: Market;
-  address: Address;
-  coords: Coords;
-  payment: OrderPayment;
-  shoppingList: ShoppingList;
-  activeSchedule: OrderSchedule;
-};
+function useCartScreen() {
+  const { accessToken } = useAuthContext();
+  const {
+    shoppingList,
+    activeMarket: market,
+    payment,
+    loadLastPayment,
+    activeMarketId,
+    setActiveMarket,
+    setActiveSchedule,
+    setSchedules,
+  } = useCartContext();
+
+  const [profile, setProfile] = useState<Profile>();
+
+  const [tryAgainValue, setTryAgain] = useState(false);
+  const [error, setError] = useState<MyErrors>(null);
+
+  const [buyTooList, setBuyTooList] = useState<Product[]>();
+  const [marketTime, setMarketTime] = useState<MarketTime>();
+
+  const [isDelivery, setIsDelivery] = useState(true);
+  const [isOrdering, setIsOrdering] = useState(false);
+
+  useEffect(() => {
+    if (accessToken) {
+      loadLastPayment(accessToken);
+      api.customers.find(accessToken).then(setProfile);
+    }
+  }, [accessToken, loadLastPayment]);
+
+  useEffect(() => {
+    (async () => {
+      const { market_id: marketId, city_slug: citySlug } = activeMarketId;
+
+      if (!marketId || !citySlug) return;
+      setError(null);
+
+      const products = await api.products.findMany(citySlug, { marketId });
+      setBuyTooList(products);
+    })().catch(() => setError("server"));
+  }, [tryAgainValue, activeMarketId, setError]);
+
+  useEffect(() => {
+    let canceled = false;
+    let updateScheduleTimer: NodeJS.Timer;
+
+    (async () => {
+      const { market_id: marketId, city_slug: citySlug } = activeMarketId;
+
+      if (!marketId || !citySlug) return;
+      setError(null);
+
+      const market = await api.markets.findOne(citySlug, marketId);
+      if (!market) return setError("nothing_market");
+
+      setActiveMarket(market);
+
+      const updateSchedules = () => {
+        const { schedules, marketTime } = getUpdatedSchedule(market);
+
+        if (marketTime.isOpen)
+          setActiveSchedule((activeSchedule) => {
+            const isActiveScheduleAvailable = () =>
+              !!schedules.find((s) => isScheduleEqual(s, activeSchedule));
+
+            return !activeSchedule || !isActiveScheduleAvailable()
+              ? schedules[0]
+              : activeSchedule;
+          });
+        setSchedules(schedules);
+        setMarketTime(marketTime);
+      };
+      updateSchedules();
+
+      const updateSchedulesTask = () => {
+        const minTimeInMs = market.min_time * minute;
+
+        updateScheduleTimer = setTimeout(
+          () => {
+            if (canceled) return;
+
+            updateSchedules();
+            updateSchedulesTask();
+          },
+          hour - ((Date.now() + minTimeInMs) % hour)
+        );
+      };
+      updateSchedulesTask();
+    })().catch(() => setError("server"));
+
+    return () => {
+      canceled = true;
+      if (updateScheduleTimer) clearInterval(updateScheduleTimer);
+    };
+  }, [
+    tryAgainValue,
+    setError,
+    activeMarketId,
+    setActiveMarket,
+    setActiveSchedule,
+    setSchedules,
+  ]);
+
+  const hasInternet = useConnection();
+  const connectErr = hasInternet === false ? "connection" : undefined;
+
+  const orderItems = useMemo(
+    () => shoppingList && [...shoppingList.values()].map((v) => v.item),
+    [shoppingList?.size]
+  );
+
+  return {
+    isLoading: !shoppingList || !market || !marketTime || isOrdering,
+    isEmpty: !shoppingList?.size,
+    error: connectErr ?? error,
+    orderItems,
+    buyTooList,
+    marketTime,
+    needDocument:
+      payment?.method === "PIX" && payment?.inApp && !profile?.document,
+    isDelivery,
+    setIsDelivery,
+    isOrdering,
+    setIsOrdering,
+    tryAgainValue,
+    tryAgain: useCallback(() => setTryAgain((v) => !v), []),
+    setError,
+  };
+}
+
+export const [
+  CartScreenProvider,
+  useCartScreenContext,
+  useCartScreenContextSelector,
+] = createContext(useCartScreen);
+
+function Cart() {
+  const { isLoading, isEmpty, error, tryAgain } = useCartScreenContext();
+
+  if (error)
+    return (
+      <>
+        <MyHeader />
+        <Errors error={error} onPress={tryAgain} />
+      </>
+    );
+
+  if (isLoading) return <Loading />;
+
+  if (isEmpty)
+    return (
+      <>
+        <MyHeader />
+        <View
+          style={[
+            globalStyles.centralizer,
+            { backgroundColor: myColors.background },
+          ]}
+        >
+          <MyText style={{ fontSize: 15, color: myColors.text2 }}>
+            Carrinho vazio
+          </MyText>
+        </View>
+      </>
+    );
+
+  return (
+    <View style={[{ backgroundColor: myColors.background, flex: 1 }]}>
+      <CartHeader />
+      <OrderItems header={<ListHeader />} />
+      <OrderButton />
+      <OrderChangeModal />
+    </View>
+  );
+}
 
 const extraWidth = device.android ? 0 : 10;
 
-const CartHeader = ({
-  isDelivery,
-  setIsDelivery,
-  setIsExiting,
-}: {
-  isDelivery: boolean;
-  setIsDelivery: SetState<boolean>;
-  setIsExiting: SetState<boolean>;
-}) => {
+function CartHeader() {
   const routing = useRouting();
   const { cleanCart } = useCartContext();
+  const { isDelivery, setIsDelivery } = useCartScreenContext();
 
   const emptyCard = () => {
-    setIsExiting(true);
-
     cleanCart();
     routing.goBack();
   };
@@ -127,364 +291,26 @@ const CartHeader = ({
       />
     </HeaderContainer>
   );
-};
+}
 
-type MarketTime = ReturnType<typeof getUpdatedSchedule>["marketTime"];
-
-const getUpdatedSchedule = ({
-  business_hours,
-  min_time,
-  max_time,
-  schedule_mins_interval,
-  schedule_max_days,
-}: Market) => {
-  const date = new Date();
-  const hoursNow = date.getHours();
-  const minsNow = date.getMinutes();
-  const today = date.getDay();
-
-  const { isOpen, nextHour, intervals } = isMarketOpen(
-    business_hours,
-    schedule_max_days,
-  );
-
-  const activeSchedule = (() => {
-    if (!isOpen) return;
-
-    const [{ close_time }] = intervals;
-    const closeHour = +close_time.split(":")[0];
-    const isToday = hoursNow < closeHour;
-
-    const schedule: OrderSchedule = {
-      dayText: isToday ? "Hoje" : "Amanhã",
-      dayNumber: isToday ? today : (today + 1) % 7,
-      hours: `${min_time} - ${max_time} min`,
-      scheduled: false,
-    };
-    return schedule;
-  })();
-
-  const scheduleList = (() => {
-    if (!schedule_mins_interval) return;
-
-    const toMins = (time: string) => {
-      const [hours, mins] = time.split(":");
-      return +hours * 60 + +mins;
-    };
-    const formatMin = (mins: number) =>
-      `${Math.trunc(mins / 60)}:${`${mins % 60}`.padStart(2, "0")}`;
-
-    const delay = 60;
-    const step = schedule_mins_interval;
-
-    const minsList = intervals.map((interval) => {
-      const { day, open_time, close_time } = interval;
-
-      const first = intervals.find((v) => v.day === day);
-      const _delay = interval === first ? delay : 0;
-
-      return {
-        day,
-        mins: range(toMins(open_time) + _delay, toMins(close_time), step),
-      };
-    });
-
-    const deliverableHour = (hoursNow + (minsNow + min_time) / 60) % 12;
-
-    return minsList.reduce((list, { day, mins }) => {
-      const item = mins.slice(1).reduce((list, min, i) => {
-        const hour = min / 60;
-
-        if (hour > deliverableHour || day !== today) {
-          const startTime = formatMin(mins[i] ?? mins[1]);
-          const endTime = formatMin(mins[i + 1]);
-
-          const dayText =
-            {
-              [today]: "Hoje",
-              [(today + 1) % 7]: "Amanhã",
-            }[day] ?? weekDayNames[day];
-
-          return list.concat({
-            dayText,
-            dayNumber: day,
-            hours: `${startTime} - ${endTime}`,
-            scheduled: true,
-          });
-        }
-
-        return list;
-      }, [] as OrderSchedule[]);
-      return list.concat(item);
-    }, [] as OrderSchedule[]);
-  })();
-
-  return {
-    schedules: [...addToArray(activeSchedule), ...(scheduleList ?? [])],
-    marketTime: { isOpen, open_time: nextHour },
-  };
-};
-
-const marketAddress = (a: Market["address"]) => `${a.street}, ${a.number}`;
-
-const Cart = () => {
-  const routing = useRouting();
-  const { isAuth, accessToken } = useAuthContext();
-  const { address } = useAddressContext();
+function ListHeader() {
+  const { isAuth } = useAuthContext();
   const {
-    subtotal,
-    totalOff,
-    total,
-    shoppingList,
-    revalidateCart,
-    cleanCart,
-    activeMarketId,
     activeMarket: market,
-    setActiveMarket,
     payment,
-    setPayment,
-    loadLastPayment,
     activeSchedule,
     setActiveSchedule,
     schedules,
-    setSchedules,
   } = useCartContext();
-  const { createOrder } = useOrderContext();
-  const { alert } = useAlertContext();
-  const [buyTooList, setBuyTooList] = useState<Product[]>();
-  const [marketTime, setMarketTime] = useState<MarketTime>();
-  const [isDelivery, setIsDelivery] = useState(true);
-  const [tryAgain, setTryAgain] = useState(false);
-  const [isExiting, setIsExiting] = useState(false);
-  const [error, setError] = useState<MyErrors>(null);
-  const [profile, setProfile] = useState<Profile>();
+  const { marketTime, buyTooList } = useCartScreenContext();
 
-  const insufficientChange =
-    payment?.change && money.isLess(payment.change, total);
+  if (!market || !marketTime) return null;
 
-  const prodList =
-    shoppingList && [...shoppingList.values()].map((v) => v.item);
-
-  const hasInternet = useConnection();
-  const connectErr = hasInternet === false ? "connection" : undefined;
-
-  useEffect(() => {
-    if (accessToken) {
-      loadLastPayment(accessToken);
-      api.customers.find(accessToken).then(setProfile);
-    }
-  }, [accessToken, loadLastPayment]);
-
-  useEffect(() => {
-    let canceled = false;
-    let updateScheduleTimer: NodeJS.Timer;
-
-    (async () => {
-      const { market_id: marketId, city_slug: citySlug } = activeMarketId;
-
-      if (!marketId || !citySlug) return;
-      setError(null);
-
-      const market = await api.markets.findOne(citySlug, marketId);
-      if (!market) return setError("nothing_market");
-
-      setActiveMarket(market);
-
-      const products = await api.products.findMany(citySlug, { marketId });
-      setBuyTooList(products);
-
-      const updateSchedules = () => {
-        const { schedules, marketTime } = getUpdatedSchedule(market);
-
-        if (marketTime.isOpen)
-          setActiveSchedule((activeSchedule) => {
-            const isActiveScheduleAvailable = () =>
-              !!schedules.find((s) => isScheduleEqual(s, activeSchedule));
-
-            return !activeSchedule || !isActiveScheduleAvailable()
-              ? schedules[0]
-              : activeSchedule;
-          });
-        setSchedules(schedules);
-        setMarketTime(marketTime);
-      };
-      updateSchedules();
-
-      const updateSchedulesTask = () => {
-        const minTimeInMs = market.min_time * minute;
-
-        updateScheduleTimer = setTimeout(
-          () => {
-            if (canceled) return;
-
-            updateSchedules();
-            updateSchedulesTask();
-          },
-          hour - ((Date.now() + minTimeInMs) % hour),
-        );
-      };
-      updateSchedulesTask();
-    })().catch(() => setError("server"));
-
-    return () => {
-      canceled = true;
-      if (updateScheduleTimer) clearInterval(updateScheduleTimer);
-    };
-  }, [
-    tryAgain,
-    activeMarketId,
-    setActiveMarket,
-    setActiveSchedule,
-    setSchedules,
-  ]);
-
-  const _error = connectErr ?? error;
-  if (_error)
-    return (
-      <>
-        <MyHeader />
-        <Errors error={_error} onPress={() => setTryAgain(!tryAgain)} />
-      </>
-    );
-
-  if (!isExiting && prodList && !prodList.length)
-    return (
-      <>
-        <MyHeader />
-        <View
-          style={[
-            globalStyles.centralizer,
-            { backgroundColor: myColors.background },
-          ]}
-        >
-          <MyText style={{ fontSize: 15, color: myColors.text2 }}>
-            Carrinho vazio
-          </MyText>
-        </View>
-      </>
-    );
-
-  if (!market || !marketTime || isExiting) return <Loading />;
-  if (!shoppingList) return null;
-
-  const needDocument =
-    payment?.method === "PIX" && payment?.inApp && !profile?.document;
-
-  const [buttonText, dto] = ((): [string, OrderDto?] => {
-    const isTotalBelowMin = money.isLess(subtotal ?? 0, market.order_min);
-    const orderMin = money.toString(market.order_min, "R$");
-
-    if (!schedules?.length) return ["Fechado"];
-
-    if (!activeSchedule) return ["Escolha um agendamento"];
-
-    if (accessToken == null) return ["Entre ou cadastre-se"];
-
-    if (isTotalBelowMin) return [`Subtotal mínimo de ${orderMin}`];
-
-    if (!address?.street) return ["Escolha um endereço"];
-
-    if (!address.number) return ["Endereço falta o numero"];
-    if (!address.district) return ["Endereço falta o bairro"];
-    if (!address.city) return ["Endereço falta a cidade"];
-    if (!address.state) return ["Endereço falta o estado"];
-    if (!address.coords) return ["Endereço falta coordenadas"];
-
-    if (!payment) return ["Escolha um meio de pagamento"];
-
-    if (needDocument) return ["Salve seu CPF"];
-
-    const dto = {
-      accessToken,
-      market,
-      address,
-      coords: address.coords,
-      payment,
-      shoppingList,
-      activeSchedule,
-    };
-    return ["Fazer pedido", dto];
-  })();
-
-  const MissingInfo = ({ title = "", buttonTitle = "", screen = "" }) => (
-    <>
-      <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
-        <MyText
-          style={{
-            color: myColors.text2,
-            fontSize: 20,
-            fontFamily: myFonts.Medium,
-          }}
-        >
-          Falta pouco!
-        </MyText>
-        <MyText style={{ marginTop: 8, color: myColors.text, fontSize: 16 }}>
-          {title}
-        </MyText>
-        <MyButton
-          title={buttonTitle}
-          screen={screen}
-          buttonStyle={{ marginTop: 12 }}
-        />
-      </View>
-      <MyDivider style={styles.divider} />
-    </>
-  );
-
-  const ListHeader = (
+  return (
     <View>
-      {!isAuth && (
-        <MissingInfo
-          title="Para concluir o pedido, precisamos que você se identifique primeiro."
-          buttonTitle="Entrar ou cadastrar-se"
-          screen="SignIn"
-        />
-      )}
+      <OrderInfo />
 
-      {needDocument && (
-        <MissingInfo
-          title={`Para pagar com Pix pelo ${appOrSite}, salve seu CPF primeiro.`}
-          buttonTitle="Salvar CPF"
-          screen="MyProfile"
-        />
-      )}
-
-      <MyTouchable
-        disabled={!isDelivery}
-        screen="Addresses"
-        style={styles.addressContainer}
-      >
-        <MyIcon
-          name={isDelivery ? "home-map-marker" : "map-marker-radius"}
-          size={28}
-          style={{ marginLeft: -2 }}
-        />
-        <View style={{ marginLeft: 8 }}>
-          <MyText style={styles.topText}>
-            {isDelivery ? "Entregar" : "Retirar"} em
-          </MyText>
-          <MyText style={styles.addressText}>
-            {isDelivery
-              ? !address
-                ? "Carregando..."
-                : stringifyShortAddress(address) || "Escolha um endereço" // `||` filter empty strings
-              : marketAddress(market?.address)}
-          </MyText>
-          {
-            <MyText style={styles.addressSubtext}>
-              {isDelivery ? address?.district : market?.address.district}
-            </MyText>
-          }
-        </View>
-        {isDelivery && (
-          <MyIcon
-            name="chevron-right"
-            size={36}
-            color={myColors.grey2}
-            style={styles.rightIcon}
-          />
-        )}
-      </MyTouchable>
+      <OrderAddress />
 
       <MyDivider style={styles.divider2} />
 
@@ -504,8 +330,8 @@ const Cart = () => {
                       ? `Troco para ${money.toString(payment.change, "R$")}`
                       : "Sem Troco"
                     : payment.inApp
-                      ? `Pelo ${appOrSite}`
-                      : "Na entrega"}
+                    ? `Pelo ${appOrSite}`
+                    : "Na entrega"}
                 </MyText>
               )}
             </View>
@@ -531,8 +357,8 @@ const Cart = () => {
           {activeSchedule
             ? `${activeSchedule.dayText}, ${activeSchedule.hours}`
             : schedules?.length
-              ? "Escolha um agendamento"
-              : ""}
+            ? "Escolha um agendamento"
+            : ""}
         </MyText>
         {!!schedules?.length && (
           <MyButton
@@ -639,6 +465,142 @@ const Cart = () => {
       </View>
 
       <MyDivider style={[styles.divider, { marginBottom: 4 }]} />
+      <OrderTotal />
+      <MyDivider style={[styles.divider, { marginTop: 4 }]} />
+      <MyTouchable screen="Cupons" style={styles.cupomContainer}>
+        <MyIcon name="ticket-percent" size={48} />
+        <View style={styles.cupomTextContainer}>
+          <MyText style={{ color: myColors.text5, fontSize: 16 }}>Cupom</MyText>
+          <MyText style={{ color: myColors.text4 }}>Insira um código</MyText>
+        </View>
+        <MyIcon
+          name="chevron-right"
+          size={36}
+          color={myColors.grey2}
+          style={styles.rightIcon}
+        />
+      </MyTouchable>
+      <MyDivider style={styles.divider} />
+      <View style={styles.prodListTopBar}>
+        <MyImage
+          source={getImageUrl("market", market.market_id)}
+          thumbhash={market.thumbhash}
+          alt=""
+          style={{ borderRadius: 48 }}
+          height={48}
+          width={48}
+        />
+        <MyText style={styles.marketName}>{market.name}</MyText>
+      </View>
+    </View>
+  );
+}
+
+const MissingInfo = ({ title = "", buttonTitle = "", screen = "" }) => (
+  <>
+    <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
+      <MyText
+        style={{
+          color: myColors.text2,
+          fontSize: 20,
+          fontFamily: myFonts.Medium,
+        }}
+      >
+        Falta pouco!
+      </MyText>
+      <MyText style={{ marginTop: 8, color: myColors.text, fontSize: 16 }}>
+        {title}
+      </MyText>
+      <MyButton
+        title={buttonTitle}
+        screen={screen}
+        buttonStyle={{ marginTop: 12 }}
+      />
+    </View>
+    <MyDivider style={styles.divider} />
+  </>
+);
+
+function OrderInfo() {
+  const { isAuth } = useAuthContext();
+  const { needDocument } = useCartScreenContext();
+
+  return (
+    <>
+      {!isAuth && (
+        <MissingInfo
+          title="Para concluir o pedido, precisamos que você se identifique primeiro."
+          buttonTitle="Entrar ou cadastrar-se"
+          screen="SignIn"
+        />
+      )}
+
+      {needDocument && (
+        <MissingInfo
+          title={`Para pagar com Pix pelo ${appOrSite}, salve seu CPF primeiro.`}
+          buttonTitle="Salvar CPF"
+          screen="MyProfile"
+        />
+      )}
+    </>
+  );
+}
+
+function OrderAddress() {
+  const { activeMarket: market } = useCartContext();
+  const { isDelivery } = useCartScreenContext();
+  const { address } = useAddressContext();
+
+  if (!market) return null;
+
+  return (
+    <MyTouchable
+      disabled={!isDelivery}
+      screen="Addresses"
+      style={styles.addressContainer}
+    >
+      <MyIcon
+        name={isDelivery ? "home-map-marker" : "map-marker-radius"}
+        size={28}
+        style={{ marginLeft: -2 }}
+      />
+      <View style={{ marginLeft: 8 }}>
+        <MyText style={styles.topText}>
+          {isDelivery ? "Entregar" : "Retirar"} em
+        </MyText>
+        <MyText style={styles.addressText}>
+          {isDelivery
+            ? !address
+              ? "Carregando..."
+              : stringifyShortAddress(address) || "Escolha um endereço" // `||` filter empty strings
+            : marketAddress(market.address)}
+        </MyText>
+        {
+          <MyText style={styles.addressSubtext}>
+            {isDelivery ? address?.district : market.address.district}
+          </MyText>
+        }
+      </View>
+      {isDelivery && (
+        <MyIcon
+          name="chevron-right"
+          size={36}
+          color={myColors.grey2}
+          style={styles.rightIcon}
+        />
+      )}
+    </MyTouchable>
+  );
+}
+
+function OrderTotal() {
+  const { total, subtotal, totalOff, activeMarket: market } = useCartContext();
+  const { isDelivery } = useCartScreenContext();
+
+  if (!market) return null;
+
+  return (
+    <>
       <View style={styles.priceContainer}>
         <MyText style={styles.priceText}>Subtotal</MyText>
         <AnimatedText style={styles.priceText} distance={10}>
@@ -678,34 +640,93 @@ const Cart = () => {
         <MyText style={styles.priceTotalText}>Total</MyText>
         <AnimatedText style={styles.priceTotalText}>{total}</AnimatedText>
       </View>
-      <MyDivider style={[styles.divider, { marginTop: 4 }]} />
-      <MyTouchable screen="Cupons" style={styles.cupomContainer}>
-        <MyIcon name="ticket-percent" size={48} />
-        <View style={styles.cupomTextContainer}>
-          <MyText style={{ color: myColors.text5, fontSize: 16 }}>Cupom</MyText>
-          <MyText style={{ color: myColors.text4 }}>Insira um código</MyText>
-        </View>
-        <MyIcon
-          name="chevron-right"
-          size={36}
-          color={myColors.grey2}
-          style={styles.rightIcon}
-        />
-      </MyTouchable>
-      <MyDivider style={styles.divider} />
-      <View style={styles.prodListTopBar}>
-        <Image
-          style={{ height: 48, width: 48, borderRadius: 48 }}
-          source={{ uri: getImageUrl("market", market.market_id) }}
-          alt=""
-        />
-        <MyText style={styles.marketName}>{market.name}</MyText>
-      </View>
-    </View>
+    </>
   );
+}
+
+function OrderItems({ header }: { header: ReactElement }) {
+  const { orderItems } = useCartScreenContext();
+
+  return (
+    <ProdListHorizontal
+      hideMarketLogo
+      style={{ paddingBottom: device.iOS ? 98 : 66 }}
+      header={header}
+      data={orderItems}
+    />
+  );
+}
+
+type OrderDto = {
+  accessToken: string;
+  market: Market;
+  address: Address;
+  coords: Coords;
+  payment: OrderPayment;
+  shoppingList: ShoppingList;
+  activeSchedule: OrderSchedule;
+};
+
+function OrderButton() {
+  const routing = useRouting();
+  const { accessToken } = useAuthContext();
+  const { address } = useAddressContext();
+  const {
+    subtotal,
+    total,
+    shoppingList,
+    refetchCartItems,
+    cleanCart,
+    activeMarket: market,
+    payment,
+    setPayment,
+    activeSchedule,
+    schedules,
+  } = useCartContext();
+  const { needDocument, setIsOrdering: setOrdering } = useCartScreenContext();
+  const { alert } = useAlertContext();
+  const { createOrder } = useOrderContext();
+
+  if (!market || !shoppingList) return null;
+
+  const [buttonText, dto] = ((): [string, OrderDto?] => {
+    const isTotalBelowMin = money.isLess(subtotal ?? 0, market.order_min);
+    const orderMin = money.toString(market.order_min, "R$");
+
+    if (!schedules?.length) return ["Fechado"];
+
+    if (!activeSchedule) return ["Escolha um agendamento"];
+
+    if (accessToken == null) return ["Entre ou cadastre-se"];
+
+    if (isTotalBelowMin) return [`Subtotal mínimo de ${orderMin}`];
+
+    if (!address?.street) return ["Escolha um endereço"];
+
+    if (!address.number) return ["Endereço falta o numero"];
+    if (!address.district) return ["Endereço falta o bairro"];
+    if (!address.city) return ["Endereço falta a cidade"];
+    if (!address.state) return ["Endereço falta o estado"];
+    if (!address.coords) return ["Endereço falta coordenadas"];
+
+    if (!payment) return ["Escolha um meio de pagamento"];
+
+    if (needDocument) return ["Salve seu CPF"];
+
+    const dto = {
+      accessToken,
+      market,
+      address,
+      coords: address.coords,
+      payment,
+      shoppingList,
+      activeSchedule,
+    };
+    return ["Fazer pedido", dto];
+  })();
 
   const makeOrder = (total: Money, dto: OrderDto) => {
-    setIsExiting(true);
+    setOrdering(true);
 
     createOrder(dto.accessToken, {
       market_id: market.market_id,
@@ -757,43 +778,138 @@ const Cart = () => {
               onConfirm: () => makeOrder(money(total), dto),
               cancelTitle: "Voltar",
               onCancel: async () => {
-                await revalidateCart();
-                setIsExiting(false);
+                await refetchCartItems();
+                setOrdering(false);
               },
-            },
+            }
           );
 
         alert("Error ao fazer o pedido");
-        setIsExiting(false);
+        setOrdering(false);
       });
   };
 
   return (
-    <View style={[{ backgroundColor: myColors.background, flex: 1 }]}>
-      <CartHeader
-        isDelivery={isDelivery}
-        setIsDelivery={setIsDelivery}
-        setIsExiting={setIsExiting}
-      />
-      <ProdListHorizontal
-        hideMarketLogo
-        style={{ paddingBottom: device.iOS ? 98 : 66 }}
-        header={ListHeader}
-        data={prodList}
-      />
-      <MyButton
-        title={buttonText}
-        disabled={!dto}
-        buttonStyle={styles.buttonContainer}
-        onPress={dto ? () => makeOrder(total, dto) : undefined}
-      />
-      <ChangeModal
-        valuePrefix="Valor da compra aumentou para"
-        state={{ isVisible: !!insufficientChange }}
-      />
-    </View>
+    <MyButton
+      title={buttonText}
+      disabled={!dto}
+      buttonStyle={styles.buttonContainer}
+      onPress={dto ? () => makeOrder(total, dto) : undefined}
+    />
   );
+}
+
+function OrderChangeModal() {
+  const { payment, total } = useCartContext();
+
+  const insufficientChange =
+    payment?.change && money.isLess(payment.change, total);
+
+  return (
+    <ChangeModal
+      valuePrefix="Valor da compra aumentou para"
+      state={{ isVisible: insufficientChange }}
+    />
+  );
+}
+
+type MarketTime = ReturnType<typeof getUpdatedSchedule>["marketTime"];
+
+const getUpdatedSchedule = ({
+  business_hours,
+  min_time,
+  max_time,
+  schedule_mins_interval,
+  schedule_max_days,
+}: Market) => {
+  const date = new Date();
+  const hoursNow = date.getHours();
+  const minsNow = date.getMinutes();
+  const today = date.getDay();
+
+  const { isOpen, nextHour, intervals } = isMarketOpen(
+    business_hours,
+    schedule_max_days
+  );
+
+  const activeSchedule = (() => {
+    if (!isOpen) return;
+
+    const [{ close_time }] = intervals;
+    const closeHour = +close_time.split(":")[0];
+    const isToday = hoursNow < closeHour;
+
+    const schedule: OrderSchedule = {
+      dayText: isToday ? "Hoje" : "Amanhã",
+      dayNumber: isToday ? today : (today + 1) % 7,
+      hours: `${min_time} - ${max_time} min`,
+      scheduled: false,
+    };
+    return schedule;
+  })();
+
+  const scheduleList = (() => {
+    if (!schedule_mins_interval) return;
+
+    const toMins = (time: string) => {
+      const [hours, mins] = time.split(":");
+      return +hours * 60 + +mins;
+    };
+    const formatMin = (mins: number) =>
+      `${Math.trunc(mins / 60)}:${`${mins % 60}`.padStart(2, "0")}`;
+
+    const delay = 60;
+    const step = schedule_mins_interval;
+
+    const minsList = intervals.map((interval) => {
+      const { day, open_time, close_time } = interval;
+
+      const first = intervals.find((v) => v.day === day);
+      const _delay = interval === first ? delay : 0;
+
+      return {
+        day,
+        mins: range(toMins(open_time) + _delay, toMins(close_time), step),
+      };
+    });
+
+    const deliverableHour = (hoursNow + (minsNow + min_time) / 60) % 12;
+
+    return minsList.reduce((list, { day, mins }) => {
+      const item = mins.slice(1).reduce((list, min, i) => {
+        const hour = min / 60;
+
+        if (hour > deliverableHour || day !== today) {
+          const startTime = formatMin(mins[i] ?? mins[1]);
+          const endTime = formatMin(mins[i + 1]);
+
+          const dayText =
+            {
+              [today]: "Hoje",
+              [(today + 1) % 7]: "Amanhã",
+            }[day] ?? weekDayNames[day];
+
+          return list.concat({
+            dayText,
+            dayNumber: day,
+            hours: `${startTime} - ${endTime}`,
+            scheduled: true,
+          });
+        }
+
+        return list;
+      }, [] as OrderSchedule[]);
+      return list.concat(item);
+    }, [] as OrderSchedule[]);
+  })();
+
+  return {
+    schedules: [...addToArray(activeSchedule), ...(scheduleList ?? [])],
+    marketTime: { isOpen, open_time: nextHour },
+  };
 };
+
+const marketAddress = (a: Market["address"]) => `${a.street}, ${a.number}`;
 
 const styles = StyleSheet.create({
   headerContainer: {
@@ -942,4 +1058,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WithToast(Cart);
+export default WithToast(function CartRoot() {
+  return (
+    <CartScreenProvider>
+      <Cart />
+    </CartScreenProvider>
+  );
+});

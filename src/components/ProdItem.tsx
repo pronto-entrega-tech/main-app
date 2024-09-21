@@ -11,30 +11,16 @@ import MyIcon from "./MyIcon";
 import { Product } from "~/core/models";
 import { MotiView } from "moti";
 import MyImage from "./MyImage";
-import { useCartContextSelector } from "~/contexts/CartContext";
+import { useCartContext, useCartContextSelector } from "~/contexts/CartContext";
 
 const ProdItem = (props: {
   item: Product;
   isFavorite?: boolean;
-  quantity?: number;
   style?: StyleProp<ViewStyle>;
   showsMarketLogo: boolean;
-  onPressFav?: () => void;
-  onPressAdd: () => void;
-  onPressRemove: () => void;
 }) => {
-  const {
-    item,
-    /* quantity = 0, */
-    style = {},
-    showsMarketLogo,
-    onPressAdd,
-    onPressRemove,
-  } = props;
+  const { item, style = {}, showsMarketLogo } = props;
   const { price, previous_price, discountText } = calcPrices(item);
-  const quantity = useCartContextSelector(
-    (v) => v.shoppingList?.get(item.item_id)?.quantity ?? 0,
-  );
 
   return (
     <View
@@ -104,39 +90,51 @@ const ProdItem = (props: {
           </MyText>
         </View>
       </MyTouchable>
-      <MotiView
-        transition={{ type: "timing", duration: 200 }}
-        animate={{ width: quantity === 0 ? 32 : 32 * 2 + 16 }}
-        style={[
-          globalStyles.elevation4,
-          globalStyles.darkBorder,
-          styles.addBar,
-          { height: 32 },
-        ]}
-      >
-        <IconButton
-          onPress={onPressAdd}
-          icon="plus"
-          style={styles.add}
-          hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
-        />
-        {quantity !== 0 && (
-          <>
-            <AnimatedText style={styles.centerNumText} distance={10}>
-              {quantity}
-            </AnimatedText>
-            <IconButton
-              onPress={onPressRemove}
-              icon="minus"
-              style={[styles.add, styles.remove]}
-              hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
-            />
-          </>
-        )}
-      </MotiView>
+
+      <QuantityButton item={item} />
     </View>
   );
 };
+
+function QuantityButton({ item }: { item: Product }) {
+  const { addProduct, removeProduct } = useCartContext();
+  const quantity = useCartContextSelector(
+    (v) => v.shoppingList?.get(item.item_id)?.quantity ?? 0
+  );
+
+  return (
+    <MotiView
+      transition={{ type: "timing", duration: 200 }}
+      animate={{ width: quantity === 0 ? 32 : 32 * 2 + 16 }}
+      style={[
+        globalStyles.elevation4,
+        globalStyles.darkBorder,
+        styles.addBar,
+        { height: 32 },
+      ]}
+    >
+      <IconButton
+        onPress={() => addProduct(item)}
+        icon="plus"
+        style={styles.add}
+        hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
+      />
+      {quantity !== 0 && (
+        <>
+          <AnimatedText style={styles.centerNumText} distance={10}>
+            {quantity}
+          </AnimatedText>
+          <IconButton
+            onPress={() => removeProduct(item)}
+            icon="minus"
+            style={[styles.add, styles.remove]}
+            hitSlop={{ top: 9, bottom: 9, left: 9, right: 9 }}
+          />
+        </>
+      )}
+    </MotiView>
+  );
+}
 
 const styles = StyleSheet.create({
   card: {

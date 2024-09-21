@@ -20,6 +20,16 @@ const CenterModal = ({
   style?: StyleProp<ViewStyle>;
   children: ReactNode;
 }) => {
+  if (device.web)
+    return (
+      isVisible && (
+        <View style={[StyleSheet.absoluteFill, styles.container]}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
+          <View style={[styles.modal, style]}>{children}</View>
+        </View>
+      )
+    );
+
   return (
     <AnimatePresence>
       {isVisible && (

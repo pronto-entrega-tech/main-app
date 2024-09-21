@@ -7,7 +7,7 @@ import AnimatedText from "~/components/AnimatedText";
 import MyIcon from "./MyIcon";
 import useRouting from "~/hooks/useRouting";
 import { Money, money } from "~/functions/money";
-import { useCartContext } from "~/contexts/CartContext";
+import { useCartContext, useCartContextSelector } from "~/contexts/CartContext";
 import { MotiView } from "moti";
 
 const screensWOCartBar = ["OrderDetails", "Chat"];
@@ -18,10 +18,10 @@ const getTranslateValue = (subtotal: Money, screen: string) =>
   screensWOCartBar.includes(screen) || money.isEqual(subtotal, 0) ? hiddenY : 0;
 
 const CartBar = ({ toped = false }: { toped?: boolean }) => {
-  const { subtotal } = useCartContext();
   const { screen, navigate } = useRouting();
-
-  const translateY = getTranslateValue(subtotal, screen);
+  const translateY = useCartContextSelector((v) =>
+    getTranslateValue(v.subtotal, screen)
+  );
 
   return (
     <View
@@ -58,13 +58,19 @@ const CartBar = ({ toped = false }: { toped?: boolean }) => {
               style={styles.iconCart}
             />
             <MyText style={styles.textCart}>Ver carrinho</MyText>
-            <AnimatedText style={styles.priceCart}>{subtotal}</AnimatedText>
+            <Subtotal />
           </View>
         </MyTouchable>
       </MotiView>
     </View>
   );
 };
+
+function Subtotal() {
+  const { subtotal } = useCartContext();
+
+  return <AnimatedText style={styles.priceCart}>{subtotal}</AnimatedText>;
+}
 
 const styles = StyleSheet.create({
   cartBarContainer: {

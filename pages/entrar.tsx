@@ -134,8 +134,7 @@ const SignIn = () => {
       buttonStyle={[styles.button, { borderColor: myColors.grey_1 }]}
       onPress={() => {
         closeModal();
-        authIsWipAlert();
-        /* routing.navigate('EmailSignIn'); */
+        routing.navigate("EmailSignIn");
       }}
     />
   );

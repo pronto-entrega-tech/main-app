@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAlertContext } from "~/contexts/AlertContext";
 import { calcSubtotal } from "~/functions/calcSubtotal";
 import { pick } from "~/functions/converter";
@@ -61,24 +61,27 @@ function useCart() {
     setActiveMarketId({});
   };
 
-  const setPayment = (v: OrderPayment | null) => {
+  const setPayment = useCallback((v: OrderPayment | null) => {
     _setPayment(v);
     saveLastPayment(v);
-  };
+  }, []);
 
-  const loadLastPayment = async (token: string) => {
-    if (payment !== undefined) return;
+  const loadLastPayment = useCallback(
+    async (token: string) => {
+      if (payment !== undefined) return;
 
-    const [lastPayment, paymentCards] = await Promise.all([
-      getLastPayment(),
-      api.paymentCards.find(token),
-    ]);
+      const [lastPayment, paymentCards] = await Promise.all([
+        getLastPayment(),
+        api.paymentCards.find(token),
+      ]);
 
-    const hasCardSaved = () =>
-      paymentCards.find((c) => c.id === lastPayment?.cardId);
+      const hasCardSaved = () =>
+        paymentCards.find((c) => c.id === lastPayment?.cardId);
 
-    if (!lastPayment?.cardId || hasCardSaved()) _setPayment(lastPayment);
-  };
+      if (!lastPayment?.cardId || hasCardSaved()) _setPayment(lastPayment);
+    },
+    [payment]
+  );
 
   const addProduct = (item: Product) => {
     const shoppingList = shoppingListRef.current;
@@ -97,7 +100,7 @@ function useCart() {
             ]);
             setShoppingList(newShoppingList);
           },
-        },
+        }
       );
 
     const value = shoppingList?.get(item.item_id)?.quantity ?? 0;
@@ -152,28 +155,30 @@ function useCart() {
       });
       setShoppingList(new Map(newList));
     },
-    [setShoppingList],
+    [setShoppingList]
   );
 
   useEffect(() => {
     getActiveMarketId().then(_setActiveMarketId);
+  }, []);
 
+  useEffect(() => {
     getShoppingList().then((list) => {
       _setShoppingList(list);
       updateTotal(list);
 
       refetchCartItems(list);
     });
-  }, [setShoppingList, refetchCartItems]);
+  }, [refetchCartItems]);
 
   return {
     subtotal,
     totalOff,
     total,
     shoppingList,
-    revalidateCart: useCallback(
+    refetchCartItems: useCallback(
       () => shoppingList && refetchCartItems(shoppingList),
-      [shoppingList, refetchCartItems],
+      [shoppingList, refetchCartItems]
     ),
     cleanCart: useCallback(cleanCart, [setShoppingList]),
     addProduct: useCallback(addProduct, [
@@ -191,8 +196,8 @@ function useCart() {
     activeMarket,
     setActiveMarket,
     payment,
-    setPayment: useCallback(setPayment, []),
-    loadLastPayment: useCallback(loadLastPayment, [payment]),
+    setPayment,
+    loadLastPayment,
     activeSchedule,
     setActiveSchedule,
     schedules,

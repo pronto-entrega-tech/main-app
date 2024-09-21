@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Share, StyleSheet, View } from "react-native";
-import { Image } from "react-native-elements/dist/image/Image";
 import { device, myColors, myFonts } from "~/constants";
 import MyTouchable from "~/components/MyTouchable";
 import ProdList from "~/components/ProdList";
@@ -25,6 +24,7 @@ import { Market, Product } from "~/core/models";
 import MyHeader from "~/components/MyHeader";
 import { useAddressContext } from "~/contexts/AddressContext";
 import { api } from "~/services/api";
+import MyImage from "~/components/MyImage";
 
 const useIsProductRoute = () => useRouting().screen.startsWith("Product");
 
@@ -99,7 +99,7 @@ const MarketFeedBody = (props: MarketFeedProps) => {
 
       setData({ market, products });
     })().catch((err) =>
-      setError(api.isError("NotFound", err) ? "nothing_market" : "server"),
+      setError(api.isError("NotFound", err) ? "nothing_market" : "server")
     );
   }, [tryAgain, market, params.city, marketId]);
 
@@ -134,10 +134,13 @@ const MarketFeedBody = (props: MarketFeedProps) => {
         style={[styles.headerContainer, { marginTop: isProductRoute ? 12 : 0 }]}
       >
         <View style={{ paddingTop: 2 }}>
-          <Image
-            source={{ uri: getImageUrl("market", market.market_id) }}
+          <MyImage
+            source={getImageUrl("market", market.market_id)}
             alt=""
-            containerStyle={{ borderRadius: 8, height: 128, width: 128 }}
+            thumbhash={market.thumbhash}
+            style={{ borderRadius: 8 }}
+            height={128}
+            width={128}
           />
           {market.rating ? (
             <View style={styles.ratingContainer}>

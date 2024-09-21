@@ -20,6 +20,7 @@ type OnlyButton = {
    * To navigate use the `screen` instead, so this button become a link.
    */
   onPress?: (event: GestureResponderEvent) => void;
+  onPressIn?: (event: GestureResponderEvent) => void;
 
   screen?: undefined;
   params?: undefined;
@@ -36,6 +37,7 @@ type OnlyLink = {
   params?: Params;
 
   onPress?: undefined;
+  onPressIn?: undefined;
 };
 
 export type ButtonOrLink<T> = (OnlyButton | OnlyLink) & T;
@@ -65,10 +67,11 @@ const useTryRouting = () => {
 
 const MyTouchable = ({
   onPress,
+  onPressIn,
   screen,
   params,
   children,
-  disabled = !onPress && !screen,
+  disabled = !onPress && !onPressIn && !screen,
   hitSlop,
   style,
   hoverStyle,
@@ -101,6 +104,7 @@ const MyTouchable = ({
     ) : (
       <Pressable
         {...hoverBind}
+        onPressIn={onPressIn}
         onPress={onPress}
         disabled={disabled}
         style={fullStyle}
@@ -117,6 +121,7 @@ const MyTouchable = ({
       <TouchableHighlight
         underlayColor="#68b5f2"
         onPress={onPressOrNav}
+        onPressIn={onPressIn}
         disabled={disabled}
         hitSlop={hitSlop}
         style={style}
@@ -126,6 +131,7 @@ const MyTouchable = ({
     ) : (
       <TouchableOpacity
         onPress={onPressOrNav}
+        onPressIn={onPressIn}
         disabled={disabled}
         hitSlop={hitSlop}
         style={style}
@@ -139,6 +145,7 @@ const MyTouchable = ({
   return (
     <Pressable
       onPress={onPressOrNav}
+      onPressIn={onPressIn}
       disabled={disabled}
       hitSlop={hitSlop}
       android_ripple={{
