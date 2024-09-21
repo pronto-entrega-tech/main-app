@@ -57,6 +57,7 @@ import { useAlertContext } from "~/contexts/AlertContext";
 import { minute, hour } from "~/constants/time";
 import { createContext } from "~/contexts/createContext";
 import MyImage from "~/components/MyImage";
+import { PageTitle } from "~/components/PageTitle";
 
 function useCartScreen() {
   const { accessToken } = useAuthContext();
@@ -194,6 +195,15 @@ export const [
   useCartScreenContext,
   useCartScreenContextSelector,
 ] = createContext(useCartScreen);
+
+function CartScreen() {
+  return (
+    <CartScreenProvider>
+      <PageTitle title="Carrinho" />
+      <Cart />
+    </CartScreenProvider>
+  );
+}
 
 function Cart() {
   const { isLoading, isEmpty, error, tryAgain } = useCartScreenContext();
@@ -1058,10 +1068,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WithToast(function CartRoot() {
-  return (
-    <CartScreenProvider>
-      <Cart />
-    </CartScreenProvider>
-  );
-});
+export default WithToast(CartScreen);

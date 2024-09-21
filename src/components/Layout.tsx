@@ -4,6 +4,7 @@ import CartBar from "~/components/CartBar";
 import NavigationBar from "~/components/NavigationBar";
 import myColors from "~/constants/myColors";
 import device from "~/constants/device";
+import Head from "next/head";
 
 const baseStyle = {
   display: "flex",

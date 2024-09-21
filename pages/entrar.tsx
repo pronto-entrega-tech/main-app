@@ -18,6 +18,7 @@ import { objectConditional } from "~/functions/conditionals";
 import { api } from "~/services/api";
 import { useUpdateAddress } from "~/hooks/useAddress";
 import { useAlertContext } from "~/contexts/AlertContext";
+import { PageTitle } from "~/components/PageTitle";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -188,6 +189,8 @@ const SignIn = () => {
 
   return (
     <View style={device.web ? { height: 630 } : styles.container}>
+      <PageTitle title="Entrar" />
+
       <View style={[styles.container, globalStyles.notch]}>
         <Image {...images.pineapple} style={styles.pineapple} alt="" />
         <Image {...images.tomato} style={styles.tomato} alt="" />

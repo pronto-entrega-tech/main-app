@@ -11,6 +11,7 @@ import { arrayConditional } from "~/functions/conditionals";
 import Loading from "~/components/Loading";
 import { useAuthContext } from "~/contexts/AuthContext";
 import { api } from "~/services/api";
+import { PageTitle } from "~/components/PageTitle";
 
 const Profile = () => {
   const [profileName, setProfileName] = useState<string>();
@@ -22,7 +23,7 @@ const Profile = () => {
         api.customers
           .find(accessToken)
           .then(({ name }) => setProfileName(name));
-    }, [accessToken]),
+    }, [accessToken])
   );
 
   if (isAuth === undefined || (isAuth && !profileName)) return <Loading />;
@@ -103,8 +104,8 @@ const Profile = () => {
                 index === 0
                   ? styles.top
                   : index === row.length - 1
-                    ? styles.bottom
-                    : styles.mid,
+                  ? styles.bottom
+                  : styles.mid,
               ]}
               titleStyle={{
                 color: myColors.text2,
@@ -120,23 +121,26 @@ const Profile = () => {
   ));
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      style={globalStyles.notch}
-      contentContainerStyle={{ paddingBottom: 68 }}
-    >
-      <>
-        <View style={styles.header}>
-          <MyIcon
-            name="account-circle-outline"
-            color={myColors.grey4}
-            size={100}
-          />
-          <MyText style={styles.name}>{profileName ?? "Convidado"}</MyText>
-        </View>
-        {cards}
-      </>
-    </ScrollView>
+    <>
+      <PageTitle title="Perfil" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={globalStyles.notch}
+        contentContainerStyle={{ paddingBottom: 68 }}
+      >
+        <>
+          <View style={styles.header}>
+            <MyIcon
+              name="account-circle-outline"
+              color={myColors.grey4}
+              size={100}
+            />
+            <MyText style={styles.name}>{profileName ?? "Convidado"}</MyText>
+          </View>
+          {cards}
+        </>
+      </ScrollView>
+    </>
   );
 };
 

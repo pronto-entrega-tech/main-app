@@ -11,6 +11,17 @@ import { useAlertContext } from "~/contexts/AlertContext";
 import { range } from "~/functions/range";
 import useRouting from "~/hooks/useRouting";
 import { api } from "~/services/api";
+import { PageTitle } from "~/components/PageTitle";
+import MyHeader from "~/components/MyHeader";
+
+export default function EmailSignInScreen() {
+  return (
+    <>
+      <MyHeader />
+      <EmailSignIn />
+    </>
+  );
+}
 
 const EmailSignIn = () => {
   const { navigate } = useRouting();
@@ -78,6 +89,7 @@ const EmailSignIn = () => {
   const data = (
     [
       {
+        pageTitle: "Entrar email",
         title: "Insira seu email",
         autoComplete: "email",
         onPress: async () => {
@@ -88,10 +100,12 @@ const EmailSignIn = () => {
         },
       },
       {
+        pageTitle: "Código de verificação",
         title: "Insira o código de verificação",
         component: codeInput,
       },
       {
+        pageTitle: "Cadastro",
         title: "Insira seu nome",
         autoComplete: "name",
         onPress: async () => {
@@ -117,6 +131,7 @@ const EmailSignIn = () => {
 
   return (
     <View style={[globalStyles.centralizer, { paddingHorizontal: 24 }]}>
+      <PageTitle title={data.pageTitle} />
       <MyText style={{ fontSize: 18, marginBottom: 36 }}>{data.title}</MyText>
       {data.component ?? (
         <>
@@ -167,5 +182,3 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
 });
-
-export default EmailSignIn;

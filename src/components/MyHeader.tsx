@@ -6,6 +6,7 @@ import IconButton from "./IconButton";
 import MyDivider from "./MyDivider";
 import MyText from "./MyText";
 import HeaderContainer from "./HeaderContainer";
+import { PageTitle } from "./PageTitle";
 
 const MyHeader = ({
   title,
@@ -26,6 +27,8 @@ const MyHeader = ({
 }) => {
   return (
     <HeaderContainer>
+      {title && <PageTitle title={title} />}
+
       <View style={[styles.header, !notchLess && globalStyles.notch]}>
         {!goBackLess && <GoBackButton onGoBack={onGoBack} />}
         <MyText style={styles.textHeader}>{title}</MyText>
