@@ -51,7 +51,7 @@ const Filter = () => {
   const [orderBy, setOrderBy] = useState(ItemOrderBy.Default);
   const [distance, setDistance] = useState(defaultDistance);
   const [categories, setCategories] = useState<string[]>(
-    toArray(routing.params.category) ?? [],
+    toArray(routing.params.category) ?? []
   );
 
   const chipsBar = categoriesArray.map((category, index) => {
@@ -116,10 +116,20 @@ const Filter = () => {
           <MyText style={styles.distance}>Distância</MyText>
           <View style={{ flexDirection: "row" }}>
             <MyText style={styles.distance2}>Menos de </MyText>
-            <AnimatedText style={styles.distance2} distance={10}>
+            <AnimatedText
+              style={[
+                styles.distance2,
+                {
+                  lineHeight: device.web ? 18 : 10,
+                  textAlign: "right",
+                  width: distance < 10 ? 8 : 16,
+                },
+              ]}
+              distance={10}
+            >
               {distance}
             </AnimatedText>
-            <MyText style={styles.distance2}>km</MyText>
+            <MyText style={[styles.distance2]}>km</MyText>
           </View>
         </View>
         <View style={device.web ? { height: 28 } : {}}>
