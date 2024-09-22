@@ -34,7 +34,7 @@ const useRouting = (): MyRouting => {
   const { params, path, name } = useRoute();
 
   const getScreenName = (
-    s: StackNavigationState<any>["routes"][number]["state"]
+    s: StackNavigationState<any>["routes"][number]["state"],
   ): string => {
     if (s?.index === undefined) throw new Error();
 
@@ -45,7 +45,7 @@ const useRouting = (): MyRouting => {
   return {
     navigate: useCallback(
       (...args) => navigate(...validate(...args)),
-      [navigate]
+      [navigate],
     ),
     push: useCallback((...args) => push(...validate(...args)), [push]),
     replace: useCallback((...args) => replace(...validate(...args)), [replace]),

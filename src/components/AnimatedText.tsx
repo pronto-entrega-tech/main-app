@@ -61,16 +61,16 @@ const AnimatedText = ({
           if (finished) {
             sharedText.value = text;
           }
-        }
+        },
       ),
       withTiming(isGoingUp ? distance : -distance, { duration: 0 }),
-      withTiming(0, { duration, easing: Easing.out(Easing.cubic) })
+      withTiming(0, { duration, easing: Easing.out(Easing.cubic) }),
     );
     cancelAnimation(opacity);
     opacity.value = 1;
     opacity.value = withSequence(
       withTiming(0, { duration, easing: Easing.out(Easing.cubic) }),
-      withTiming(1, { duration, easing: Easing.out(Easing.cubic) })
+      withTiming(1, { duration, easing: Easing.out(Easing.cubic) }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
@@ -119,7 +119,7 @@ function WebAnimatedText({
     (currentValue) => {
       if (ref.current) ref.current.textContent = currentValue;
     },
-    [sharedText]
+    [sharedText],
   );
 
   return (

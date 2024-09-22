@@ -36,7 +36,7 @@ const nextConfig = withBundleAnalyzer(
       "moti",
     ],
     experimental: { forceSwcTransforms: true },
-  })
+  }),
 );
 
 module.exports = withPlugins([withExpo, withBundleAnalyzer], nextConfig);

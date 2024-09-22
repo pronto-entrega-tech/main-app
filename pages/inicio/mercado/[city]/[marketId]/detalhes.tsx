@@ -38,7 +38,7 @@ const MarketDetailsBody = (props: MarketDetailsProps) => {
       .findOne(params.city, params.marketId)
       .then(setMarket)
       .catch((err) =>
-        setError(api.isError("NotFound", err) ? "nothing_market" : "server")
+        setError(api.isError("NotFound", err) ? "nothing_market" : "server"),
       );
   }, [tryAgain, market, params.city, params.marketId]);
 

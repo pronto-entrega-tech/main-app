@@ -99,7 +99,7 @@ const MarketFeedBody = (props: MarketFeedProps) => {
 
       setData({ market, products });
     })().catch((err) =>
-      setError(api.isError("NotFound", err) ? "nothing_market" : "server")
+      setError(api.isError("NotFound", err) ? "nothing_market" : "server"),
     );
   }, [tryAgain, market, params.city, marketId]);
 

@@ -26,9 +26,9 @@ export const AppContexts = (p: { children: ReactNode }) =>
 
 const nestComponents = (
   children: ReactNode,
-  components: ComponentType<{ children: ReactNode }>[]
+  components: ComponentType<{ children: ReactNode }>[],
 ) =>
   components.reduceRight(
     (previous, Component) => <Component>{previous}</Component>,
-    children
+    children,
   );

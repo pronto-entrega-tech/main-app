@@ -122,7 +122,7 @@ const ProductDetailsHeader = ({ setMarketId }: ProductDetailsProps) => {
 const QuantityButton = ({ product }: { product: Product }) => {
   const { addProduct, removeProduct } = useCartContext();
   const quantity = useCartContextSelector(
-    (v) => v.shoppingList?.get(product.item_id)?.quantity ?? 0
+    (v) => v.shoppingList?.get(product.item_id)?.quantity ?? 0,
   );
 
   return (

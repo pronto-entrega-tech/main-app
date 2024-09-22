@@ -144,7 +144,7 @@ function useCartScreen() {
             updateSchedules();
             updateSchedulesTask();
           },
-          hour - ((Date.now() + minTimeInMs) % hour)
+          hour - ((Date.now() + minTimeInMs) % hour),
         );
       };
       updateSchedulesTask();
@@ -168,7 +168,7 @@ function useCartScreen() {
 
   const orderItems = useMemo(
     () => shoppingList && [...shoppingList.values()].map((v) => v.item),
-    [shoppingList?.size]
+    [shoppingList?.size],
   );
 
   return {
@@ -340,8 +340,8 @@ function ListHeader() {
                       ? `Troco para ${money.toString(payment.change, "R$")}`
                       : "Sem Troco"
                     : payment.inApp
-                    ? `Pelo ${appOrSite}`
-                    : "Na entrega"}
+                      ? `Pelo ${appOrSite}`
+                      : "Na entrega"}
                 </MyText>
               )}
             </View>
@@ -367,8 +367,8 @@ function ListHeader() {
           {activeSchedule
             ? `${activeSchedule.dayText}, ${activeSchedule.hours}`
             : schedules?.length
-            ? "Escolha um agendamento"
-            : ""}
+              ? "Escolha um agendamento"
+              : ""}
         </MyText>
         {!!schedules?.length && (
           <MyButton
@@ -791,7 +791,7 @@ function OrderButton() {
                 await refetchCartItems();
                 setOrdering(false);
               },
-            }
+            },
           );
 
         alert("Error ao fazer o pedido");
@@ -839,7 +839,7 @@ const getUpdatedSchedule = ({
 
   const { isOpen, nextHour, intervals } = isMarketOpen(
     business_hours,
-    schedule_max_days
+    schedule_max_days,
   );
 
   const activeSchedule = (() => {

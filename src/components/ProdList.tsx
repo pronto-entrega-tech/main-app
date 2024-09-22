@@ -46,7 +46,7 @@ const ProdList = (props: {
   } = props;
 
   const shoppingListLoaded = useCartContextSelector(
-    (v) => v.shoppingList != null
+    (v) => v.shoppingList != null,
   );
 
   const { address } = useAddressContext();
@@ -96,7 +96,7 @@ const ProdList = (props: {
         setServerErr("server");
       }
     },
-    [listData, connectErr, city, searchParams, address]
+    [listData, connectErr, city, searchParams, address],
   );
 
   const searchParamsString = JSON.stringify(searchParams);

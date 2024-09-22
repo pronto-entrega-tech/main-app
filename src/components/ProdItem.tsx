@@ -99,7 +99,7 @@ const ProdItem = (props: {
 function QuantityButton({ item }: { item: Product }) {
   const { addProduct, removeProduct } = useCartContext();
   const quantity = useCartContextSelector(
-    (v) => v.shoppingList?.get(item.item_id)?.quantity ?? 0
+    (v) => v.shoppingList?.get(item.item_id)?.quantity ?? 0,
   );
 
   return (

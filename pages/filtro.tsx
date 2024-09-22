@@ -51,7 +51,7 @@ const Filter = () => {
   const [orderBy, setOrderBy] = useState(ItemOrderBy.Default);
   const [distance, setDistance] = useState(defaultDistance);
   const [categories, setCategories] = useState<string[]>(
-    toArray(routing.params.category) ?? []
+    toArray(routing.params.category) ?? [],
   );
 
   const chipsBar = categoriesArray.map((category, index) => {

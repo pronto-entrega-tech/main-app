@@ -20,7 +20,7 @@ const getTranslateValue = (subtotal: Money, screen: string) =>
 const CartBar = ({ toped = false }: { toped?: boolean }) => {
   const { screen, navigate } = useRouting();
   const translateY = useCartContextSelector((v) =>
-    getTranslateValue(v.subtotal, screen)
+    getTranslateValue(v.subtotal, screen),
   );
 
   return (

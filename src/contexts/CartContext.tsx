@@ -80,7 +80,7 @@ function useCart() {
 
       if (!lastPayment?.cardId || hasCardSaved()) _setPayment(lastPayment);
     },
-    [payment]
+    [payment],
   );
 
   const addProduct = (item: Product) => {
@@ -100,7 +100,7 @@ function useCart() {
             ]);
             setShoppingList(newShoppingList);
           },
-        }
+        },
       );
 
     const value = shoppingList?.get(item.item_id)?.quantity ?? 0;
@@ -155,7 +155,7 @@ function useCart() {
       });
       setShoppingList(new Map(newList));
     },
-    [setShoppingList]
+    [setShoppingList],
   );
 
   useEffect(() => {
@@ -178,7 +178,7 @@ function useCart() {
     shoppingList,
     refetchCartItems: useCallback(
       () => shoppingList && refetchCartItems(shoppingList),
-      [shoppingList, refetchCartItems]
+      [shoppingList, refetchCartItems],
     ),
     cleanCart: useCallback(cleanCart, [setShoppingList]),
     addProduct: useCallback(addProduct, [

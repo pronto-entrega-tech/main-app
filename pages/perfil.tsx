@@ -23,7 +23,7 @@ const Profile = () => {
         api.customers
           .find(accessToken)
           .then(({ name }) => setProfileName(name));
-    }, [accessToken])
+    }, [accessToken]),
   );
 
   if (isAuth === undefined || (isAuth && !profileName)) return <Loading />;
@@ -104,8 +104,8 @@ const Profile = () => {
                 index === 0
                   ? styles.top
                   : index === row.length - 1
-                  ? styles.bottom
-                  : styles.mid,
+                    ? styles.bottom
+                    : styles.mid,
               ]}
               titleStyle={{
                 color: myColors.text2,
