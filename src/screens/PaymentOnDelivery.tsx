@@ -13,6 +13,8 @@ import { Money, money } from "~/functions/money";
 import useRouting from "~/hooks/useRouting";
 import CenterModal from "~/components/CenterModal";
 import { ImageSource, paymentImages } from "~/constants/images";
+import { PaymentMethod } from "~/core/models";
+import { match } from "ts-pattern";
 
 const PaymentOnDelivery = () => {
   const { replace, pop, goBack } = useRouting();
@@ -31,7 +33,10 @@ const PaymentOnDelivery = () => {
     paymentImages[getPaymentTitle(title)];
 
   const getPaymentMethod = (v: string) =>
-    ({ Dinheiro: "CASH", Pix: "PIX" })[v] ?? "CARD";
+    match(v)
+      .with("Dinheiro", () => "CASH" as const)
+      .with("Pix", () => "PIX" as const)
+      .otherwise(() => "CARD" as const);
 
   const _payments = activeMarket.payments_accepted.reduce(
     (o, name) => {
@@ -61,7 +66,7 @@ const PaymentOnDelivery = () => {
     [] as (
       | { group: string }
       | {
-          payment: { description: string; payment_method: string };
+          payment: { description: string; payment_method: PaymentMethod };
           onPress?: () => void;
           icon: ImageSource | undefined;
           text: string;
@@ -79,8 +84,8 @@ const PaymentOnDelivery = () => {
 
     const saveInCard = () => {
       setPayment({
-        ...item.payment,
-        method: "CARD",
+        method: item.payment.payment_method,
+        description: item.payment.description,
         inApp: false,
       });
       pop();
@@ -149,7 +154,7 @@ export const ChangeModal = ({
       change,
     });
     const back = () => {
-      routing.pop();
+      /* routing.pop(); */
       routing.goBack("Cart");
     };
 

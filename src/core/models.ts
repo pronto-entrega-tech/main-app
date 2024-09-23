@@ -251,7 +251,7 @@ export type Order = Omit<CreateOrder, "items" | "card_id"> & {
     in_app: boolean;
     method: PaymentMethod;
     description: string;
-    change: Money;
+    change?: Money;
     pix_code?: string;
     pix_expires_at?: Date;
   };
@@ -278,19 +278,28 @@ export type Order = Omit<CreateOrder, "items" | "card_id"> & {
 
 export type OrderItem = {
   prod_id: string | null;
-  product: {
-    name: string;
-    brand: string;
-    quantity: string;
-  };
   quantity: string;
   price: string;
-  is_kit: boolean;
-  item_details: OrderItemDetails[];
-};
+} & (
+  | {
+      is_kit: false;
+      product: {
+        is_kit: false;
+        name: string;
+        brand: string;
+        quantity: string;
+      };
+      details: null;
+    }
+  | {
+      is_kit: true;
+      product: null;
+      details: OrderItemDetails[];
+    }
+);
 
 type OrderItemDetails = {
-  prod_id: string;
+  product: { name: string };
   quantity: string;
 };
 
@@ -321,7 +330,7 @@ export type OrderSchedule = {
   scheduled: boolean;
 };
 
-type PaymentMethod = "CASH" | "CARD" | "PIX";
+export type PaymentMethod = "CASH" | "CARD" | "PIX";
 
 type ChatMessageAuthor = "CUSTOMER" | "MARKET";
 

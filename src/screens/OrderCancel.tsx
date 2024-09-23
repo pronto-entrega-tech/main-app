@@ -1,7 +1,7 @@
 import React from "react";
 import { OrderPages } from "@pages/compras/[marketId]/[orderId]";
 import { useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { serverError } from "~/components/Errors";
 import Loading from "~/components/Loading";
@@ -87,17 +87,16 @@ const CancelPageBody = ({
           onValueChange={setReason as SetState<string>}
         >
           {reasons.map(([value, title], i) => (
-            <>
+            <View key={value}>
               {!!i && <MyDivider style={styles.smallDivider} />}
               <RadioButton.Item
-                key={value}
                 label={title}
                 value={value}
                 color={myColors.primaryColor}
                 uncheckedColor={myColors.grey}
                 labelStyle={{ color: myColors.text4 }}
               />
-            </>
+            </View>
           ))}
         </RadioButton.Group>
         <MyInput

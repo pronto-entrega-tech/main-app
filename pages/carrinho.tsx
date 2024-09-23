@@ -340,8 +340,8 @@ function ListHeader() {
                       ? `Troco para ${money.toString(payment.change, "R$")}`
                       : "Sem Troco"
                     : payment.inApp
-                      ? `Pelo ${appOrSite}`
-                      : "Na entrega"}
+                    ? `Pelo ${appOrSite}`
+                    : "Na entrega"}
                 </MyText>
               )}
             </View>
@@ -367,8 +367,8 @@ function ListHeader() {
           {activeSchedule
             ? `${activeSchedule.dayText}, ${activeSchedule.hours}`
             : schedules?.length
-              ? "Escolha um agendamento"
-              : ""}
+            ? "Escolha um agendamento"
+            : ""}
         </MyText>
         {!!schedules?.length && (
           <MyButton

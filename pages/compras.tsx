@@ -51,8 +51,11 @@ const OrdersBody = () => {
     socket.on("orders", (newOrder: Partial<Order>) => {
       const getNew = (o: Order) => validateOrder({ ...(o ?? {}), ...newOrder });
 
-      setOrders((orders) =>
-        orders?.map((o) => (o.order_id === newOrder.order_id ? getNew(o) : o)),
+      setOrders(
+        (orders) =>
+          orders?.map((o) =>
+            o.order_id === newOrder.order_id ? getNew(o) : o,
+          ),
       );
     });
 
@@ -75,20 +78,22 @@ const OrdersBody = () => {
     const statusMsg = isCompleted(item)
       ? "Pedido concluído"
       : isCanceled(item)
-        ? "Pedido cancelado"
-        : "Pedido em andamento";
+      ? "Pedido cancelado"
+      : "Pedido em andamento";
 
     const timeMsg = isCompleted(item)
       ? "Concluído em"
       : isCanceled(item)
-        ? "Cancelado em"
-        : item.is_scheduled
-          ? "Agendado para"
-          : "Previsão de entrega";
+      ? "Cancelado em"
+      : item.is_scheduled
+      ? "Agendado para"
+      : "Previsão de entrega";
 
     const time =
       isCompleted(item) || isCanceled(item)
-        ? lightFormat(item.finished_at ?? fail(), "dd/MM/yy")
+        ? item.finished_at
+          ? lightFormat(item.finished_at, "dd/MM/yy")
+          : ""
         : formatDeliveryTime(item);
 
     return (

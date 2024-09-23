@@ -8,20 +8,18 @@ import MyIcon from "./MyIcon";
 import useRouting from "~/hooks/useRouting";
 import { Money, money } from "~/functions/money";
 import { useCartContext, useCartContextSelector } from "~/contexts/CartContext";
-import { MotiView } from "moti";
+import { AnimatePresence, MotiView } from "moti";
 
 const screensWOCartBar = ["OrderDetails", "Chat"];
 
 const hiddenY = 50 + 24;
 
-const getTranslateValue = (subtotal: Money, screen: string) =>
-  screensWOCartBar.includes(screen) || money.isEqual(subtotal, 0) ? hiddenY : 0;
+const shouldShow = (subtotal: Money, screen: string) =>
+  !screensWOCartBar.includes(screen) && !money.isEqual(subtotal, 0);
 
 const CartBar = ({ toped = false }: { toped?: boolean }) => {
   const { screen, navigate } = useRouting();
-  const translateY = useCartContextSelector((v) =>
-    getTranslateValue(v.subtotal, screen),
-  );
+  const show = useCartContextSelector((v) => shouldShow(v.subtotal, screen));
 
   return (
     <View
@@ -30,38 +28,46 @@ const CartBar = ({ toped = false }: { toped?: boolean }) => {
         toped ? { marginBottom: device.iPhoneNotch ? 54 + 34 : 54 } : {},
       ]}
     >
-      <MotiView
-        transition={{ type: "timing", duration: 200 }}
-        animate={{ translateY }}
-      >
-        <MyTouchable
-          solid
-          style={[
-            styles.cartBarTouchable,
-            !toped && device.iPhoneNotch ? { height: 50 + 24 } : { height: 50 },
-          ]}
-          onPress={() => navigate("Cart")}
-        >
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: !toped && device.iPhoneNotch ? 24 : 0,
-            }}
+      <AnimatePresence>
+        {show && (
+          <MotiView
+            transition={{ type: "timing", duration: 200 }}
+            from={{ translateY: hiddenY }}
+            animate={{ translateY: 0 }}
+            exit={{ translateY: hiddenY }}
           >
-            <MyIcon
-              name={"cart"}
-              size={28}
-              color={"#FFF"}
-              style={styles.iconCart}
-            />
-            <MyText style={styles.textCart}>Ver carrinho</MyText>
-            <Subtotal />
-          </View>
-        </MyTouchable>
-      </MotiView>
+            <MyTouchable
+              solid
+              style={[
+                styles.cartBarTouchable,
+                !toped && device.iPhoneNotch
+                  ? { height: 50 + 24 }
+                  : { height: 50 },
+              ]}
+              onPress={() => navigate("Cart")}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: !toped && device.iPhoneNotch ? 24 : 0,
+                }}
+              >
+                <MyIcon
+                  name={"cart"}
+                  size={28}
+                  color={"#FFF"}
+                  style={styles.iconCart}
+                />
+                <MyText style={styles.textCart}>Ver carrinho</MyText>
+                <Subtotal />
+              </View>
+            </MyTouchable>
+          </MotiView>
+        )}
+      </AnimatePresence>
     </View>
   );
 };

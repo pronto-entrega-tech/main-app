@@ -191,7 +191,7 @@ const OrderDetailsPage = ({
     CARD: cardBrandIcon(),
   }[payment.method];
 
-  const change = money.isGreater(payment.change, 0)
+  const change = payment.change
     ? ` - Troco para ${money.toString(payment.change, "R$")}`
     : "";
   const subtotal = money.minus(order.total, order.delivery_fee);
@@ -414,23 +414,54 @@ const OrderDetailsPage = ({
   );
 };
 
-const orderItem = ({ item }: { item: OrderItem }) => (
-  <>
-    <View style={styles.itemContainer}>
-      <MyText style={styles.itemQuantity}>{item.quantity}x</MyText>
-      <View style={{ marginLeft: 18 }}>
-        <MyText style={styles.itemDescription}>
-          {`${item.product.name} ${item.product.brand}`}
-        </MyText>
-        <MyText style={styles.itemPrice}>
-          {money.toString(+item.price, "R$")}
-        </MyText>
-        <MyText style={styles.itemWeight}>{item.product.quantity}</MyText>
+const orderItem = ({ item }: { item: OrderItem }) =>
+  item.is_kit ? (
+    <>
+      <View style={styles.itemContainer}>
+        <MyText style={styles.itemQuantity}>{item.quantity}x</MyText>
+        <View style={{ marginLeft: 18 }}>
+          <MyText style={styles.itemDescription}>Kit</MyText>
+          <MyText style={styles.itemPrice}>
+            {money.toString(+item.price, "R$")}
+          </MyText>
+        </View>
       </View>
-    </View>
-    <MyDivider style={styles.itemDivider} />
-  </>
-);
+
+      {item.details.map((details, index) => (
+        <View key={index}>
+          <MyDivider style={styles.itemDetailsDivider} />
+
+          <View style={[styles.itemContainer, { paddingLeft: 24 }]}>
+            <MyText style={styles.itemDetailsQuantity}>
+              {details.quantity}x
+            </MyText>
+            <View style={{ marginLeft: 18 }}>
+              <MyText style={styles.itemDescription}>
+                {details.product.name}
+              </MyText>
+            </View>
+          </View>
+        </View>
+      ))}
+      <MyDivider style={styles.itemDivider} />
+    </>
+  ) : (
+    <>
+      <View style={styles.itemContainer}>
+        <MyText style={styles.itemQuantity}>{item.quantity}x</MyText>
+        <View style={{ marginLeft: 18 }}>
+          <MyText style={styles.itemDescription}>
+            {item.product.name} {item.product.brand}
+          </MyText>
+          <MyText style={styles.itemPrice}>
+            {money.toString(+item.price, "R$")}
+          </MyText>
+          <MyText style={styles.itemWeight}>{item.product.quantity}</MyText>
+        </View>
+      </View>
+      <MyDivider style={styles.itemDivider} />
+    </>
+  );
 
 const PageModal = ({
   state,
@@ -925,6 +956,11 @@ const styles = StyleSheet.create({
     color: myColors.text3,
     fontSize: 16,
   },
+  itemDetailsQuantity: {
+    fontFamily: myFonts.Medium,
+    color: myColors.text2,
+    fontSize: 16,
+  },
   itemDescription: {
     fontFamily: myFonts.Condensed,
     color: myColors.text4,
@@ -946,6 +982,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     marginTop: 12,
     backgroundColor: myColors.divider3,
+  },
+  itemDetailsDivider: {
+    marginHorizontal: 18,
+    marginTop: 12,
+    backgroundColor: myColors.divider,
   },
 });
 
