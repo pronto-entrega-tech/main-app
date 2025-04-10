@@ -524,7 +524,7 @@ const PixModal = ({ payment }: { payment: Order["payment"] }) => {
       >
         <TextInput
           value={pix_code}
-          editable={false}
+          readOnly
           style={[styles.text, { width: "60%" }]}
         />
         <IconButton icon="content-copy" onPress={copyCode} />

@@ -115,21 +115,6 @@ const MarketFeedBody = (props: MarketFeedProps) => {
 
   const marketFee = money.toString(market.delivery_fee, "R$");
 
-  const marketDetails: { icon: IconNames; text: string }[] = [
-    { icon: "clock", text: marketOpenness(market) },
-    ...(distance
-      ? [{ icon: "map-marker", text: `Á ${distance}km de você` } as const]
-      : []),
-    {
-      icon: "truck-fast",
-      text: `${market.min_time}-${market.max_time}min • ${marketFee}`,
-    },
-    {
-      icon: "currency-usd",
-      text: `Mínimo ${money.toString(market.order_min, "R$")}`,
-    },
-  ];
-
   const marketListHeader = (
     <>
       <View
@@ -183,14 +168,19 @@ const MarketFeedBody = (props: MarketFeedProps) => {
               }}
             />
           </View>
-          {marketDetails.map((item, index) => (
-            <View key={index} style={styles.detailsContainer}>
-              <MyIcon name={item.icon} size={20} />
-              <MyText style={{ marginLeft: 4, color: myColors.text2 }}>
-                {item.text}
-              </MyText>
-            </View>
-          ))}
+
+          <MarketInfo icon="clock" text={marketOpenness(market)} />
+          {distance && (
+            <MarketInfo icon="map-marker" text={`Á ${distance}km de você`} />
+          )}
+          <MarketInfo
+            icon="truck-fast"
+            text={`${market.min_time}-${market.max_time}min • ${marketFee}`}
+          />
+          <MarketInfo
+            icon="currency-usd"
+            text={`Mínimo ${money.toString(market.order_min, "R$")}`}
+          />
         </View>
       </View>
       <ListHeader />
@@ -206,6 +196,15 @@ const MarketFeedBody = (props: MarketFeedProps) => {
     />
   );
 };
+
+function MarketInfo(p: { icon: IconNames; text: string }) {
+  return (
+    <View style={styles.detailsContainer}>
+      <MyIcon name={p.icon} size={20} />
+      <MyText style={{ marginLeft: 4, color: myColors.text2 }}>{p.text}</MyText>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   headerContainer: {

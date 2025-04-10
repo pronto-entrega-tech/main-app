@@ -1,5 +1,10 @@
 import React, { ReactNode } from "react";
-import { StyleProp, ViewStyle, TextStyle } from "react-native";
+import {
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+  ActivityIndicator,
+} from "react-native";
 import myColors from "~/constants/myColors";
 import myFonts from "~/constants/myFonts";
 import device from "~/constants/device";
@@ -7,13 +12,15 @@ import MyText from "./MyText";
 import MyTouchable, { ButtonOrLink } from "./MyTouchable";
 import useHover from "~/hooks/useHover";
 import MyIcon, { IconNames, MyIconProps } from "./MyIcon";
+import Loading from "./Loading";
 
-type MyButtonBase = {
+export type MyButtonBaseProps = {
   title: string;
   icon?: IconNames | MyIconProps;
   image?: ReactNode;
   iconRight?: boolean;
   disabled?: boolean;
+  loading?: boolean;
   type?: "solid" | "outline" | "clear";
   buttonStyle?: StyleProp<ViewStyle>;
   disabledStyle?: StyleProp<ViewStyle>;
@@ -24,7 +31,7 @@ type MyButtonBase = {
   titleStyle?: StyleProp<TextStyle>;
 };
 
-type MyButtonProps = ButtonOrLink<MyButtonBase>;
+type MyButtonProps = ButtonOrLink<MyButtonBaseProps>;
 
 /**
  * Use `onPress` if want a button, or `screen` if want a link.
@@ -34,7 +41,8 @@ const MyButton = ({
   image,
   icon,
   iconRight = false,
-  disabled = false,
+  loading = false,
+  disabled: _disabled = false,
   type = "solid",
   buttonStyle,
   disabledStyle,
@@ -42,6 +50,8 @@ const MyButton = ({
   titleStyle,
   ...props
 }: MyButtonProps) => {
+  const disabled = _disabled || loading;
+
   const baseStyle: ViewStyle = {
     borderRadius: 4,
     minHeight: 44,
@@ -49,6 +59,7 @@ const MyButton = ({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: iconRight ? "row-reverse" : "row",
+    gap: 8,
     // `padding` overwrite other paddings
     paddingTop: 8,
     paddingRight: 8,
@@ -89,8 +100,12 @@ const MyButton = ({
       {...props}
     >
       {image}
-      {icon && (
-        <MyIcon {...(typeof icon === "string" ? { name: icon } : icon)} />
+      {loading ? (
+        <ActivityIndicator color={myColors.loading} size={20} />
+      ) : (
+        icon && (
+          <MyIcon {...(typeof icon === "string" ? { name: icon } : icon)} />
+        )
       )}
       <MyText
         style={[

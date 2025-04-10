@@ -33,6 +33,7 @@ const nextConfig = withBundleAnalyzer(
       "expo-notifications",
       "expo-application",
       "expo-location",
+      "expo-clipboard",
       "moti",
     ],
     experimental: { forceSwcTransforms: true },

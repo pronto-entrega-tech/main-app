@@ -1,12 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, AppState } from "react-native";
-import { serverError } from "~/components/Errors";
-import Loading from "~/components/Loading";
 import MyButton from "~/components/MyButton";
 import MyInput from "~/components/MyInput";
 import MyText from "~/components/MyText";
 import { useAuthContext } from "~/contexts/AuthContext";
-import { useAlertContext } from "~/contexts/AlertContext";
 import { range } from "~/functions/range";
 import useRouting from "~/hooks/useRouting";
 import { api } from "~/services/api";
@@ -16,60 +13,122 @@ import * as Clipboard from "expo-clipboard";
 import device from "~/constants/device";
 import globalStyles from "~/constants/globalStyles";
 import myColors from "~/constants/myColors";
+import { match } from "ts-pattern";
+import MyAsyncButton from "~/components/MyAsyncButton";
+
+type Stage =
+  | {
+      type: "email";
+    }
+  | {
+      type: "code";
+      key: string;
+    }
+  | {
+      type: "profile";
+      createToken: string;
+    };
+
+type setState = (stage: Stage) => void;
 
 export default function EmailSignInScreen() {
+  const [stage, setState] = useState<Stage>({ type: "email" });
+
   return (
     <>
       <MyHeader />
-      <EmailSignIn />
+
+      {match(stage)
+        .with({ type: "email" }, () => <EmailStage setState={setState} />)
+        .with({ type: "code" }, ({ key }) => (
+          <CodeStage setState={setState} key={key} />
+        ))
+        .with({ type: "profile" }, ({ createToken }) => (
+          <ProfileStage createToken={createToken} />
+        ))
+        .exhaustive()}
     </>
   );
 }
 
-const EmailSignIn = () => {
+function EmailStage({ setState }: { setState: setState }) {
+  const [email, setEmail] = useState("");
+
+  const submit = async () => {
+    const res = await api.auth.email(email);
+
+    setState({
+      type: "code",
+      key: res.key,
+    });
+  };
+
+  return (
+    <View style={[globalStyles.centralizer, { paddingHorizontal: 24 }]}>
+      <PageTitle title="Entrar email" />
+
+      <MyText style={{ fontSize: 18, marginBottom: 36 }}>
+        Insira seu email
+      </MyText>
+      <MyInput
+        onChangeText={setEmail}
+        onSubmitEditing={submit}
+        autoFocus
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="email"
+        containerStyle={{ maxWidth: 400 }}
+      />
+      <MyAsyncButton
+        buttonStyle={styles.continueButton}
+        title="Continuar"
+        disabled={!email}
+        onPress={submit}
+      />
+    </View>
+  );
+}
+
+function CodeStage({ setState, key }: { setState: setState; key: string }) {
   const { navigate } = useRouting();
   const { signIn } = useAuthContext();
-  const { alert } = useAlertContext();
-  const [isLoading, setLoading] = useState(false);
-  const [stage, setStage] = useState(0);
-  const [input, setInput] = useState("");
+
+  const [code, setCode] = useState("");
   const [hasCodeError, setCodeError] = useState(false);
-  const key = useRef("");
-  const createToken = useRef("");
 
-  const nextState = () => {
-    setStage((s) => s + 1);
-    setInput("");
-    setLoading(false);
-  };
-
-  const auth = (accessToken: string, refreshToken?: string) => {
-    signIn({ accessToken, refreshToken });
-    navigate("Home");
-  };
-
-  const sendCode = async (text: string) => {
+  const submit = async (code: string) => {
     setCodeError(false);
-    if (text.length < 5) return;
-
-    setLoading(true);
+    if (code.length < 5) return;
 
     try {
-      const res = await api.auth.validate(key.current, text);
-      createToken.current = res.token;
+      const res = await api.auth.validate(key, code);
 
-      res.type === "ACCESS"
-        ? auth(res.token, res.session?.refresh_token)
-        : nextState();
+      if (res.type === "ACCESS") {
+        signIn({
+          accessToken: res.token,
+          refreshToken: res.session?.refresh_token,
+        });
+        navigate("Home");
+      } else {
+        setState({
+          type: "profile",
+          createToken: res.token,
+        });
+      }
     } catch {
-      setInput("");
+      setCode("");
       setCodeError(true);
-      setLoading(false);
     }
   };
 
-  const codeInput = (
-    <>
+  return (
+    <View style={[globalStyles.centralizer, { paddingHorizontal: 24 }]}>
+      <PageTitle title="Código de verificação" />
+
+      <MyText style={{ fontSize: 18, marginBottom: 36 }}>
+        Insira o código de verificação
+      </MyText>
+
       <View style={{ marginLeft: 55 }}>
         <View style={{ position: "absolute", flexDirection: "row", left: -8 }}>
           {range(1, 5).map((n) => (
@@ -82,87 +141,62 @@ const EmailSignIn = () => {
           keyboardType="numeric"
           inputStyle={styles.codeInput}
           errorMessage={hasCodeError ? "Código inválido" : ""}
-          onChangeText={sendCode}
+          value={code}
+          onChangeText={submit}
           containerStyle={styles.codeInputContainer}
           inputContainerStyle={{ borderBottomWidth: 0 }}
           errorStyle={{ fontSize: 14, marginTop: 16 }}
           cursorColor="transparent"
         />
       </View>
-      {device.android && <PasteCodeButton onPaste={sendCode} />}
-    </>
+      {device.android && <PasteCodeButton onPaste={submit} />}
+    </View>
   );
+}
 
-  const data = (
-    [
-      {
-        pageTitle: "Entrar email",
-        title: "Insira seu email",
-        autoComplete: "email",
-        onPress: async () => {
-          const res = await api.auth.email(input);
-          key.current = res.key;
+function ProfileStage({ createToken }: { createToken: string }) {
+  const { navigate } = useRouting();
+  const { signIn } = useAuthContext();
 
-          nextState();
-        },
-      },
-      {
-        pageTitle: "Código de verificação",
-        title: "Insira o código de verificação",
-        component: codeInput,
-      },
-      {
-        pageTitle: "Cadastro",
-        title: "Insira seu nome",
-        autoComplete: "name",
-        onPress: async () => {
-          const res = await api.customers.create(createToken.current, input);
+  const [name, setName] = useState("");
 
-          auth(res.access_token, res.refresh_token);
-        },
-      },
-    ] as const
-  )[stage];
+  const submit = async () => {
+    const res = await api.customers.create(createToken, name);
 
-  if (isLoading) return <Loading />;
-
-  const next = () => {
-    setLoading(true);
-
-    if (data.component) return;
-    data.onPress().catch(() => {
-      setLoading(false);
-      serverError(alert);
+    signIn({
+      accessToken: res.access_token,
+      refreshToken: res.refresh_token,
     });
+    navigate("Home");
   };
 
   return (
     <View style={[globalStyles.centralizer, { paddingHorizontal: 24 }]}>
-      <PageTitle title={data.pageTitle} />
-      <MyText style={{ fontSize: 18, marginBottom: 36 }}>{data.title}</MyText>
-      {data.component ?? (
-        <>
-          <MyInput
-            value={input}
-            onChangeText={setInput}
-            onSubmitEditing={next}
-            autoFocus
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete={data.autoComplete}
-            containerStyle={{ maxWidth: 400 }}
-          />
-          <MyButton
-            buttonStyle={styles.continueButton}
-            title="Continuar"
-            disabled={!input}
-            onPress={next}
-          />
-        </>
-      )}
+      <PageTitle title="Cadastro" />
+
+      <MyText style={{ fontSize: 18, marginBottom: 36 }}>
+        Insira seu nome
+      </MyText>
+
+      <MyInput
+        value={name}
+        onChangeText={setName}
+        onSubmitEditing={submit}
+        autoFocus
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="name"
+        containerStyle={{ maxWidth: 400 }}
+      />
+      <MyButton
+        buttonStyle={styles.continueButton}
+        title="Continuar"
+        disabled={!name}
+        onPress={submit}
+      />
     </View>
   );
-};
+}
 
 function PasteCodeButton(p: { onPaste: (code: string) => void }) {
   const [code, setCode] = useState<string>();

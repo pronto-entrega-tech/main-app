@@ -6,15 +6,16 @@ import MyIcon from "~/components/MyIcon";
 import useRouting from "~/hooks/useRouting";
 import MyHeader from "~/components/MyHeader";
 import { WithBottomNav } from "~/components/Layout";
-import { arrayConditional } from "~/functions/conditionals";
 import MyText from "~/components/MyText";
 import { useAuthContext } from "~/contexts/AuthContext";
 import globalStyles from "~/constants/globalStyles";
 import myColors from "~/constants/myColors";
 import myFonts from "~/constants/myFonts";
 import appInfo from "~/constants/appInfo";
+import { useAlertContext } from "~/contexts/AlertContext";
 
 const Config = () => {
+  const { alert } = useAlertContext();
   const { replace } = useRouting();
   const { isAuth, signOut } = useAuthContext();
 
@@ -22,42 +23,6 @@ const Config = () => {
     await signOut();
     replace("SignIn");
   };
-
-  const options = [
-    { title: "Gerenciar notificações", screen: "NotifConfig" },
-    { title: "Políticas de privacidade" },
-    { title: "Termos de uso" },
-    ...arrayConditional(isAuth)({
-      title: "Sair da conta",
-      onPress: signOutAndLeave,
-    }),
-  ];
-
-  const optionItems = options.map((option, index) => (
-    <View key={index}>
-      {index !== 0 && <MyDivider style={styles.divider} />}
-      <View style={{ justifyContent: "center" }}>
-        <MyIcon
-          style={{ position: "absolute", alignSelf: "flex-end" }}
-          name="chevron-right"
-          size={32}
-          color={myColors.grey2}
-        />
-        <MyButton
-          {...option}
-          buttonStyle={
-            index === 0
-              ? styles.top
-              : index === options.length - 1
-                ? styles.bottom
-                : { borderRadius: 0 }
-          }
-          titleStyle={{ color: myColors.text, fontSize: 17 }}
-          type="clear"
-        />
-      </View>
-    </View>
-  ));
 
   return (
     <>
@@ -73,8 +38,12 @@ const Config = () => {
             globalStyles.darkBorder,
           ]}
         >
-          {optionItems}
+          <Tile title="Gerenciar notificações" screen="NotifConfig" />
+          <Tile title="Políticas de privacidade" onPress={() => alert("WIP")} />
+          <Tile title="Termos de uso" onPress={() => alert("WIP")} />
+          {isAuth && <Tile title="Sair da conta" onPress={signOutAndLeave} />}
         </View>
+
         <MyText style={styles.versionText}>
           Versão {appInfo.version} ({appInfo.android.versionCode})
         </MyText>
@@ -82,6 +51,35 @@ const Config = () => {
     </>
   );
 };
+
+function Tile({
+  top,
+  title,
+  ...props
+}: {
+  top?: boolean;
+  title: string;
+} & ({ screen: string } | { onPress: () => void })) {
+  return (
+    <View>
+      {!top && <MyDivider style={styles.divider} />}
+      <View style={{ justifyContent: "center" }}>
+        <MyIcon
+          style={{ position: "absolute", alignSelf: "flex-end" }}
+          name="chevron-right"
+          size={32}
+          color={myColors.grey2}
+        />
+        <MyButton
+          title={title}
+          {...props}
+          titleStyle={{ color: myColors.text, fontSize: 17 }}
+          type="clear"
+        />
+      </View>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   header: {
@@ -98,6 +96,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     margin: 16,
     borderRadius: 8,
+    overflow: "hidden",
   },
   divider: {
     backgroundColor: myColors.divider3,

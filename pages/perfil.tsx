@@ -1,12 +1,11 @@
-import React, { useCallback, useState } from "react";
+import React, { ReactNode, useCallback, useState } from "react";
 import { ScrollView, View, StyleSheet } from "react-native";
 import MyButton from "~/components/MyButton";
-import MyIcon from "~/components/MyIcon";
+import MyIcon, { IconNames } from "~/components/MyIcon";
 import MyDivider from "~/components/MyDivider";
 import { WithBottomNav } from "~/components/Layout";
 import MyText from "~/components/MyText";
 import useFocusEffect from "~/hooks/useFocusEffect";
-import { arrayConditional } from "~/functions/conditionals";
 import Loading from "~/components/Loading";
 import { useAuthContext } from "~/contexts/AuthContext";
 import { api } from "~/services/api";
@@ -30,98 +29,6 @@ const Profile = () => {
 
   if (isAuth === undefined || (isAuth && !profileName)) return <Loading />;
 
-  const card1 = [
-    {
-      icon: "account",
-      title: isAuth ? "Meu Perfil" : "Entrar ou cadastrar-se",
-      screen: isAuth ? "MyProfile" : "SignIn",
-    },
-    {
-      icon: "map-marker",
-      title: "Endereços salvos",
-      screen: "Addresses",
-    },
-    {
-      icon: "bell",
-      title: "Notificações",
-      screen: "Notifications",
-    },
-    ...arrayConditional(isAuth)({
-      icon: "credit-card-outline",
-      title: "Meios de pagamento",
-      screen: "PaymentMethods",
-    } as const),
-  ] as const;
-  const card2 = [
-    {
-      icon: "help-circle",
-      title: "Central de ajuda",
-      screen: "Help",
-    },
-    {
-      icon: "cog",
-      title: "Configurações",
-      screen: "Config",
-    },
-    {
-      icon: "store",
-      title: "Sugerir estabelecimento",
-      screen: "Suggestion",
-    },
-    ...arrayConditional(isAuth)({
-      icon: "monitor-cellphone",
-      title: "Dispositivos conectados",
-      screen: "Devices",
-    } as const),
-  ] as const;
-
-  const cards = [card1, card2].map((row, index) => (
-    <View
-      key={index}
-      style={[styles.card, globalStyles.elevation3, globalStyles.darkBorder]}
-    >
-      {row.map((item, index) => (
-        <View key={index}>
-          {index !== 0 && <MyDivider style={styles.divider} />}
-          <View style={{ justifyContent: "center" }}>
-            <MyIcon
-              style={{
-                position: "absolute",
-                alignSelf: "flex-end",
-                right: 4,
-              }}
-              name="chevron-right"
-              size={32}
-              color={myColors.grey2}
-            />
-            <MyButton
-              screen={item.screen}
-              title={item.title}
-              icon={{
-                name: item.icon,
-                size: 28,
-              }}
-              buttonStyle={[
-                styles.button,
-                index === 0
-                  ? styles.top
-                  : index === row.length - 1
-                    ? styles.bottom
-                    : styles.mid,
-              ]}
-              titleStyle={{
-                color: myColors.text2,
-                fontSize: 17,
-                marginLeft: 6,
-              }}
-              type="clear"
-            />
-          </View>
-        </View>
-      ))}
-    </View>
-  ));
-
   return (
     <>
       <PageTitle title="Perfil" />
@@ -130,21 +37,112 @@ const Profile = () => {
         style={globalStyles.notch}
         contentContainerStyle={{ paddingBottom: 68 }}
       >
-        <>
-          <View style={styles.header}>
-            <MyIcon
-              name="account-circle-outline"
-              color={myColors.grey4}
-              size={100}
+        <View style={styles.header}>
+          <MyIcon
+            name="account-circle-outline"
+            color={myColors.grey4}
+            size={100}
+          />
+          <MyText style={styles.name}>{profileName ?? "Convidado"}</MyText>
+        </View>
+
+        <Card>
+          <CardItem
+            top
+            icon="account"
+            title={isAuth ? "Meu Perfil" : "Entrar ou cadastrar-se"}
+            screen={isAuth ? "MyProfile" : "SignIn"}
+          />
+          <CardItem
+            icon="map-marker"
+            title="Endereços salvos"
+            screen="Addresses"
+          />
+          <CardItem icon="bell" title="Notificações" screen="Notifications" />
+          {isAuth && (
+            <CardItem
+              icon="credit-card-outline"
+              title="Meios de pagamento"
+              screen="PaymentMethods"
             />
-            <MyText style={styles.name}>{profileName ?? "Convidado"}</MyText>
-          </View>
-          {cards}
-        </>
+          )}
+        </Card>
+
+        <Card>
+          <CardItem
+            top
+            icon="help-circle"
+            title="Central de ajuda"
+            screen="Help"
+          />
+          <CardItem icon="cog" title="Configurações" screen="Config" />
+          <CardItem
+            icon="store"
+            title="Sugerir estabelecimento"
+            screen="Suggestion"
+          />
+          {isAuth && (
+            <CardItem
+              icon="monitor-cellphone"
+              title="Dispositivos conectados"
+              screen="Devices"
+            />
+          )}
+        </Card>
       </ScrollView>
     </>
   );
 };
+
+function Card({ children }: { children: ReactNode }) {
+  return (
+    <View
+      style={[styles.card, globalStyles.elevation3, globalStyles.darkBorder]}
+    >
+      {children}
+    </View>
+  );
+}
+
+function CardItem(p: {
+  icon: IconNames;
+  title: string;
+  screen: string;
+  top?: boolean;
+}) {
+  return (
+    <>
+      {!p.top && <MyDivider style={styles.divider} />}
+      <View style={{ justifyContent: "center" }}>
+        <MyIcon
+          style={{
+            position: "absolute",
+            alignSelf: "flex-end",
+            right: 4,
+          }}
+          name="chevron-right"
+          size={32}
+          color={myColors.grey2}
+        />
+        <MyButton
+          screen={p.screen}
+          title={p.title}
+          icon={{
+            name: p.icon,
+            size: 28,
+          }}
+          buttonStyle={styles.button}
+          titleStyle={{
+            color: myColors.text2,
+            fontSize: 17,
+            marginLeft: 6,
+          }}
+          type="clear"
+        />
+      </View>
+    </>
+  );
+}
 
 const styles = StyleSheet.create({
   header: {
@@ -166,19 +164,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 8,
-  },
-  top: {
-    borderRadius: 0,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  mid: {
-    borderRadius: 0,
-  },
-  bottom: {
-    borderRadius: 0,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
+    overflow: "hidden",
   },
   divider: {
     backgroundColor: myColors.divider3,

@@ -24,47 +24,53 @@ export const categoriesArray = [
   "Limpeza",
 ];
 
-const Categories = () => (
-  <>
-    <MyHeader title="Categorias" goBackLess smallDivider />
-    <ScrollView
-      contentContainerStyle={{ paddingBottom: 50 }}
-      showsVerticalScrollIndicator={false}
-    >
-      <View
-        style={[styles.card, globalStyles.elevation3, globalStyles.darkBorder]}
+function Categories() {
+  return (
+    <>
+      <MyHeader title="Categorias" goBackLess smallDivider />
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 50 }}
+        showsVerticalScrollIndicator={false}
       >
-        {categoriesArray.map((category, index) => (
-          <View key={index}>
-            {index !== 0 && <MyDivider style={styles.divider} />}
-            <View style={{ justifyContent: "center" }}>
-              <MyIcon
-                style={{ position: "absolute", alignSelf: "flex-end" }}
-                name="chevron-right"
-                size={32}
-                color={myColors.grey2}
-              />
-              <MyButton
-                title={category}
-                type="clear"
-                buttonStyle={
-                  index === 0
-                    ? styles.top
-                    : index === categoriesArray.length - 1
-                      ? styles.bottom
-                      : { borderRadius: 0 }
-                }
-                titleStyle={{ color: myColors.grey3, fontSize: 17 }}
-                screen="Search"
-                params={{ category: index + 1 }}
-              />
+        <View
+          style={[
+            styles.card,
+            globalStyles.elevation3,
+            globalStyles.darkBorder,
+          ]}
+        >
+          {categoriesArray.map((category, index) => (
+            <View key={index}>
+              {index !== 0 && <MyDivider style={styles.divider} />}
+              <View style={{ justifyContent: "center" }}>
+                <MyIcon
+                  style={{ position: "absolute", alignSelf: "flex-end" }}
+                  name="chevron-right"
+                  size={32}
+                  color={myColors.grey2}
+                />
+                <MyButton
+                  title={category}
+                  type="clear"
+                  buttonStyle={
+                    index === 0
+                      ? styles.top
+                      : index === categoriesArray.length - 1
+                        ? styles.bottom
+                        : { borderRadius: 0 }
+                  }
+                  titleStyle={{ color: myColors.grey3, fontSize: 17 }}
+                  screen="Search"
+                  params={{ category: index + 1 }}
+                />
+              </View>
             </View>
-          </View>
-        ))}
-      </View>
-    </ScrollView>
-  </>
-);
+          ))}
+        </View>
+      </ScrollView>
+    </>
+  );
+}
 
 const styles = StyleSheet.create({
   card: {

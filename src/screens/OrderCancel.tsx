@@ -28,6 +28,18 @@ const OrderCancel = ({
   </>
 );
 
+const reasons: [CancelReason, string][] = [
+  ["WRONG_PRODUCT", "Produto errado ou faltando"],
+  ["WRONG_ADDRESS", "Pedido está atrasado"],
+  ["WRONG_PAYMENT_METHOD", "Errei a forma de pagamento"],
+  ["FORGOT_COUPON", "Endereço errado"],
+  ["ORDER_BY_MISTAKE", "Pedi sem querer"],
+  ["CANT_TAKE", "Esqueci do cupom"],
+  ["DELIVERY_TOO_LATE", "Não vou poder pegar"],
+  ["ORDER_IS_LATE", "Horário de entrega muito tarde"],
+  ["OTHER", "Outro motivo"],
+];
+
 const CancelPageBody = ({
   order,
   onNavigate: navigate,
@@ -53,18 +65,6 @@ const CancelPageBody = ({
       setLoading(false);
     }
   };
-
-  const reasons: [CancelReason, string][] = [
-    ["WRONG_PRODUCT", "Produto errado ou faltando"],
-    ["WRONG_ADDRESS", "Pedido está atrasado"],
-    ["WRONG_PAYMENT_METHOD", "Errei a forma de pagamento"],
-    ["FORGOT_COUPON", "Endereço errado"],
-    ["ORDER_BY_MISTAKE", "Pedi sem querer"],
-    ["CANT_TAKE", "Esqueci do cupom"],
-    ["DELIVERY_TOO_LATE", "Não vou poder pegar"],
-    ["ORDER_IS_LATE", "Horário de entrega muito tarde"],
-    ["OTHER", "Outro motivo"],
-  ];
 
   return (
     <>
