@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import * as Location from "expo-location";
-import { myColors, device, globalStyles } from "~/constants";
-import { saveIsNewUser } from "~/core/dataStorage";
+import { saveIsNewUser } from "~/services/localStorage";
 import useRouting from "~/hooks/useRouting";
 import Loading from "~/components/Loading";
 import MyButton from "~/components/MyButton";
 import MyText from "~/components/MyText";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 const NewUser = () => {
   const { replace } = useRouting();

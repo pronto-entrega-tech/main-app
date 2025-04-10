@@ -1,5 +1,4 @@
 import { MotiView, AnimatePresence } from "moti";
-import { MotiPressable } from "moti/interactions";
 import React, { ReactNode, useEffect, useState } from "react";
 import {
   View,
@@ -10,7 +9,8 @@ import {
   Keyboard,
   Pressable,
 } from "react-native";
-import { myColors, device } from "~/constants";
+import device from "~/constants/device";
+import myColors from "~/constants/myColors";
 import { zIndex } from "~/constants/zIndex";
 import { ModalState } from "~/hooks/useModalState";
 

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import { device, globalStyles } from "~/constants";
 import { zIndex } from "~/constants/zIndex";
 import { useToastContext } from "~/contexts/ToastContext";
 import MyIcon, { IconNames } from "./MyIcon";
 import MyText from "./MyText";
 import { AnimatePresence, MotiView } from "moti";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
 
 export type ToastState = {
   message: string;

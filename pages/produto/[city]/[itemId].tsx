@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import IconButton from "~/components/IconButton";
 import ProdListHorizontal from "~/components/ProdListHorizontal";
-import { myColors, device, myFonts, globalStyles } from "~/constants";
 import { getImageUrl } from "~/functions/converter";
 import { calcPrices, money } from "~/functions/money";
 import MyIcon from "~/components/MyIcon";
@@ -10,7 +9,6 @@ import MyDivider from "~/components/MyDivider";
 import useRouting from "~/hooks/useRouting";
 import Loading from "~/components/Loading";
 import Errors, { MyErrors } from "~/components/Errors";
-import { GetStaticPaths, GetStaticProps } from "next";
 import AnimatedText from "~/components/AnimatedText";
 import { MarketFeed } from "@pages/inicio/mercado/[city]/[marketId]";
 import ProductHeader from "~/components/ProductHeader";
@@ -22,6 +20,10 @@ import { api } from "~/services/api";
 import { useCartContext, useCartContextSelector } from "~/contexts/CartContext";
 import { UseStore, useAtom } from "~/functions/stores";
 import MyImage from "~/components/MyImage";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 type ProductDetailsProps = { setMarketId?: (v: string) => void };
 

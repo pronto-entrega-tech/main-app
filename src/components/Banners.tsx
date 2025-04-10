@@ -13,13 +13,13 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { globalStyles } from "~/constants";
 import { getImageUrl } from "~/functions/converter";
 import { useMediaQuery } from "~/hooks/useMediaQuery";
 import { api } from "~/services/api";
 import IconButton from "./IconButton";
 import { Banner } from "~/core/models";
 import MyImage from "./MyImage";
+import globalStyles from "~/constants/globalStyles";
 
 const slideHeight = 456;
 const slideWidth = 1024;

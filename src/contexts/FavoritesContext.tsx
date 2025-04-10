@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { createContext } from "~/contexts/createContext";
-import { saveFavorites, getFavorites } from "~/core/dataStorage";
+import { saveFavorites, getFavorites } from "~/services/localStorage";
 import { useStateToRef } from "~/hooks/useStateToRef";
 
 function useFavorites() {

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
-import { globalStyles, myColors } from "~/constants";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 import MyText from "./MyText";
 
 const Loading = ({ title }: { title?: string }) => (

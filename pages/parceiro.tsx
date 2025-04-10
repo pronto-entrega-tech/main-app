@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 import MyText from "~/components/MyText";
-import { globalStyles } from "~/constants";
+import globalStyles from "~/constants/globalStyles";
 
 const Partner = () => {
   return (

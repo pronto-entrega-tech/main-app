@@ -3,14 +3,16 @@ import { View, StyleSheet, FlatList } from "react-native";
 import IconButton from "~/components/IconButton";
 import MyButton from "~/components/MyButton";
 import MyTouchable from "~/components/MyTouchable";
-import { myColors, device, globalStyles } from "~/constants";
 import {
   requestForegroundPermissionsAsync,
   enableNetworkProviderAsync,
   getForegroundPermissionsAsync,
   hasServicesEnabledAsync,
 } from "expo-location";
-import { getActiveAddressId, saveActiveAddressId } from "~/core/dataStorage";
+import {
+  getActiveAddressId,
+  saveActiveAddressId,
+} from "~/services/localStorage";
 import { stringifyAddress } from "~/functions/converter";
 import MyIcon from "~/components/MyIcon";
 import MyDivider from "~/components/MyDivider";
@@ -24,6 +26,9 @@ import Loading from "~/components/Loading";
 import Errors from "~/components/Errors";
 import { useAlertContext } from "~/contexts/AlertContext";
 import { useGetAddress } from "~/hooks/useAddress";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 const Addresses = () => {
   const routing = useRouting();

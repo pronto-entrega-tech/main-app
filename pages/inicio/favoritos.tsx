@@ -2,11 +2,12 @@ import React from "react";
 import { View } from "react-native";
 import MySearchBar from "~/components/MySearchBar";
 import ProdListHorizontal from "~/components/ProdListHorizontal";
-import { globalStyles, myColors } from "~/constants";
 import MyText from "~/components/MyText";
 import { WithBottomNav } from "~/components/Layout";
 import MyHeader from "~/components/MyHeader";
 import { useFavoritesContext } from "~/contexts/FavoritesContext";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 const Favorites = () => {
   const { favorites } = useFavoritesContext();

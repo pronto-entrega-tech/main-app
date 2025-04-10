@@ -1,13 +1,14 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import React, { useState } from "react";
+import React from "react";
 import { View } from "react-native";
 import CartBar from "~/components/CartBar";
-import { myColors, myTitle } from "~/constants";
 import { ProductDetails } from "@pages/produto/[city]/[itemId]";
 import { MarketFeed } from "@pages/inicio/mercado/[city]/[marketId]";
 import ProductHeader from "~/components/ProductHeader";
 import useRouting from "~/hooks/useRouting";
 import { UseStore, useAtom } from "~/functions/stores";
+import { myTitle } from "~/constants/appInfo";
+import myColors from "~/constants/myColors";
 
 const Tab = createMaterialTopTabNavigator();
 

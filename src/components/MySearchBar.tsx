@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { View, StyleProp, TextInput, ViewStyle } from "react-native";
-import { globalStyles, myColors, myFonts } from "~/constants";
 import IconButton from "./IconButton";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const MySearchBar = ({
   style,

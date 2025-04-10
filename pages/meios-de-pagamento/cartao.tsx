@@ -1,7 +1,6 @@
 import React, { createRef, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 import MyHeader from "~/components/MyHeader";
-import { device, globalStyles, myColors } from "~/constants";
 import Errors from "~/components/Errors";
 import Loading from "~/components/Loading";
 import { useAuthContext } from "~/contexts/AuthContext";
@@ -13,6 +12,9 @@ import MyInput from "~/components/MyInput";
 import FormContainer from "~/components/FormContainer";
 import { digitsMask } from "~/functions/converter";
 import { reduceErrors } from "~/functions/reduceErrors";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 const dateMask = (raw: string) => digitsMask(raw, [[2, "/"]]);
 
@@ -145,7 +147,7 @@ export const PaymentCardBody = ({
           setNameError(false);
           card.current.holderName = v;
         }}
-        autoComplete={device.web ? ("cc-name" as any) : "name"}
+        autoComplete={device.web ? "cc-name" : "name"}
       />
       <MyInput
         label="Apelido do cartão (opcional)"

@@ -5,9 +5,9 @@ import { WithBottomNav } from "~/components/Layout";
 import Loading from "~/components/Loading";
 import MyDivider from "~/components/MyDivider";
 import Switch from "~/components/Switch";
-import { myColors } from "~/constants";
-import { getNotifConfig, saveNotifConfig } from "~/core/dataStorage";
+import { getNotifConfig, saveNotifConfig } from "~/services/localStorage";
 import MyText from "~/components/MyText";
+import myColors from "~/constants/myColors";
 
 const NotifConfig = () => {
   const configBase = new Map([

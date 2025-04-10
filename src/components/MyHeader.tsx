@@ -1,12 +1,14 @@
 import React, { ReactNode } from "react";
 import { View, StyleSheet } from "react-native";
 import useRouting from "~/hooks/useRouting";
-import { myColors, globalStyles, myFonts } from "~/constants";
 import IconButton from "./IconButton";
 import MyDivider from "./MyDivider";
 import MyText from "./MyText";
 import HeaderContainer from "./HeaderContainer";
 import { PageTitle } from "./PageTitle";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const MyHeader = ({
   title,

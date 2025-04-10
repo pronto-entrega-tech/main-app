@@ -1,4 +1,4 @@
-import { device } from "~/constants";
+import device from "~/constants/device";
 import { Profile } from "~/core/models";
 import Utils from "./utils";
 

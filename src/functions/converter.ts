@@ -15,6 +15,7 @@ import { money } from "./money";
 import { Buffer } from "buffer";
 import { lightFormat } from "date-fns";
 import { Params } from "~/hooks/useRouting";
+import { fail } from "./fail";
 
 export const validateProduct = (v: any): Product => ({
   ...v,
@@ -191,12 +192,6 @@ export const isScheduleEqual = (
 ) =>
   schedule1?.dayNumber === schedule2?.dayNumber &&
   schedule1?.hours === schedule2?.hours;
-
-export const fail = (message?: string) => {
-  const error = new Error(message);
-  Error.captureStackTrace?.(error, fail);
-  throw error;
-};
 
 // JavaScriptCore don't support lookbehind regex
 const pathRegex = /(?:\/)\[.*?](?=\/|$)/g;

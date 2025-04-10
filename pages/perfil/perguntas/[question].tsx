@@ -3,10 +3,10 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import MyHeader from "~/components/MyHeader";
 import { WithBottomNav } from "~/components/Layout";
-import { myColors } from "~/constants";
 import useRouting from "~/hooks/useRouting";
 import { helpList } from "../ajuda";
 import MyText from "~/components/MyText";
+import myColors from "~/constants/myColors";
 
 const Questions = () => {
   const { params } = useRouting();

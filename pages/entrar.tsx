@@ -4,7 +4,6 @@ import * as WebBrowser from "expo-web-browser";
 import { ResponseType } from "expo-auth-session";
 import * as Google from "expo-auth-session/providers/google";
 /* import * as Facebook from 'expo-auth-session/providers/facebook'; */
-import { myColors, globalStyles, images, device, myFonts } from "~/constants";
 import MyButton from "~/components/MyButton";
 import Loading from "~/components/Loading";
 import BottomModal from "~/components/BottomModal";
@@ -19,6 +18,11 @@ import { api } from "~/services/api";
 import { useUpdateAddress } from "~/hooks/useAddress";
 import { useAlertContext } from "~/contexts/AlertContext";
 import { PageTitle } from "~/components/PageTitle";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import images from "~/constants/images";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 WebBrowser.maybeCompleteAuthSession();
 

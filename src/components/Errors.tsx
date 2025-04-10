@@ -1,9 +1,10 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { globalStyles, myColors } from "~/constants";
 import { ShowAlert } from "~/contexts/AlertContext";
 import MyButton from "./MyButton";
 import MyText from "./MyText";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 export const serverError = (showAlert: ShowAlert) =>
   showAlert("Erro ao se conectar com o servidor", "Tente novamente mais tarde");

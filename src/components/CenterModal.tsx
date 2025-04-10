@@ -7,7 +7,8 @@ import {
   ViewStyle,
   Pressable,
 } from "react-native";
-import { myColors, device } from "~/constants";
+import device from "~/constants/device";
+import myColors from "~/constants/myColors";
 import { zIndex } from "~/constants/zIndex";
 import { ModalState } from "~/hooks/useModalState";
 

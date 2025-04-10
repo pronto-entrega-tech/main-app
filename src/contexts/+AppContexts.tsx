@@ -1,6 +1,6 @@
 import React, { ReactNode, ComponentType } from "react";
 import { ToastProvider } from "~/contexts/ToastContext";
-import { AlertProvider } from "../contexts/AlertContext";
+import { AlertProvider } from "./AlertContext";
 import { AddressProvider } from "~/contexts/AddressContext";
 import { AuthProvider } from "~/contexts/AuthContext";
 import { FavoritesProvider } from "~/contexts/FavoritesContext";

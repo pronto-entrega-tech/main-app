@@ -1,4 +1,4 @@
-import { device } from "~/constants";
+import device from "~/constants/device";
 import {
   getCurrentPositionAsync,
   getForegroundPermissionsAsync,
@@ -10,7 +10,7 @@ import { getStateCode } from "~/functions/converter";
 import { Address } from "~/core/models";
 import { api } from "~/services/api";
 import { ShowAlert } from "~/contexts/AlertContext";
-import { saveActiveAddress } from "~/core/dataStorage";
+import { saveActiveAddress } from "~/services/localStorage";
 
 export const updateAddress = async (showAlert: ShowAlert) => {
   const { status } = await getForegroundPermissionsAsync();

@@ -4,7 +4,6 @@ import { Market, weekDayArray, weekDayNames } from "~/core/models";
 import Loading from "~/components/Loading";
 import Errors, { MyErrors } from "~/components/Errors";
 import MyText from "~/components/MyText";
-import { myColors, myFonts } from "~/constants";
 import { documentMask } from "~/functions/converter";
 import { WithBottomNav } from "~/components/Layout";
 import MyDivider from "~/components/MyDivider";
@@ -14,6 +13,8 @@ import { GetStaticProps } from "next";
 import Chip from "~/components/Chip";
 import { api } from "~/services/api";
 import { paymentImages } from "~/constants/images";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 type MarketDetailsProps = { market?: Market };
 

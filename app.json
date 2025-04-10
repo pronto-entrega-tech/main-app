@@ -20,7 +20,7 @@
       "translucent": true
     },
     "androidNavigationBar": {
-      "backgroundColor": "#FFF",
+      "backgroundColor": "#FFFFFF",
       "barStyle": "light-content"
     },
     "android": {

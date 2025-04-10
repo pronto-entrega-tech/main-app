@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { KeyboardAvoidingView } from "react-native";
-import { device } from "~/constants";
+import device from "~/constants/device";
 
 const IOSKeyboardAvoidingView = (p: { children: ReactNode }) => {
   return device.iOS ? (

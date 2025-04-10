@@ -3,7 +3,7 @@ import "raf/polyfill"; // https://docs.swmansion.com/react-native-reanimated/doc
 import React from "react";
 import Head from "next/head";
 import { AppProps } from "next/app";
-import { AppContexts } from "~/core/AppContexts";
+import { AppContexts } from "~/contexts/+AppContexts";
 import MyAlert from "~/components/MyAlert";
 
 const MyApp = ({ Component, pageProps }: AppProps) => (

@@ -2,12 +2,13 @@ import React, { createRef, useState } from "react";
 import { TextInput } from "react-native";
 import MyHeader from "~/components/MyHeader";
 import MyButton from "~/components/MyButton";
-import { myColors, globalStyles } from "~/constants";
 import { useToastContext } from "~/contexts/ToastContext";
 import { reduceErrors } from "~/functions/reduceErrors";
 import useRouting from "~/hooks/useRouting";
 import FormContainer from "~/components/FormContainer";
 import MyInput from "~/components/MyInput";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 const Suggestion = () => {
   const routing = useRouting();

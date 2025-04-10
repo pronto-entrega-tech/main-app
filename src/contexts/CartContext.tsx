@@ -12,7 +12,7 @@ import {
   saveActiveMarketId,
   saveLastPayment,
   saveShoppingList,
-} from "../core/dataStorage";
+} from "../services/localStorage";
 import {
   Market,
   OrderPayment,

@@ -1,6 +1,5 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { device, myColors, myFonts } from "~/constants";
 import MyTouchable from "~/components/MyTouchable";
 import MyText from "~/components/MyText";
 import AnimatedText from "~/components/AnimatedText";
@@ -9,6 +8,9 @@ import useRouting from "~/hooks/useRouting";
 import { Money, money } from "~/functions/money";
 import { useCartContext, useCartContextSelector } from "~/contexts/CartContext";
 import { AnimatePresence, MotiView } from "moti";
+import device from "~/constants/device";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const screensWOCartBar = ["OrderDetails", "Chat"];
 

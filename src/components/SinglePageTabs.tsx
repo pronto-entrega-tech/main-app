@@ -1,6 +1,7 @@
 import React, { ReactNode, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { globalStyles, myColors } from "~/constants";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 import MyTouchable from "./MyTouchable";
 import MyText from "./MyText";
 import MyDivider from "./MyDivider";

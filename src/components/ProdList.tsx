@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { FlatList, StyleProp, ViewStyle, RefreshControl } from "react-native";
-import { myColors } from "~/constants";
+import myColors from "~/constants/myColors";
 import { SearchParams } from "~/services/api/products";
 import { useConnection } from "~/functions/connection";
 import ProdItem from "./ProdItem";

@@ -5,9 +5,8 @@ import MyButton from "~/components/MyButton";
 import MyInput from "~/components/MyInput";
 import MyText from "~/components/MyText";
 import MyTouchable from "~/components/MyTouchable";
-import { myColors, device, myFonts } from "~/constants";
 import { useCartContext } from "~/contexts/CartContext";
-import Portal from "~/core/Portal";
+import Portal from "~/components/Portal";
 import { arrayConditional, objectConditional } from "~/functions/conditionals";
 import { Money, money } from "~/functions/money";
 import useRouting from "~/hooks/useRouting";
@@ -15,6 +14,9 @@ import CenterModal from "~/components/CenterModal";
 import { ImageSource, paymentImages } from "~/constants/images";
 import { PaymentMethod } from "~/core/models";
 import { match } from "ts-pattern";
+import device from "~/constants/device";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const PaymentOnDelivery = () => {
   const { replace, pop, goBack } = useRouting();

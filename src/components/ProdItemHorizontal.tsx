@@ -1,6 +1,5 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import { myColors, device, globalStyles, myFonts } from "~/constants";
 import { getImageUrl } from "~/functions/converter";
 import { calcPrices, money } from "~/functions/money";
 import IconButton from "./IconButton";
@@ -13,6 +12,10 @@ import MyText from "./MyText";
 import { MotiView } from "moti";
 import MyImage from "./MyImage";
 import { useCartContext, useCartContextSelector } from "~/contexts/CartContext";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const ProdItemHorizontal = (props: {
   item: Product;

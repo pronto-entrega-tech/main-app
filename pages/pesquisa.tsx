@@ -2,7 +2,6 @@ import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import CartBar from "~/components/CartBar";
 import ProdList from "~/components/ProdList";
-import { myColors, globalStyles, myFonts } from "~/constants";
 import MySearchBar from "~/components/MySearchBar";
 import MyButton from "~/components/MyButton";
 import { categoriesArray } from "./categorias";
@@ -15,6 +14,9 @@ import HeaderContainer from "~/components/HeaderContainer";
 import { ItemOrderBy } from "~/core/models";
 import { arrayConditional } from "~/functions/conditionals";
 import { GoBackButton } from "~/components/MyHeader";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 type SearchParams = {
   query?: string;

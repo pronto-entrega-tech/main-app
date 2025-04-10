@@ -10,10 +10,8 @@ import { ProgressBar } from "react-native-paper";
 import { Image } from "react-native-elements/dist/image/Image";
 import { io } from "socket.io-client";
 import dynamic from "next/dynamic";
-import { myColors, images, myFonts, globalStyles } from "~/constants";
 import {
   canReview,
-  fail,
   formatCardBrand,
   formatDeliveryTime,
   getImageUrl,
@@ -21,6 +19,7 @@ import {
   stringifyAddress,
   validateOrder,
 } from "~/functions/converter";
+import { fail } from "~/functions/fail";
 import { BottomNav } from "~/components/Layout";
 import MyDivider from "~/components/MyDivider";
 import MyText from "~/components/MyText";
@@ -48,18 +47,22 @@ import QRCode from "react-native-qrcode-svg";
 import * as Clipboard from "expo-clipboard";
 import { useAlertContext } from "~/contexts/AlertContext";
 import { useToastContext } from "~/contexts/ToastContext";
-import { getConfirmationTokens } from "~/core/dataStorage";
+import { getConfirmationTokens } from "~/services/localStorage";
 import { appOrSite } from "~/constants/device";
 import MyButton from "~/components/MyButton";
 import Rating from "~/components/Rating";
 import MyInput from "~/components/MyInput";
 import BottomModal from "~/components/BottomModal";
-import Portal from "~/core/Portal";
+import Portal from "~/components/Portal";
 import OrderHelp from "~/screens/OrderHelp";
 import OrderCancel from "~/screens/OrderCancel";
 import { sleep } from "~/functions/sleep";
 import { Urls } from "~/constants/urls";
 import { lightFormat } from "date-fns";
+import globalStyles from "~/constants/globalStyles";
+import images from "~/constants/images";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 // Hi
 const importPaymentMethodsBody = () =>
   import("@pages/meios-de-pagamento").then((mod) => mod.PaymentMethodsBody);

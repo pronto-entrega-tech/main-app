@@ -2,7 +2,8 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
-    "package.json": "pnpm-lock.yaml"
+    "package.json": "pnpm-lock.yaml",
+    "*.ts": "${capture}.web.ts"
   },
   "material-icon-theme.activeIconPack": "react"
 }

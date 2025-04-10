@@ -6,8 +6,9 @@ import MyHeader from "~/components/MyHeader";
 import MyIcon from "~/components/MyIcon";
 import MyText from "~/components/MyText";
 import MyTouchable from "~/components/MyTouchable";
-import { myColors, myFonts } from "~/constants";
 import { Order } from "~/core/models";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const isCompleted = (order: Order) =>
   ["COMPLETING", "COMPLETED"].includes(order.status);

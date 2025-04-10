@@ -4,7 +4,6 @@ import { View } from "react-native";
 import MyHeader from "~/components/MyHeader";
 import { WithBottomNav } from "~/components/Layout";
 import MyText from "~/components/MyText";
-import { globalStyles, myColors, myFonts } from "~/constants";
 import { api } from "~/services/api";
 import { MarketRating as MarketRatingType } from "~/core/models";
 import Loading from "~/components/Loading";
@@ -13,6 +12,9 @@ import useRouting from "~/hooks/useRouting";
 import Errors, { MyErrors } from "~/components/Errors";
 import MyDivider from "~/components/MyDivider";
 import { lightFormat } from "date-fns";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 type MarketRatingProps = { market?: MarketRatingType };
 

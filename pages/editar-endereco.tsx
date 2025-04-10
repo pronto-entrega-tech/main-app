@@ -4,7 +4,6 @@ import { geocodeAsync } from "expo-location";
 import Loading from "~/components/Loading";
 import MyButton from "~/components/MyButton";
 import MyPicker from "~/components/MyPicker";
-import { myColors, device, myFonts, globalStyles } from "~/constants";
 import { useToastContext } from "~/contexts/ToastContext";
 import useRouting from "~/hooks/useRouting";
 import { reduceErrors } from "~/functions/reduceErrors";
@@ -15,6 +14,10 @@ import { useAuthContext } from "~/contexts/AuthContext";
 import MyInput from "~/components/MyInput";
 import FormContainer from "~/components/FormContainer";
 import { api } from "~/services/api";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const blankAddress = (): Address => ({
   id: "",

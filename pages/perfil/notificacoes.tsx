@@ -2,8 +2,9 @@ import React from "react";
 import { View } from "react-native";
 import MyHeader from "~/components/MyHeader";
 import { WithBottomNav } from "~/components/Layout";
-import { globalStyles, myColors } from "~/constants";
 import MyText from "~/components/MyText";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 const Notifications = () => (
   <>

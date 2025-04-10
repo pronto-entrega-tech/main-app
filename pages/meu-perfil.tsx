@@ -1,7 +1,6 @@
 import React, { createRef, useEffect, useState } from "react";
 import MyHeader from "~/components/MyHeader";
 import { KeyboardAvoidingView, TextInput } from "react-native";
-import { myColors, device, globalStyles } from "~/constants";
 import { useToastContext } from "~/contexts/ToastContext";
 import Loading from "~/components/Loading";
 import MyButton from "~/components/MyButton";
@@ -12,6 +11,9 @@ import { useAuthContext } from "~/contexts/AuthContext";
 import FormContainer from "~/components/FormContainer";
 import MyInput from "~/components/MyInput";
 import { api } from "~/services/api";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 const onlyDigits = (s: string) => s.replace(/\D/g, "");
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { View } from "react-native";
-import { globalStyles, myColors } from "~/constants";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 import MyTouchable from "./MyTouchable";
 import MyText from "./MyText";
 import MyIcon from "./MyIcon";

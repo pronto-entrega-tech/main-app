@@ -7,10 +7,8 @@ import Loading from "~/components/Loading";
 import MyDivider from "~/components/MyDivider";
 import MyText from "~/components/MyText";
 import MyTouchable from "~/components/MyTouchable";
-import { myColors, globalStyles, myFonts } from "~/constants";
 import {
   canReview,
-  fail,
   formatDeliveryTime,
   getImageUrl,
   validateOrder,
@@ -23,6 +21,9 @@ import Rating from "~/components/Rating";
 import Errors from "~/components/Errors";
 import { Urls } from "~/constants/urls";
 import { lightFormat } from "date-fns";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const isCompleted = (order: Order) =>
   ["COMPLETING", "COMPLETED"].includes(order.status);
@@ -51,11 +52,8 @@ const OrdersBody = () => {
     socket.on("orders", (newOrder: Partial<Order>) => {
       const getNew = (o: Order) => validateOrder({ ...(o ?? {}), ...newOrder });
 
-      setOrders(
-        (orders) =>
-          orders?.map((o) =>
-            o.order_id === newOrder.order_id ? getNew(o) : o,
-          ),
+      setOrders((orders) =>
+        orders?.map((o) => (o.order_id === newOrder.order_id ? getNew(o) : o)),
       );
     });
 
@@ -78,16 +76,16 @@ const OrdersBody = () => {
     const statusMsg = isCompleted(item)
       ? "Pedido concluído"
       : isCanceled(item)
-      ? "Pedido cancelado"
-      : "Pedido em andamento";
+        ? "Pedido cancelado"
+        : "Pedido em andamento";
 
     const timeMsg = isCompleted(item)
       ? "Concluído em"
       : isCanceled(item)
-      ? "Cancelado em"
-      : item.is_scheduled
-      ? "Agendado para"
-      : "Previsão de entrega";
+        ? "Cancelado em"
+        : item.is_scheduled
+          ? "Agendado para"
+          : "Previsão de entrega";
 
     const time =
       isCompleted(item) || isCanceled(item)

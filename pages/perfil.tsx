@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { ScrollView, View, StyleSheet } from "react-native";
 import MyButton from "~/components/MyButton";
-import { myColors, globalStyles, myFonts } from "~/constants";
 import MyIcon from "~/components/MyIcon";
 import MyDivider from "~/components/MyDivider";
 import { WithBottomNav } from "~/components/Layout";
@@ -12,6 +11,9 @@ import Loading from "~/components/Loading";
 import { useAuthContext } from "~/contexts/AuthContext";
 import { api } from "~/services/api";
 import { PageTitle } from "~/components/PageTitle";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const Profile = () => {
   const [profileName, setProfileName] = useState<string>();

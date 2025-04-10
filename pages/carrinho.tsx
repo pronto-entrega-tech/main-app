@@ -12,7 +12,6 @@ import MyTouchable from "~/components/MyTouchable";
 import MyButton from "~/components/MyButton";
 import ProdList from "~/components/ProdList";
 import ProdListHorizontal from "~/components/ProdListHorizontal";
-import { myColors, device, globalStyles, myFonts } from "~/constants";
 import {
   Address,
   Coords,
@@ -47,9 +46,9 @@ import { useAuthContext } from "~/contexts/AuthContext";
 import { useAddressContext } from "~/contexts/AddressContext";
 import { useOrderContext } from "~/contexts/OrderContext";
 import { ChangeModal } from "~/screens/PaymentOnDelivery";
-import { saveConfirmationToken } from "~/core/dataStorage";
+import { saveConfirmationToken } from "~/services/localStorage";
 import { api } from "~/services/api";
-import { appOrSite } from "~/constants/device";
+import device, { appOrSite } from "~/constants/device";
 import { WithToast } from "~/components/Layout";
 import { range } from "~/functions/range";
 import HeaderContainer from "~/components/HeaderContainer";
@@ -58,6 +57,9 @@ import { minute, hour } from "~/constants/time";
 import { createContext } from "~/contexts/createContext";
 import MyImage from "~/components/MyImage";
 import { PageTitle } from "~/components/PageTitle";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 function useCartScreen() {
   const { accessToken } = useAuthContext();
@@ -340,8 +342,8 @@ function ListHeader() {
                       ? `Troco para ${money.toString(payment.change, "R$")}`
                       : "Sem Troco"
                     : payment.inApp
-                    ? `Pelo ${appOrSite}`
-                    : "Na entrega"}
+                      ? `Pelo ${appOrSite}`
+                      : "Na entrega"}
                 </MyText>
               )}
             </View>
@@ -367,8 +369,8 @@ function ListHeader() {
           {activeSchedule
             ? `${activeSchedule.dayText}, ${activeSchedule.hours}`
             : schedules?.length
-            ? "Escolha um agendamento"
-            : ""}
+              ? "Escolha um agendamento"
+              : ""}
         </MyText>
         {!!schedules?.length && (
           <MyButton

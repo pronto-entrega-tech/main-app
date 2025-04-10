@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Share, StatusBar } from "react-native";
 import IconButton from "~/components/IconButton";
-import { myColors, device } from "~/constants";
+import device from "~/constants/device";
+import myColors from "~/constants/myColors";
 import useRouting from "~/hooks/useRouting";
 import { Urls } from "~/constants/urls";
 import { GoBackButton } from "./MyHeader";

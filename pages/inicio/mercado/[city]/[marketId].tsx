@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Share, StyleSheet, View } from "react-native";
-import { device, myColors, myFonts } from "~/constants";
 import MyTouchable from "~/components/MyTouchable";
 import ProdList from "~/components/ProdList";
 import Loading from "~/components/Loading";
@@ -25,6 +24,9 @@ import MyHeader from "~/components/MyHeader";
 import { useAddressContext } from "~/contexts/AddressContext";
 import { api } from "~/services/api";
 import MyImage from "~/components/MyImage";
+import device from "~/constants/device";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const useIsProductRoute = () => useRouting().screen.startsWith("Product");
 

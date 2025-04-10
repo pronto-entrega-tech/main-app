@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { Image } from "react-native-elements/dist/image/Image";
 import MyHeader from "~/components/MyHeader";
-import { myColors, globalStyles, myFonts, images } from "~/constants";
 import MyText from "~/components/MyText";
 import Errors from "~/components/Errors";
 import Loading from "~/components/Loading";
@@ -14,11 +13,15 @@ import MyTouchable from "~/components/MyTouchable";
 import IconButton from "~/components/IconButton";
 import { formatCardBrand } from "~/functions/converter";
 import { useCartContext } from "~/contexts/CartContext";
-import Portal from "~/core/Portal";
+import Portal from "~/components/Portal";
 import MyInput from "~/components/MyInput";
 import { useAlertContext } from "~/contexts/AlertContext";
 import CenterModal from "~/components/CenterModal";
 import MyIcon from "~/components/MyIcon";
+import globalStyles from "~/constants/globalStyles";
+import images from "~/constants/images";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const Nothing = () => (
   <View

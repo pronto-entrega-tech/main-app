@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleProp, View, ViewStyle } from "react-native";
-import { myColors } from "~/constants";
+import myColors from "~/constants/myColors";
 
 const MyDivider = ({ style }: { style?: StyleProp<ViewStyle> }) => (
   <View

@@ -1,4 +1,4 @@
-import { device } from "~/constants";
+import device from "~/constants/device";
 import { withCache } from "../cache";
 import Utils from "./utils";
 

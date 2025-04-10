@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
 import { useRouter } from "next/router";
-import { MyRouting } from ".";
+import { MyRouting } from "./useRouting";
 import { screenFrom, urlFrom } from "~/functions/converter";
 import { useHasNavigatedContext } from "~/contexts/HasNavigatedContext";
 

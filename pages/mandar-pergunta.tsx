@@ -2,7 +2,6 @@ import React, { useEffect, createRef, useState } from "react";
 import { StyleSheet, View, TextInput } from "react-native";
 import { getDocumentAsync, DocumentPickerAsset } from "expo-document-picker";
 import Loading from "~/components/Loading";
-import { device, globalStyles, myColors, myFonts } from "~/constants";
 import { useAlertContext } from "~/contexts/AlertContext";
 import { useToastContext } from "~/contexts/ToastContext";
 import IconButton from "~/components/IconButton";
@@ -17,6 +16,10 @@ import { useAuthContext } from "~/contexts/AuthContext";
 import FormContainer from "~/components/FormContainer";
 import MyInput from "~/components/MyInput";
 import { api } from "~/services/api";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const emailRegex =
   /[a-zA-Z0-9.!#$%&'*+/=?`{|}~^-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;

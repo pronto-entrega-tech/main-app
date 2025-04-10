@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { SetState } from "./models";
+import { SetState } from "../core/models";
 
 type PortalValues = {
   setGates: SetState<ReactNode>;

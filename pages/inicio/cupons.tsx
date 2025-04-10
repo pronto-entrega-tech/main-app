@@ -3,7 +3,8 @@ import { View } from "react-native";
 import { WithBottomNav } from "~/components/Layout";
 import MyHeader from "~/components/MyHeader";
 import MyText from "~/components/MyText";
-import { globalStyles, myColors } from "~/constants";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 const Cupons = () => (
   <>

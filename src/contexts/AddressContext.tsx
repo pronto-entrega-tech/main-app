@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getActiveAddress, saveActiveAddress } from "~/core/dataStorage";
+import { getActiveAddress, saveActiveAddress } from "~/services/localStorage";
 import { Address } from "~/core/models";
 import { createContext } from "~/contexts/createContext";
 import { api } from "~/services/api";

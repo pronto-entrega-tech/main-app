@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Text, TextInput, TextProps } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { TextInput, TextProps } from "react-native";
 import { StyleProp, TextStyle } from "react-native";
 import Animated, {
   useSharedValue,
@@ -12,7 +12,8 @@ import Animated, {
   useAnimatedReaction,
   Easing,
 } from "react-native-reanimated";
-import { device, myFonts } from "~/constants";
+import device from "~/constants/device";
+import myFonts from "~/constants/myFonts";
 import { Money, money } from "~/functions/money";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);

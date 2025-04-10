@@ -4,8 +4,9 @@ import MyHeader from "~/components/MyHeader";
 import { WithBottomNav } from "~/components/Layout";
 import MyButton from "~/components/MyButton";
 import MyDivider from "~/components/MyDivider";
-import { myColors, myFonts } from "~/constants";
 import MyText from "~/components/MyText";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 type HelpOption = {
   route: string;

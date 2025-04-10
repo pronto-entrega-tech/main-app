@@ -1,6 +1,8 @@
 import React from "react";
 import { ScrollView, ScrollViewProps } from "react-native";
-import { device, globalStyles, myColors } from "~/constants";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 const FormContainer = (props: ScrollViewProps) => (
   <ScrollView

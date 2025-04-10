@@ -10,11 +10,13 @@ import MyDivider from "~/components/MyDivider";
 import MyHeader from "~/components/MyHeader";
 import MyInput from "~/components/MyInput";
 import MyText from "~/components/MyText";
-import { myColors, myFonts, globalStyles } from "~/constants";
 import { useAuthContext } from "~/contexts/AuthContext";
 import { CancelReason, Order, SetState } from "~/core/models";
 import { useAlertContext } from "~/contexts/AlertContext";
 import { api } from "~/services/api";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const OrderCancel = ({
   onGoBack: goBack,

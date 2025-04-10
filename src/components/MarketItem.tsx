@@ -2,13 +2,16 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Image } from "react-native-elements/dist/image/Image";
 import { Coords, Market } from "~/core/models";
-import { myColors, device, globalStyles, myFonts } from "~/constants";
 import { computeDistance, getImageUrl } from "~/functions/converter";
 import { marketOpenness } from "~/functions/marketOpenness";
 import { money } from "~/functions/money";
 import MyText from "./MyText";
 import MyTouchable from "./MyTouchable";
 import Rating from "./Rating";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const MarketItem = (props: { market: Market; coords?: Coords }) => {
   const { market, coords } = props;

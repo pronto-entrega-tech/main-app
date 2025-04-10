@@ -3,7 +3,6 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import Slider from "@react-native-community/slider";
 import MyTouchable from "~/components/MyTouchable";
 import MyButton from "~/components/MyButton";
-import { myColors, device, globalStyles, myFonts } from "~/constants";
 import { categoriesArray } from "./categorias";
 import MyHeader from "~/components/MyHeader";
 import useRouting from "~/hooks/useRouting";
@@ -14,6 +13,10 @@ import MyText from "~/components/MyText";
 import { toArray } from "~/functions/converter";
 import { ItemOrderBy } from "~/core/models";
 import { objectConditional } from "~/functions/conditionals";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const FilterButton = (props: {
   icon: IconNames;

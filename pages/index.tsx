@@ -1,12 +1,18 @@
 import React from "react";
 import { View, StyleSheet, Image } from "react-native";
-import { myColors, globalStyles, images, myFonts } from "~/constants";
 import MyButton from "~/components/MyButton";
 import MyText from "~/components/MyText";
 import useRouting from "~/hooks/useRouting";
-import { saveActiveAddress, saveActiveAddressId } from "~/core/dataStorage";
+import {
+  saveActiveAddress,
+  saveActiveAddressId,
+} from "~/services/localStorage";
 import { Address } from "~/core/models";
 import { useMediaQuery } from "~/hooks/useMediaQuery";
+import globalStyles from "~/constants/globalStyles";
+import images from "~/constants/images";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const saveCity = async (p: { city: string; state: string }) => {
   const address: Address = {

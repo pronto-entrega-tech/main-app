@@ -2,12 +2,13 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import React from "react";
 import { KeyboardAvoidingView, View } from "react-native";
 import MyHeader from "~/components/MyHeader";
-import { device, myColors, myTitle } from "~/constants";
 import { PaymentOnApp } from "@pages/pagamento";
-import Portal from "~/core/Portal";
+import Portal from "~/components/Portal";
 import PaymentOnDelivery from "./PaymentOnDelivery";
-import { appOrSite, notchHeight } from "~/constants/device";
+import device, { appOrSite, notchHeight } from "~/constants/device";
 import useRouting from "~/hooks/useRouting";
+import { myTitle } from "~/constants/appInfo";
+import myColors from "~/constants/myColors";
 
 const Tab = createMaterialTopTabNavigator();
 

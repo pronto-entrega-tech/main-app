@@ -1,6 +1,6 @@
 import React from "react";
 import MyHeader from "~/components/MyHeader";
-import Portal from "~/core/Portal";
+import Portal from "~/components/Portal";
 import { SinglePageTabs } from "~/components/SinglePageTabs";
 import PaymentOnDelivery from "~/screens/PaymentOnDelivery";
 import { PaymentMethodsBody } from "./meios-de-pagamento";

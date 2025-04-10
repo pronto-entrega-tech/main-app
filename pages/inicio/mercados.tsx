@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { FlatList } from "react-native";
-import { myColors } from "~/constants";
 import MarketItem from "~/components/MarketItem";
 import { Coords, Market } from "~/core/models";
 import Loading from "~/components/Loading";
@@ -10,6 +9,7 @@ import { WithBottomNav } from "~/components/Layout";
 import MyHeader from "~/components/MyHeader";
 import { useAddressContext } from "~/contexts/AddressContext";
 import { api } from "~/services/api";
+import myColors from "~/constants/myColors";
 
 const MarketList = () => (
   <>

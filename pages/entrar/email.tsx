@@ -5,7 +5,6 @@ import Loading from "~/components/Loading";
 import MyButton from "~/components/MyButton";
 import MyInput from "~/components/MyInput";
 import MyText from "~/components/MyText";
-import { device, globalStyles, myColors } from "~/constants";
 import { useAuthContext } from "~/contexts/AuthContext";
 import { useAlertContext } from "~/contexts/AlertContext";
 import { range } from "~/functions/range";
@@ -14,6 +13,9 @@ import { api } from "~/services/api";
 import { PageTitle } from "~/components/PageTitle";
 import MyHeader from "~/components/MyHeader";
 import * as Clipboard from "expo-clipboard";
+import device from "~/constants/device";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 export default function EmailSignInScreen() {
   return (

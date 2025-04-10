@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
-import { device } from "~/constants";
+import device from "~/constants/device";
 import { zIndex } from "~/constants/zIndex";
 
 const HeaderContainer = ({

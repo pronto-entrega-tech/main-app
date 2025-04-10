@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleProp, View, ViewStyle } from "react-native";
-import { myColors } from "~/constants";
+import myColors from "~/constants/myColors";
 import { range } from "~/functions/range";
 import MyIcon from "./MyIcon";
 import MyTouchable from "./MyTouchable";

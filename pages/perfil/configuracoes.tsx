@@ -1,6 +1,5 @@
 import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import { myColors, globalStyles, AppInfo, myFonts } from "~/constants";
 import MyButton from "~/components/MyButton";
 import MyDivider from "~/components/MyDivider";
 import MyIcon from "~/components/MyIcon";
@@ -10,6 +9,10 @@ import { WithBottomNav } from "~/components/Layout";
 import { arrayConditional } from "~/functions/conditionals";
 import MyText from "~/components/MyText";
 import { useAuthContext } from "~/contexts/AuthContext";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
+import appInfo from "~/constants/appInfo";
 
 const Config = () => {
   const { replace } = useRouting();
@@ -73,7 +76,7 @@ const Config = () => {
           {optionItems}
         </View>
         <MyText style={styles.versionText}>
-          Versão {AppInfo.version} ({AppInfo.android.versionCode})
+          Versão {appInfo.version} ({appInfo.android.versionCode})
         </MyText>
       </ScrollView>
     </>

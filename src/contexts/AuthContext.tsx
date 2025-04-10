@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { createContext } from "~/contexts/createContext";
-import { fail, getJwtExpiration } from "~/functions/converter";
-import { saveRefreshToken, getRefreshToken } from "~/core/dataStorage";
-import { device } from "~/constants";
+import { getJwtExpiration } from "~/functions/converter";
+import { fail } from "~/functions/fail";
+import { saveRefreshToken, getRefreshToken } from "~/services/localStorage";
+import device from "~/constants/device";
 import { useConnection } from "~/functions/connection";
 import { api } from "~/services/api";
 import { withMutex } from "~/services/mutex";

@@ -1,6 +1,7 @@
 import React, { ComponentProps } from "react";
 import { Switch as NativeSwitch } from "react-native";
-import { device, myColors } from "~/constants";
+import device from "~/constants/device";
+import myColors from "~/constants/myColors";
 
 type Props = ComponentProps<typeof NativeSwitch> & {
   color?: string;

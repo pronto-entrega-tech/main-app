@@ -1,11 +1,12 @@
 import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { WithBottomNav } from "~/components/Layout";
-import { myColors, globalStyles } from "~/constants";
 import MyButton from "~/components/MyButton";
 import MyDivider from "~/components/MyDivider";
 import MyIcon from "~/components/MyIcon";
 import MyHeader from "~/components/MyHeader";
+import globalStyles from "~/constants/globalStyles";
+import myColors from "~/constants/myColors";
 
 export const categoriesArray = [
   "Alimentos básicos",

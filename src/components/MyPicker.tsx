@@ -9,7 +9,9 @@ import {
   Pressable,
   TouchableOpacity,
 } from "react-native";
-import { device, myColors, myFonts } from "~/constants";
+import device from "~/constants/device";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 import MyIcon from "./MyIcon";
 import MyDivider from "./MyDivider";
 import MyText from "./MyText";

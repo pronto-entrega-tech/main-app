@@ -4,8 +4,9 @@ import MyHeader from "~/components/MyHeader";
 import MyDivider from "~/components/MyDivider";
 import MyIcon from "~/components/MyIcon";
 import MyText from "~/components/MyText";
-import { myColors, myFonts } from "~/constants";
-import { fail } from "~/functions/converter";
+import { fail } from "~/functions/fail";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 const currentDevice = (() => {
   switch (Platform.OS) {

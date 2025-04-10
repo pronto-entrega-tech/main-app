@@ -1,7 +1,7 @@
 import React, { ComponentPropsWithoutRef, RefObject } from "react";
 import { TextInput, TextInputProps } from "react-native";
 import Input from "react-native-elements/dist/input/Input"; // react-native-elements don't tree shake
-import { myColors } from "~/constants";
+import myColors from "~/constants/myColors";
 
 type InputArgs = Omit<
   ComponentPropsWithoutRef<typeof Input>,

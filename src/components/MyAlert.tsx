@@ -1,10 +1,11 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { useAlertContext } from "~/contexts/AlertContext";
-import { myColors, myFonts } from "~/constants";
 import CenterModal from "./CenterModal";
 import MyButton from "./MyButton";
 import MyText from "./MyText";
+import myColors from "~/constants/myColors";
+import myFonts from "~/constants/myFonts";
 
 export type AlertState = {
   title: string;
