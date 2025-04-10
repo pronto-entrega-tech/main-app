@@ -3,6 +3,7 @@ const myColors = {
   primaryColor: "#2196F3",
   primaryColorDark: "#1E80F0",
   background: "#FEFEFE",
+  error: "#ff190c",
   rating: "#FDCC0D",
   pending: "#FDEC00",
   green: "#10b500",

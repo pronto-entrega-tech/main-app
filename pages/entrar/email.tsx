@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, AppState } from "react-native";
+import {
+  StyleSheet,
+  View,
+  AppState,
+  ActivityIndicator,
+  TextInput,
+} from "react-native";
 import MyButton from "~/components/MyButton";
 import MyInput from "~/components/MyInput";
 import MyText from "~/components/MyText";
@@ -15,6 +21,8 @@ import globalStyles from "~/constants/globalStyles";
 import myColors from "~/constants/myColors";
 import { match } from "ts-pattern";
 import MyAsyncButton from "~/components/MyAsyncButton";
+import { useAsyncAction } from "~/hooks/useAsyncAction";
+import { MotiView } from "moti";
 
 type Stage =
   | {
@@ -22,7 +30,7 @@ type Stage =
     }
   | {
       type: "code";
-      key: string;
+      codeKey: string;
     }
   | {
       type: "profile";
@@ -40,8 +48,8 @@ export default function EmailSignInScreen() {
 
       {match(stage)
         .with({ type: "email" }, () => <EmailStage setState={setState} />)
-        .with({ type: "code" }, ({ key }) => (
-          <CodeStage setState={setState} key={key} />
+        .with({ type: "code" }, ({ codeKey }) => (
+          <CodeStage setState={setState} codeKey={codeKey} />
         ))
         .with({ type: "profile" }, ({ createToken }) => (
           <ProfileStage createToken={createToken} />
@@ -59,7 +67,7 @@ function EmailStage({ setState }: { setState: setState }) {
 
     setState({
       type: "code",
-      key: res.key,
+      codeKey: res.key,
     });
   };
 
@@ -89,19 +97,26 @@ function EmailStage({ setState }: { setState: setState }) {
   );
 }
 
-function CodeStage({ setState, key }: { setState: setState; key: string }) {
+function CodeStage({
+  setState,
+  codeKey,
+}: {
+  setState: setState;
+  codeKey: string;
+}) {
   const { navigate } = useRouting();
   const { signIn } = useAuthContext();
 
   const [code, setCode] = useState("");
   const [hasCodeError, setCodeError] = useState(false);
 
-  const submit = async (code: string) => {
+  const [submit, loading] = useAsyncAction(async (code: string) => {
+    setCode(code);
     setCodeError(false);
     if (code.length < 5) return;
 
     try {
-      const res = await api.auth.validate(key, code);
+      const res = await api.auth.validate(codeKey, code);
 
       if (res.type === "ACCESS") {
         signIn({
@@ -119,7 +134,7 @@ function CodeStage({ setState, key }: { setState: setState; key: string }) {
       setCode("");
       setCodeError(true);
     }
-  };
+  });
 
   return (
     <View style={[globalStyles.centralizer, { paddingHorizontal: 24 }]}>
@@ -129,28 +144,72 @@ function CodeStage({ setState, key }: { setState: setState; key: string }) {
         Insira o código de verificação
       </MyText>
 
-      <View style={{ marginLeft: 55 }}>
-        <View style={{ position: "absolute", flexDirection: "row", left: -8 }}>
-          {range(1, 5).map((n) => (
-            <View key={n} style={styles.codeBorder} />
+      <View style={{ alignItems: "center", gap: 8 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 8,
+          }}
+        >
+          {range(0, 4).map((n) => (
+            <View key={n} style={styles.codeBorder}>
+              {!code[n] && (n === 0 || code[n - 1]) ? (
+                <Cursor />
+              ) : (
+                <MyText style={{ fontSize: 22 }}>{code[n]}</MyText>
+              )}
+            </View>
           ))}
+
+          <TextInput
+            autoFocus
+            maxLength={5}
+            inputMode="numeric"
+            value={code}
+            onChangeText={submit}
+            readOnly={loading}
+            style={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              opacity: 0,
+            }}
+          />
         </View>
-        <MyInput
-          autoFocus
-          maxLength={5}
-          keyboardType="numeric"
-          inputStyle={styles.codeInput}
-          errorMessage={hasCodeError ? "Código inválido" : ""}
-          value={code}
-          onChangeText={submit}
-          containerStyle={styles.codeInputContainer}
-          inputContainerStyle={{ borderBottomWidth: 0 }}
-          errorStyle={{ fontSize: 14, marginTop: 16 }}
-          cursorColor="transparent"
-        />
+        {hasCodeError && (
+          <MyText style={{ color: myColors.error }}>Código inválido</MyText>
+        )}
+
+        <View style={{ height: 24 }}>
+          {loading && <ActivityIndicator color={myColors.loading} size={24} />}
+        </View>
       </View>
+
       {device.android && <PasteCodeButton onPaste={submit} />}
     </View>
+  );
+}
+
+function Cursor() {
+  return (
+    <MotiView
+      from={{
+        opacity: 1,
+      }}
+      animate={{
+        opacity: 0.2,
+      }}
+      transition={{
+        loop: true,
+        type: "timing",
+        duration: 1000,
+      }}
+      style={{
+        backgroundColor: myColors.text,
+        height: 22,
+        width: 1,
+      }}
+    />
   );
 }
 
@@ -188,7 +247,7 @@ function ProfileStage({ createToken }: { createToken: string }) {
         autoComplete="name"
         containerStyle={{ maxWidth: 400 }}
       />
-      <MyButton
+      <MyAsyncButton
         buttonStyle={styles.continueButton}
         title="Continuar"
         disabled={!name}
@@ -242,17 +301,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     height: 60,
     width: 50,
-    marginLeft: 8,
-  },
-  codeInputContainer: {
-    width: 55 * 6,
-    marginTop: 10,
-    marginLeft: 8,
-  },
-  codeInput: {
-    width: 0,
-    letterSpacing: device.web ? 46 : 46,
-    marginLeft: -23,
-    fontSize: 22,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -25,6 +25,7 @@
     "preset": "jest-expo/universal"
   },
   "dependencies": {
+    "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@nanostores/react": "^0.7.3",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/netinfo": "11.3.1",

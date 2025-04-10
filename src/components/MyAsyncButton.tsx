@@ -1,7 +1,5 @@
-import React, { useState } from "react";
 import MyButton, { MyButtonBaseProps } from "./MyButton";
-import { serverError } from "./Errors";
-import { useAlertContext } from "~/contexts/AlertContext";
+import { useAsyncAction } from "~/hooks/useAsyncAction";
 
 export type MyAsyncButtonBase = MyButtonBaseProps & {
   onPress: () => Promise<void>;
@@ -12,19 +10,7 @@ export type MyAsyncButtonBase = MyButtonBaseProps & {
  *  On promise rejection shows an alert.
  **/
 function MyAsyncButton({ onPress, ...props }: MyAsyncButtonBase) {
-  const { alert } = useAlertContext();
-
-  const [loading, setLoading] = useState(false);
-  const action = async () => {
-    try {
-      setLoading(true);
-      await onPress();
-    } catch {
-      serverError(alert);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [action, loading] = useAsyncAction(onPress);
 
   return <MyButton onPress={action} loading={loading} {...props} />;
 }
