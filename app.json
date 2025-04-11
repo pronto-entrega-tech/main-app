@@ -11,11 +11,6 @@
     "scheme": "prontoentrega",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./src/assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#2196F3"
-    },
     "androidStatusBar": {
       "translucent": true
     },
@@ -79,6 +74,15 @@
             "./src/assets/fonts/Roboto-Bold.ttf",
             "./src/assets/fonts/RobotoCondensed-Regular.ttf"
           ]
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/assets/splash.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#2196F3"
         }
       ]
     ]

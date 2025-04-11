@@ -38,8 +38,8 @@ import useRouting from "~/hooks/useRouting";
 import { StatusBar } from "expo-status-bar";
 import device from "~/constants/device";
 import globalStyles from "~/constants/globalStyles";
-import images from "~/constants/images";
 import myColors from "~/constants/myColors";
+import SplashImage from "~/assets/splash.png";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -104,10 +104,13 @@ const App = () => {
         ]}
       >
         <Image
-          {...images.splash}
+          source={SplashImage}
           alt="splash"
+          style={{
+            width: 180,
+          }}
+          resizeMode="contain"
           fadeDuration={0}
-          style={{ aspectRatio: 0.462, height: "100%" }}
         />
       </View>
     );

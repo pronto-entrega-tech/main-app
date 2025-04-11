@@ -1,20 +1,12 @@
 import React, { useCallback, useState } from "react";
 import { View, Image, StyleSheet } from "react-native";
-import * as WebBrowser from "expo-web-browser";
-import { ResponseType } from "expo-auth-session";
-import * as Google from "expo-auth-session/providers/google";
-/* import * as Facebook from 'expo-auth-session/providers/facebook'; */
 import MyButton from "~/components/MyButton";
 import Loading from "~/components/Loading";
 import BottomModal from "~/components/BottomModal";
 import { useModalState } from "~/hooks/useModalState";
 import MyText from "~/components/MyText";
 import useRouting from "~/hooks/useRouting";
-import { createURL } from "expo-linking";
-import { GoogleClientId } from "~/constants/ids";
 import { useAuthContext } from "~/contexts/AuthContext";
-import { objectConditional } from "~/functions/conditionals";
-import { api } from "~/services/api";
 import { useUpdateAddress } from "~/hooks/useAddress";
 import { useAlertContext } from "~/contexts/AlertContext";
 import { PageTitle } from "~/components/PageTitle";
@@ -24,8 +16,6 @@ import images from "~/constants/images";
 import myColors from "~/constants/myColors";
 import myFonts from "~/constants/myFonts";
 
-WebBrowser.maybeCompleteAuthSession();
-
 const SignIn = () => {
   const routing = useRouting();
   const { alert } = useAlertContext();
@@ -33,15 +23,6 @@ const SignIn = () => {
   const updateAddress = useUpdateAddress();
   const [isLoading, setIsLoading] = useState(false);
   const [modalState, openModal, closeModal] = useModalState();
-  const [, , promptAsync] = Google.useAuthRequest({
-    androidClientId: GoogleClientId.android,
-    iosClientId: GoogleClientId.ios,
-    webClientId: GoogleClientId.web,
-    responseType: ResponseType.IdToken,
-    ...objectConditional(device.web)({
-      redirectUri: createURL("/entrar"),
-    }),
-  });
 
   const authIsWipAlert = useCallback(() => {
     alert("Esse demo não tem log-in", "Entre como convidado");

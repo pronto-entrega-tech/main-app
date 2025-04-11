@@ -1,5 +1,4 @@
 import account from "@public/icons/account.png";
-import splash from "@public/splash.png";
 import logo from "@public/logo.webp";
 import tomato from "@public/icons/tomato.webp";
 import broccoli from "@public/icons/broccoli.webp";
@@ -19,7 +18,6 @@ import device from "./device";
 
 const rawImages = {
   account,
-  splash,
   logo,
   tomato,
   broccoli,
